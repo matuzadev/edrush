@@ -45,3 +45,5 @@ dist/
 *.js
 *.mjs
 supabase/
+next-env.d.ts
+next.config.ts
