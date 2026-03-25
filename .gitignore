@@ -47,3 +47,5 @@ dist/
 supabase/
 next-env.d.ts
 next.config.ts
+middleware.ts
+tailwind.config.ts
