@@ -62,6 +62,7 @@ export default function Hero() {
 
             <p className="hero-sub mx-auto max-w-2xl mb-10 text-slate-400">
               A plataforma que combina <strong className="text-white">Active Recall científico</strong> e <strong className="text-white">analytics em tempo real</strong> para maximizar seu desempenho.
+              Sistema de 
             </p>
 
             <div className="flex flex-row justify-center items-center gap-4 md:gap-6 mt-8">
