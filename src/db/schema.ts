@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, boolean, real, primaryKey, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, primaryKey, index } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
 // Tabela de UF (Estados) e Cidades
@@ -116,8 +116,8 @@ export const concurso_candidato = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     user_id: text('user_id').notNull().references(() => users.id),
     concurso_id: integer('concurso_id').notNull().references(() => concursos.id),
-    is_favorito: boolean('is_favorito').default(false),
-    estudando: boolean('estudando').default(false),
+    is_favorito: integer('is_favorito').default(0), // 0 = false, 1 = true
+    estudando: integer('estudando').default(0), // 0 = false, 1 = true
     data_inscricao: text('data_inscricao'),
     numero_inscricao: text('numero_inscricao'),
     status_candidatura: text('status_candidatura'), // nao_inscrito, inscrito, aprovado, reprovado
@@ -127,6 +127,54 @@ export const concurso_candidato = sqliteTable(
   (table) => [
     index('idx_concurso_candidato_user').on(table.user_id),
     index('idx_concurso_candidato_concurso').on(table.concurso_id),
+  ]
+);
+
+// Tabela de Questões
+export const questions = sqliteTable(
+  'questions',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    titulo: text('titulo').notNull(),
+    disciplina: text('disciplina').notNull(), // Direito Penal, Redes, etc
+    capitulo: text('capitulo').notNull(), // Capítulo dentro da disciplina
+    tipo: text('tipo').notNull(), // 'multipla_escolha', 'verdadeiro_falso'
+    enunciado: text('enunciado').notNull(),
+    explicacao: text('explicacao'), // Detalhes da resposta correta
+    dica: text('dica'), // Dica para ajudar
+    opcoes: text('opcoes'), // JSON array para múltipla escolha
+    resposta_correta: text('resposta_correta').notNull(), // A, B, C, D, E ou "Verdadeiro"/"Falso"
+    dificuldade: text('dificuldade').default('médio'), // fácil, médio, difícil
+    fonte: text('fonte'), // CESPE, FCC, FGV, etc
+    concurso_id: integer('concurso_id').references(() => concursos.id),
+    ano: integer('ano'), // Ano da prova
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+    atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_questions_disciplina').on(table.disciplina),
+    index('idx_questions_capitulo').on(table.capitulo),
+    index('idx_questions_concurso_id').on(table.concurso_id),
+    index('idx_questions_dificuldade').on(table.dificuldade),
+  ]
+);
+
+// Tabela de Respostas do Usuário (para rastreamento)
+export const user_responses = sqliteTable(
+  'user_responses',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    question_id: integer('question_id').notNull().references(() => questions.id),
+    resposta_dada: text('resposta_dada').notNull(),
+    acertou: integer('acertou').notNull(), // 0 = errado, 1 = correto
+    tempo_resposta_ms: integer('tempo_resposta_ms'), // Em milissegundos
+    respondida_em: text('respondida_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_user_responses_user_id').on(table.user_id),
+    index('idx_user_responses_question_id').on(table.question_id),
+    index('idx_user_responses_respondida_em').on(table.respondida_em),
   ]
 );
 
@@ -186,5 +234,24 @@ export const concurso_candidatoRelations = relations(concurso_candidato, ({ one 
   concurso: one(concursos, {
     fields: [concurso_candidato.concurso_id],
     references: [concursos.id],
+  }),
+}));
+
+export const questionsRelations = relations(questions, ({ one, many }) => ({
+  concurso: one(concursos, {
+    fields: [questions.concurso_id],
+    references: [concursos.id],
+  }),
+  user_responses: many(user_responses),
+}));
+
+export const user_responsesRelations = relations(user_responses, ({ one }) => ({
+  user: one(users, {
+    fields: [user_responses.user_id],
+    references: [users.id],
+  }),
+  question: one(questions, {
+    fields: [user_responses.question_id],
+    references: [questions.id],
   }),
 }));

@@ -5,6 +5,7 @@ import { db, initializeDatabase } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
 // Inicializar banco ao carregar
 initializeDatabase();
@@ -37,9 +38,13 @@ const config = {
             throw new Error('Usuário não encontrado');
           }
 
-          // Verificar senha (implementar hash bcrypt em produção)
-          // Por enquanto, usando comparação simples
-          if (result.senha_hash !== hashPassword(credentials.password as string)) {
+          // Verificar senha com bcrypt
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password as string,
+            result.senha_hash || ''
+          );
+
+          if (!isPasswordValid) {
             throw new Error('Senha incorreta');
           }
 
@@ -116,7 +121,13 @@ const config = {
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);
 
-// Função auxiliar para hash de senha (implementar bcrypt em produção)
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
+// Função para hash de senha com bcrypt
+export async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+}
+
+// Função para verificar senha com bcrypt
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
 }
