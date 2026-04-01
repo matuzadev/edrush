@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { Client } from 'pg';
 
 export async function POST() {
   try {
-    const dbUrl = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL;
-    if (!dbUrl) {
-      return NextResponse.json({ error: 'SUPABASE_DB_URL or DATABASE_URL is not set on the server.' }, { status: 500 });
+    // Este endpoint é para manutenção e não é mais necessário com SQLite
+    // A tabela de questões é criada automaticamente via db.ts
+    return NextResponse.json({
+      message: 'A tabela de questões é criada automaticamente.',
+      status: 'ok'
+    });
+  } catch (error) {
+    console.error('Erro:', error);
+    return NextResponse.json(
+      { error: 'Erro ao criar tabela' },
+      { status: 500 }
+    );
+  }
+}
     }
 
     const sqlPath = path.join(process.cwd(), 'supabase', 'create_questions_table.sql');

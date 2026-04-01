@@ -140,6 +140,47 @@ export function initializeDatabase() {
 
         CREATE INDEX IF NOT EXISTS idx_concurso_candidato_user ON concurso_candidato(user_id);
         CREATE INDEX IF NOT EXISTS idx_concurso_candidato_concurso ON concurso_candidato(concurso_id);
+
+        CREATE TABLE IF NOT EXISTS questions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          titulo TEXT NOT NULL,
+          disciplina TEXT NOT NULL,
+          capitulo TEXT NOT NULL,
+          tipo TEXT NOT NULL,
+          enunciado TEXT NOT NULL,
+          explicacao TEXT,
+          dica TEXT,
+          opcoes TEXT,
+          resposta_correta TEXT NOT NULL,
+          dificuldade TEXT DEFAULT 'médio',
+          fonte TEXT,
+          concurso_id INTEGER,
+          ano INTEGER,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (concurso_id) REFERENCES concursos(id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_questions_disciplina ON questions(disciplina);
+        CREATE INDEX IF NOT EXISTS idx_questions_capitulo ON questions(capitulo);
+        CREATE INDEX IF NOT EXISTS idx_questions_concurso_id ON questions(concurso_id);
+        CREATE INDEX IF NOT EXISTS idx_questions_dificuldade ON questions(dificuldade);
+
+        CREATE TABLE IF NOT EXISTS user_responses (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          question_id INTEGER NOT NULL,
+          resposta_dada TEXT NOT NULL,
+          acertou INTEGER NOT NULL,
+          tempo_resposta_ms INTEGER,
+          respondida_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (question_id) REFERENCES questions(id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_user_responses_user_id ON user_responses(user_id);
+        CREATE INDEX IF NOT EXISTS idx_user_responses_question_id ON user_responses(question_id);
+        CREATE INDEX IF NOT EXISTS idx_user_responses_respondida_em ON user_responses(respondida_em);
       `);
 
       console.log('✅ Tabelas criadas com sucesso!');
