@@ -65,12 +65,12 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-row justify-center items-center gap-4 md:gap-6 mt-8">
-              <Link href="auth/login" className="btn btn-primary pulse !text-lg !py-3 !px-8 !rounded-full shrink-0 no-underline">
+              <Link href="/auth/login" className="btn btn-primary pulse !text-lg !py-3 !px-8 !rounded-full shrink-0 no-underline">
                 Começar Agora
               </Link>
-              <a href="#beneficios" className="btn btn-secondary !text-lg !py-3 !px-8 !rounded-full shrink-0 no-underline">
+              <Link href="/#beneficios" className="btn btn-secondary !text-lg !py-3 !px-8 !rounded-full shrink-0 no-underline">
                 Ver Benefícios
-              </a>
+              </Link>
             </div>
           </div>
         </div>
