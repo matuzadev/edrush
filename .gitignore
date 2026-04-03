@@ -22,7 +22,6 @@ dist/
 *.swo
 *.swn
 *.md
-*.json
 *.yml
 *.yaml
 *.csv
@@ -41,7 +40,6 @@ dist/
 *.sqlite
 *.db3
 *.sqlite3
-*.jsonl
 *.js
 *.mjs
 supabase/
