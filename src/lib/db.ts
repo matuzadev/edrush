@@ -13,6 +13,25 @@ sqlite.pragma('foreign_keys = ON');
 
 export const db = drizzle(sqlite, { schema });
 
+// Adicionar colunas de onboarding em bancos já existentes
+function runMigrations() {
+  const columns = sqlite.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+  const names = columns.map((c) => c.name);
+
+  if (!names.includes('onboarding_completed')) {
+    sqlite.exec('ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0');
+  }
+  if (!names.includes('selected_concurso_id')) {
+    sqlite.exec('ALTER TABLE users ADD COLUMN selected_concurso_id INTEGER');
+  }
+  if (!names.includes('selected_concurso_slug')) {
+    sqlite.exec('ALTER TABLE users ADD COLUMN selected_concurso_slug TEXT');
+  }
+  if (!names.includes('selected_areas')) {
+    sqlite.exec('ALTER TABLE users ADD COLUMN selected_areas TEXT');
+  }
+}
+
 // Criar tabelas se não existirem
 export function initializeDatabase() {
   try {
@@ -188,6 +207,9 @@ export function initializeDatabase() {
       // Inserir dados de UFs e Cidades (dados brasileiros)
       seedUFsAndCidades(sqlite);
     }
+
+    // Rodar migrações para bancos já existentes (adiciona colunas novas)
+    runMigrations();
   } catch (error) {
     console.error('❌ Erro ao inicializar banco de dados:', error);
     throw error;

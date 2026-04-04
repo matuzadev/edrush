@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { concursos } from '@/db/schema';
-import { eq, and, gte, lte, like } from 'drizzle-orm';
+import { eq, and, like, SQL } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,15 +11,8 @@ export async function GET(request: NextRequest) {
     const cidadeId = searchParams.get('cidadeId');
     const titulo = searchParams.get('titulo');
 
-    let query = db.query.concursos.findMany({
-      with: {
-        uf: true,
-        cidade: true,
-      },
-    });
-
     // Aplicar filtros
-    const whereConditions = [];
+    const whereConditions: SQL[] = [];
     if (status) whereConditions.push(eq(concursos.status, status));
     if (ufId) whereConditions.push(eq(concursos.uf_id, parseInt(ufId)));
     if (cidadeId) whereConditions.push(eq(concursos.cidade_id, parseInt(cidadeId)));

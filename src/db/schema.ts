@@ -43,6 +43,11 @@ export const users = sqliteTable(
     subscription_expires_at: text('subscription_expires_at'),
     stripe_customer_id: text('stripe_customer_id'),
     pagbank_customer_id: text('pagbank_customer_id'),
+    // Onboarding
+    onboarding_completed: integer('onboarding_completed').default(0), // 0 = false, 1 = true
+    selected_concurso_id: integer('selected_concurso_id'),
+    selected_concurso_slug: text('selected_concurso_slug'),
+    selected_areas: text('selected_areas'), // JSON array of disciplina strings
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
