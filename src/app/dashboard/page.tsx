@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { useQuestions } from '@/hooks/useQuestions';
-import { LogOut, CheckCircle, Lock, PlayCircle, Menu, X, Star, User } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { LogOut, CheckCircle, Lock, PlayCircle, Star, User } from 'lucide-react';
 
 // Exemplo de estrutura de dados para as trilhas
 import subjectsData from '@/data/subjects.json';
@@ -21,22 +20,34 @@ const COURSES = Object.keys(subjectsData).reduce((acc, slug) => {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, signOut, isLoading } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
   const [activeSubject, setActiveSubject] = useState('portugues');
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (status === 'unauthenticated') {
       router.push('/auth/login');
+      return;
     }
-  }, [user, isLoading, router]);
+    if (status === 'authenticated') {
+      const user = session?.user as any;
+      // Redirecionar para dashboard personalizado se onboarding completo
+      if (user?.onboardingCompleted && user?.concursoSlug) {
+        router.replace(`/dashboard/${user.concursoSlug}`);
+        return;
+      }
+      // Sem onboarding → middleware já redireciona, mas como fallback:
+      if (!user?.onboardingCompleted) {
+        router.replace('/onboarding/select-concurso');
+      }
+    }
+  }, [status, session, router]);
 
   const handleLogout = async () => {
-    await signOut();
-    router.push('/');
+    const { signOut } = await import('next-auth/react');
+    await signOut({ callbackUrl: '/auth/login' });
   };
 
-  if (isLoading || !user) return null;
+  if (status === 'loading' || status === 'authenticated') return null;
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
