@@ -87,6 +87,7 @@ export const concursos = sqliteTable(
     criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
     atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
     fonte_scrape: text('fonte_scrape'), // gov.br, PC, IADES, etc
+    logo_url: text('logo_url'), // URL da logo do órgão (ex: /logos/orgaos/pf.png)
   },
   (table) => [
     index('idx_concursos_status').on(table.status),

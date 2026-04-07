@@ -1,0 +1,390 @@
+{
+  "portugues": {
+    "title": "Português",
+    "chapters": [
+      { "id": 1, "title": "Ortografia e Acentuação" },
+      { "id": 2, "title": "Morfologia: Classes de Palavras" }
+    ]
+  },
+  "redes-de-computadores": {
+    "title": "Redes de Computadores",
+    "chapters": [
+      { "id": 1, "title": "Modelo OSI e TCP/IP" },
+      { "id": 2, "title": "Protocolos de Camada de Aplicação" }
+    ]
+  },
+
+  "lingua-portuguesa": {
+    "title": "Língua Portuguesa",
+    "chapters": [
+      { "id": 1,  "title": "Interpretação de textos" },
+      { "id": 2,  "title": "Tipos e gêneros textuais" },
+      { "id": 3,  "title": "Ortografia oficial" },
+      { "id": 4,  "title": "Coesão e coerência" },
+      { "id": 5,  "title": "Tempos e modos verbais" },
+      { "id": 6,  "title": "Morfossintaxe" },
+      { "id": 7,  "title": "Classes de palavras" },
+      { "id": 8,  "title": "Coordenação e subordinação" },
+      { "id": 9,  "title": "Pontuação" },
+      { "id": 10, "title": "Concordância verbal e nominal" },
+      { "id": 11, "title": "Regência verbal e nominal" },
+      { "id": 12, "title": "Crase" },
+      { "id": 13, "title": "Colocação pronominal" },
+      { "id": 14, "title": "Reescrita de frases e textos" },
+      { "id": 15, "title": "Significação de palavras" },
+      { "id": 16, "title": "Correspondência oficial" }
+    ]
+  },
+
+  "informatica-basica": {
+    "title": "Informática Básica",
+    "chapters": [
+      { "id": 1, "title": "Sistemas operacionais: Windows, Android, iOS" },
+      { "id": 2, "title": "Navegadores" },
+      { "id": 3, "title": "Webmail" },
+      { "id": 4, "title": "Microsoft Office 365" },
+      { "id": 5, "title": "Malware: vírus, worm, trojan, ransomware, spyware, backdoor, zero-day, keylogger" },
+      { "id": 6, "title": "Phishing, baiting, engenharia social" },
+      { "id": 7, "title": "MFA (autenticação multifator)" },
+      { "id": 8, "title": "Assinatura e certificação digital" }
+    ]
+  },
+
+  "direito-penal": {
+    "title": "Direito Penal e Processual Penal",
+    "chapters": [
+      { "id": 1,  "title": "Princípios Básicos" },
+      { "id": 2,  "title": "Lei penal no tempo e no espaço" },
+      { "id": 3,  "title": "Fato típico, ilicitude e culpabilidade" },
+      { "id": 4,  "title": "Crimes contra a Pessoa" },
+      { "id": 5,  "title": "Crimes contra o Patrimônio" },
+      { "id": 6,  "title": "Crimes contra a Fé Pública e Administração Pública" },
+      { "id": 7,  "title": "Inquérito policial" },
+      { "id": 8,  "title": "Prova pericial" },
+      { "id": 9,  "title": "Cadeia de custódia" },
+      { "id": 10, "title": "Exame de corpo de delito" },
+      { "id": 11, "title": "Busca e apreensão" },
+      { "id": 12, "title": "Prisão em flagrante" }
+    ]
+  },
+
+  "criminalistica": {
+    "title": "Criminalística",
+    "chapters": [
+      { "id": 1, "title": "Conceitos Básicos de Criminalística" },
+      { "id": 2, "title": "Ciências forenses, criminalística e perícia" },
+      { "id": 3, "title": "Vestígio, evidência e indício" },
+      { "id": 4, "title": "Princípio de Locard" },
+      { "id": 5, "title": "Classificação dos vestígios" }
+    ]
+  },
+
+  "fundamentos-computacao": {
+    "title": "Fundamentos da Computação",
+    "chapters": [
+      { "id": 1, "title": "Arquitetura e organização de computadores" },
+      { "id": 2, "title": "Sistemas Operacionais: Kernel, Gerência de memória, Gerência de arquivos" },
+      { "id": 3, "title": "Processadores: Multicore, Multiprocessamento, Hyper-Threading, GPUs e CUDA" },
+      { "id": 4, "title": "Sistemas distribuídos" },
+      { "id": 5, "title": "Virtualização: Emuladores, Máquinas virtuais, Contêineres" },
+      { "id": 6, "title": "RAID (todos os níveis)" },
+      { "id": 7, "title": "Sistemas de arquivos: NTFS, FAT32, exFAT, EXT3/EXT4, XFS" },
+      { "id": 8, "title": "Computação quântica (conceitos)" }
+    ]
+  },
+
+  "bancos-de-dados": {
+    "title": "Bancos de Dados",
+    "chapters": [
+      { "id": 1, "title": "Arquitetura de bancos de dados" },
+      { "id": 2, "title": "Modelos lógicos e físicos" },
+      { "id": 3, "title": "Bancos multidimensionais" },
+      { "id": 4, "title": "SGBDs relacionais" },
+      { "id": 5, "title": "SQLite" },
+      { "id": 6, "title": "SQL" },
+      { "id": 7, "title": "Transações" },
+      { "id": 8, "title": "Logs de banco de dados" },
+      { "id": 9, "title": "NoSQL" }
+    ]
+  },
+
+  "engenharia-reversa-malware": {
+    "title": "Engenharia Reversa e Malware",
+    "chapters": [
+      { "id": 1, "title": "Descompilação" },
+      { "id": 2, "title": "Debuggers" },
+      { "id": 3, "title": "Análise de malware: vírus, worms, backdoors, keyloggers" },
+      { "id": 4, "title": "Ofuscação de código" },
+      { "id": 5, "title": "Compactadores de executáveis" },
+      { "id": 6, "title": "Malware polimórfico" },
+      { "id": 7, "title": "Sandboxing" },
+      { "id": 8, "title": "Assembly" }
+    ]
+  },
+
+  "linguagens-programacao": {
+    "title": "Linguagens de Programação",
+    "chapters": [
+      { "id": 1, "title": "Programação orientada a objetos" },
+      { "id": 2, "title": "Programação procedural" },
+      { "id": 3, "title": "Estruturas de controle" },
+      { "id": 4, "title": "Compiladores, montadores, interpretadores" },
+      { "id": 5, "title": "Linguagem C" },
+      { "id": 6, "title": "Linguagem Java" },
+      { "id": 7, "title": "JavaScript e Python" },
+      { "id": 8, "title": "Desenvolvimento Web: HTML, XML, JSON, APIs REST e GraphQL" },
+      { "id": 9, "title": "Análise estática de código (SonarQube)" }
+    ]
+  },
+
+  "estrutura-dados-algoritmos": {
+    "title": "Estrutura de Dados e Algoritmos",
+    "chapters": [
+      { "id": 1, "title": "Listas" },
+      { "id": 2, "title": "Pilhas" },
+      { "id": 3, "title": "Filas" },
+      { "id": 4, "title": "Árvores" },
+      { "id": 5, "title": "Busca" },
+      { "id": 6, "title": "Ordenação" },
+      { "id": 7, "title": "Complexidade (Big-O)" }
+    ]
+  },
+
+  "prova-discursiva": {
+    "title": "Prova Discursiva",
+    "chapters": [
+      { "id": 1, "title": "Texto dissertativo" },
+      { "id": 2, "title": "Temas técnicos de informática forense" },
+      { "id": 3, "title": "Linguagem técnica clara e objetiva" },
+      { "id": 4, "title": "Laudo pericial" }
+    ]
+  },
+
+  "compreensao-textos": {
+    "title": "Compreensão e Interpretação de Textos",
+    "chapters": [
+      { "id": 1, "title": "Textos informativos, narrativos e argumentativos" },
+      { "id": 2, "title": "Ideia principal e secundária" },
+      { "id": 3, "title": "Inferências" },
+      { "id": 4, "title": "Sentido explícito e implícito" },
+      { "id": 5, "title": "Coesão e coerência textual" }
+    ]
+  },
+
+  "gramatica-texto": {
+    "title": "Gramática Aplicada ao Texto",
+    "chapters": [
+      { "id": 1, "title": "Classes de palavras" },
+      { "id": 2, "title": "Emprego de tempos e modos verbais" },
+      { "id": 3, "title": "Voz ativa e passiva" },
+      { "id": 4, "title": "Concordância Verbal" },
+      { "id": 5, "title": "Concordância Nominal" },
+      { "id": 6, "title": "Regência verbal e nominal" },
+      { "id": 7, "title": "Crase" },
+      { "id": 8, "title": "Pontuação" }
+    ]
+  },
+
+  "semantica": {
+    "title": "Semântica",
+    "chapters": [
+      { "id": 1, "title": "Significação das palavras" },
+      { "id": 2, "title": "Sinônimos e antônimos" },
+      { "id": 3, "title": "Denotação e conotação" },
+      { "id": 4, "title": "Ambiguidade" }
+    ]
+  },
+
+  "reescrita-textual": {
+    "title": "Reescrita e Equivalência Textual",
+    "chapters": [
+      { "id": 1, "title": "Substituição de palavras e expressões" },
+      { "id": 2, "title": "Reorganização de frases" },
+      { "id": 3, "title": "Manutenção do sentido original" }
+    ]
+  },
+
+  "historia-colonia": {
+    "title": "Brasil Colônia",
+    "chapters": [
+      { "id": 1, "title": "Descobrimento" },
+      { "id": 2, "title": "Capitanias hereditárias" },
+      { "id": 3, "title": "Governo-geral" },
+      { "id": 4, "title": "Economia colonial" },
+      { "id": 5, "title": "Escravidão" },
+      { "id": 6, "title": "Invasões estrangeiras" }
+    ]
+  },
+
+  "historia-imperio": {
+    "title": "Brasil Império",
+    "chapters": [
+      { "id": 1, "title": "Independência do Brasil" },
+      { "id": 2, "title": "Primeiro Reinado" },
+      { "id": 3, "title": "Período Regencial" },
+      { "id": 4, "title": "Segundo Reinado" },
+      { "id": 5, "title": "Abolição da escravidão" },
+      { "id": 6, "title": "Proclamação da República" }
+    ]
+  },
+
+  "historia-republica": {
+    "title": "Brasil República",
+    "chapters": [
+      { "id": 1, "title": "República Velha" },
+      { "id": 2, "title": "Era Vargas" },
+      { "id": 3, "title": "Regime Militar" },
+      { "id": 4, "title": "Redemocratização" },
+      { "id": 5, "title": "Constituição de 1988" }
+    ]
+  },
+
+  "historia-temas": {
+    "title": "Temas Recorrentes de História",
+    "chapters": [
+      { "id": 1, "title": "Formação do Estado brasileiro" },
+      { "id": 2, "title": "Movimentos sociais" },
+      { "id": 3, "title": "Questão agrária" },
+      { "id": 4, "title": "Industrialização" },
+      { "id": 5, "title": "Urbanização" }
+    ]
+  },
+
+  "geografia-fisica": {
+    "title": "Geografia Física",
+    "chapters": [
+      { "id": 1, "title": "Relevo brasileiro" },
+      { "id": 2, "title": "Climas do Brasil" },
+      { "id": 3, "title": "Biomas: Amazônia, Cerrado, Caatinga" },
+      { "id": 4, "title": "Biomas: Mata Atlântica, Pampas, Pantanal" },
+      { "id": 5, "title": "Hidrografia brasileira" }
+    ]
+  },
+
+  "geografia-humana": {
+    "title": "Geografia Humana",
+    "chapters": [
+      { "id": 1, "title": "População brasileira" },
+      { "id": 2, "title": "Migrações internas" },
+      { "id": 3, "title": "Urbanização" },
+      { "id": 4, "title": "Industrialização" },
+      { "id": 5, "title": "Regiões metropolitanas" }
+    ]
+  },
+
+  "geografia-economica": {
+    "title": "Geografia Econômica",
+    "chapters": [
+      { "id": 1, "title": "Agricultura" },
+      { "id": 2, "title": "Pecuária" },
+      { "id": 3, "title": "Extrativismo" },
+      { "id": 4, "title": "Indústria" },
+      { "id": 5, "title": "Matriz energética" },
+      { "id": 6, "title": "Transportes" }
+    ]
+  },
+
+  "organizacao-territorio": {
+    "title": "Organização do Território",
+    "chapters": [
+      { "id": 1, "title": "Regiões do IBGE" },
+      { "id": 2, "title": "Fronteiras" },
+      { "id": 3, "title": "Integração nacional" }
+    ]
+  },
+
+  "fundamentos-informatica": {
+    "title": "Fundamentos de Informática",
+    "chapters": [
+      { "id": 1, "title": "Conceitos de internet e intranet" },
+      { "id": 2, "title": "Tecnologias, ferramentas e aplicações da internet" },
+      { "id": 3, "title": "Navegadores, e-mail, redes sociais, busca e pesquisa" },
+      { "id": 4, "title": "Sistemas Operacionais: Windows e Linux" },
+      { "id": 5, "title": "Acesso remoto" },
+      { "id": 6, "title": "Transferência de arquivos" },
+      { "id": 7, "title": "Aplicações multimídia" }
+    ]
+  },
+
+  "escritorio-produtividade": {
+    "title": "Escritório e Produtividade",
+    "chapters": [
+      { "id": 1, "title": "Microsoft Office: Word, Excel, PowerPoint" },
+      { "id": 2, "title": "LibreOffice: Writer, Calc, Impress" }
+    ]
+  },
+
+  "seguranca-informacao": {
+    "title": "Segurança da Informação",
+    "chapters": [
+      { "id": 1, "title": "Conceitos de segurança da informação" },
+      { "id": 2, "title": "Malware: vírus, worms, pragas virtuais" },
+      { "id": 3, "title": "Ferramentas de segurança: antivírus, firewall, anti-spyware" }
+    ]
+  },
+
+  "computacao-nuvem": {
+    "title": "Computação em Nuvem",
+    "chapters": [
+      { "id": 1, "title": "Conceito de Cloud Computing" },
+      { "id": 2, "title": "Características da computação em nuvem" },
+      { "id": 3, "title": "Vantagens e aplicações" }
+    ]
+  },
+
+  "teoria-sistemas": {
+    "title": "Teoria Geral de Sistemas",
+    "chapters": [
+      { "id": 1, "title": "Conceitos fundamentais" },
+      { "id": 2, "title": "Sistemas abertos e fechados" },
+      { "id": 3, "title": "Integração de sistemas" }
+    ]
+  },
+
+  "camadas-aplicacao": {
+    "title": "Camadas de Aplicação",
+    "chapters": [
+      { "id": 1, "title": "Frontend" },
+      { "id": 2, "title": "Backend" },
+      { "id": 3, "title": "Processos" },
+      { "id": 4, "title": "Aplicações distribuídas" }
+    ]
+  },
+
+  "sistemas-informacao": {
+    "title": "Sistemas de Informação",
+    "chapters": [
+      { "id": 1, "title": "Ciclo de vida de sistemas" },
+      { "id": 2, "title": "Levantamento de requisitos e análise" },
+      { "id": 3, "title": "Especificação e desenvolvimento" },
+      { "id": 4, "title": "Testes, homologação, produção e suporte" }
+    ]
+  },
+
+  "teoria-informacao": {
+    "title": "Teoria da Informação",
+    "chapters": [
+      { "id": 1, "title": "Dados, Informação, Conhecimento" },
+      { "id": 2, "title": "Representação de dados" },
+      { "id": 3, "title": "Segurança da informação" },
+      { "id": 4, "title": "Inteligência da informação" }
+    ]
+  },
+
+  "banco-de-dados": {
+    "title": "Banco de Dados",
+    "chapters": [
+      { "id": 1,  "title": "Conceitos básicos de banco de dados" },
+      { "id": 2,  "title": "Base de dados" },
+      { "id": 3,  "title": "Documentação" },
+      { "id": 4,  "title": "Prototipação" },
+      { "id": 5,  "title": "Modelagem conceitual" },
+      { "id": 6,  "title": "Modelo Entidade-Relacionamento (MER)" },
+      { "id": 7,  "title": "Administração de dados" },
+      { "id": 8,  "title": "Dados estruturados e não estruturados" },
+      { "id": 9,  "title": "Bancos relacionais" },
+      { "id": 10, "title": "Chaves primária e estrangeira" },
+      { "id": 11, "title": "Relacionamentos" }
+    ]
+  }
+}
