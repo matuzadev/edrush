@@ -1,0 +1,16 @@
+{
+  "portugues": {
+    "title": "Português",
+    "chapters": [
+      { "id": 1, "title": "Ortografia e Acentuação" },
+      { "id": 2, "title": "Morfologia: Classes de Palavras" }
+    ]
+  },
+  "redes-de-computadores": {
+    "title": "Redes de Computadores",
+    "chapters": [
+      { "id": 1, "title": "Modelo OSI e TCP/IP" },
+      { "id": 2, "title": "Protocolos de Camada de Aplicação" }
+    ]
+  }
+}

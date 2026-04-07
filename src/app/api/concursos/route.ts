@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
       remuneracao_inicial: body.remuneracao_inicial,
       nivel_escolaridade: body.nivel_escolaridade,
       fonte_scrape: body.fonte_scrape,
+      logo_url: body.logo_url ?? null,
       criado_em: new Date().toISOString(),
       atualizado_em: new Date().toISOString(),
     });

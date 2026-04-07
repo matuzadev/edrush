@@ -30,6 +30,34 @@ function runMigrations() {
   if (!names.includes('selected_areas')) {
     sqlite.exec('ALTER TABLE users ADD COLUMN selected_areas TEXT');
   }
+
+  // Migração: colunas faltantes em concursos
+  const concursosCols = sqlite.prepare("PRAGMA table_info(concursos)").all() as { name: string }[];
+  const cc = new Set(concursosCols.map((c) => c.name));
+  const concursosMigrations: [string, string][] = [
+    ['orgao',                      "TEXT NOT NULL DEFAULT ''"],
+    ['descricao',                  'TEXT'],
+    ['vagas_total',                'INTEGER'],
+    ['vagas_por_funcao',           'TEXT'],
+    ['data_publicacao_edital',     'TEXT'],
+    ['data_abertura_inscricoes',   'TEXT'],
+    ['data_fechamento_inscricoes', 'TEXT'],
+    ['data_prova_objetiva',        'TEXT'],
+    ['data_prova_discursiva',      'TEXT'],
+    ['data_resultado_final',       'TEXT'],
+    ['url_edital',                 'TEXT'],
+    ['url_site_oficial',           'TEXT'],
+    ['banca',                      'TEXT'],
+    ['remuneracao_inicial',        'REAL'],
+    ['nivel_escolaridade',         'TEXT'],
+    ['fonte_scrape',               'TEXT'],
+    ['logo_url',                   'TEXT'],
+  ];
+  for (const [col, def] of concursosMigrations) {
+    if (!cc.has(col)) {
+      sqlite.exec(`ALTER TABLE concursos ADD COLUMN ${col} ${def}`);
+    }
+  }
 }
 
 // Criar tabelas se não existirem

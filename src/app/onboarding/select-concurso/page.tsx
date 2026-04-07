@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Search, Building2, Users, FileText, ChevronRight, Loader2, BookOpen } from 'lucide-react';
+import { Search, Building2, Users, FileText, ChevronRight, BookOpen } from 'lucide-react';
+import { getOrgaoConfig } from '@/lib/orgao-config';
 
 interface Concurso {
   id: number;
@@ -13,6 +14,36 @@ interface Concurso {
   vagas_total: number | null;
   descricao: string | null;
   status: string;
+  logo_url: string | null;
+}
+
+function OrgaoLogo({ concurso }: { concurso: Concurso }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (concurso.logo_url && !imgError) {
+    return (
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl overflow-hidden border border-white/10 bg-slate-800 flex items-center justify-center">
+        <img
+          src={concurso.logo_url}
+          alt={concurso.organizador}
+          className="w-8 h-8 object-contain"
+          onError={() => setImgError(true)}
+        />
+      </div>
+    );
+  }
+
+  const cfg = getOrgaoConfig(concurso.organizador);
+  const fontSize = cfg.initials.length > 3 ? 'text-[9px]' : cfg.initials.length === 3 ? 'text-[10px]' : 'text-xs';
+
+  return (
+    <div
+      className={`flex-shrink-0 w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center font-black ${fontSize} tracking-tight`}
+      style={{ backgroundColor: cfg.color, color: cfg.textColor }}
+    >
+      {cfg.initials}
+    </div>
+  );
 }
 
 export default function SelectConcursoPage() {
@@ -142,7 +173,11 @@ export default function SelectConcursoPage() {
                 onClick={() => handleSelect(concurso)}
                 className="group text-left bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 rounded-2xl p-5 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10"
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  {/* Logo do órgão */}
+                  <OrgaoLogo concurso={concurso} />
+
+                  {/* Conteúdo */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-white text-base leading-snug mb-1 group-hover:text-emerald-400 transition-colors line-clamp-2">
                       {concurso.titulo}
@@ -189,7 +224,8 @@ export default function SelectConcursoPage() {
                     </div>
                   </div>
 
-                  <div className="flex-shrink-0 w-9 h-9 bg-slate-800 group-hover:bg-emerald-500/20 border border-white/5 group-hover:border-emerald-500/30 rounded-xl flex items-center justify-center transition-all">
+                  {/* Seta */}
+                  <div className="flex-shrink-0 w-9 h-9 bg-slate-800 group-hover:bg-emerald-500/20 border border-white/5 group-hover:border-emerald-500/30 rounded-xl flex items-center justify-center transition-all self-center">
                     <ChevronRight
                       size={16}
                       className="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all"
