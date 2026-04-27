@@ -9,8 +9,14 @@
   "redes-de-computadores": {
     "title": "Redes de Computadores",
     "chapters": [
-      { "id": 1, "title": "Modelo OSI e TCP/IP" },
-      { "id": 2, "title": "Protocolos de Camada de Aplicação" }
+      { "id": 1, "title": "Conceitos gerais de redes" },
+      { "id": 2, "title": "Modelo OSI e TCP/IP" },
+      { "id": 3, "title": "IPv4 e IPv6 — Endereçamento IP" },
+      { "id": 4, "title": "Arquitetura de redes" },
+      { "id": 5, "title": "Noções de comunicação de dados" },
+      { "id": 6, "title": "Protocolos de camada de aplicação: HTTP/S, FTP, DNS, SMTP" },
+      { "id": 7, "title": "VPN e redes privadas" },
+      { "id": 8, "title": "Protocolos de roteamento" }
     ]
   },
 
@@ -56,15 +62,15 @@
       { "id": 1,  "title": "Princípios Básicos" },
       { "id": 2,  "title": "Lei penal no tempo e no espaço" },
       { "id": 3,  "title": "Fato típico, ilicitude e culpabilidade" },
-      { "id": 4,  "title": "Crimes contra a Pessoa" },
-      { "id": 5,  "title": "Crimes contra o Patrimônio" },
-      { "id": 6,  "title": "Crimes contra a Fé Pública e Administração Pública" },
-      { "id": 7,  "title": "Inquérito policial" },
-      { "id": 8,  "title": "Prova pericial" },
-      { "id": 9,  "title": "Cadeia de custódia" },
-      { "id": 10, "title": "Exame de corpo de delito" },
-      { "id": 11, "title": "Busca e apreensão" },
-      { "id": 12, "title": "Prisão em flagrante" }
+      { "id": 4,  "title": "Crimes contra a Pessoa, Patrimônio, Fé Pública e Administração Pública" },
+      { "id": 5,  "title": "Inquérito policial" },
+      { "id": 6,  "title": "Prova pericial" },
+      { "id": 7,  "title": "Cadeia de custódia" },
+      { "id": 8,  "title": "Exame de corpo de delito" },
+      { "id": 9,  "title": "Busca e apreensão" },
+      { "id": 10, "title": "Prisão em flagrante" },
+      { "id": 11, "title": "Função pericial do Estado" },
+      { "id": 12, "title": "Lei nº 12.030/2009 — Perícia Oficial de Natureza Criminal" }
     ]
   },
 
@@ -609,6 +615,29 @@
       { "id": 4, "title": "Eletromagnetismo" },
       { "id": 5, "title": "Ondas e óptica geométrica" },
       { "id": 6, "title": "Termodinâmica básica" }
+    ]
+  },
+
+  "banca-analise": {
+    "title": "O que a Banca Realmente Quer",
+    "chapters": [
+      { "id": 1, "title": "Raciocínio técnico aplicado" },
+      { "id": 2, "title": "Capacidade de análise forense" },
+      { "id": 3, "title": "Entendimento de crimes no mundo digital" },
+      { "id": 4, "title": "Cadeia de custódia aplicada à informática" },
+      { "id": 5, "title": "Como elaborar um laudo pericial técnico" }
+    ]
+  },
+
+  "extras-esfcex": {
+    "title": "Conteúdo Extra Recomendado (ESFCEx)",
+    "chapters": [
+      { "id": 1, "title": "Noções de virtualização e containers" },
+      { "id": 2, "title": "Versionamento com Git (conceito)" },
+      { "id": 3, "title": "LGPD — Lei Geral de Proteção de Dados" },
+      { "id": 4, "title": "Criptografia: Hash, Simétrica e Assimétrica" },
+      { "id": 5, "title": "Logs e auditoria de sistemas" },
+      { "id": 6, "title": "Conceitos iniciais de forense digital" }
     ]
   }
 }

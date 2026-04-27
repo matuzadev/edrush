@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { concursos } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -8,26 +6,18 @@ import subjects from '@/data/subjects.json';
 import { getAreasForConcurso } from '@/lib/concurso-areas';
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-  }
-
   const concursoId = request.nextUrl.searchParams.get('concursoId');
 
   let areas: { slug: string; title: string }[] = [];
 
   if (concursoId) {
-    // 1. Buscar título do concurso
     const concurso = await db.query.concursos.findFirst({
       where: eq(concursos.id, parseInt(concursoId)),
       columns: { titulo: true },
     });
 
     if (concurso) {
-      // 2. Tentar mapeamento estático por título
       const slugs = getAreasForConcurso(concurso.titulo);
-
       if (slugs) {
         const subjectsMap = subjects as Record<string, { title: string }>;
         areas = slugs
