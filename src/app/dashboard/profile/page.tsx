@@ -214,6 +214,7 @@ export default function ProfilePage() {
                 </div>
                 <p className="text-slate-400 text-sm uppercase tracking-widest">Acertos</p>
               </div>
+            </div>
 
             {/* Histórico de Atividade (GitHub Style) */}
             <ActivityCalendar
@@ -229,7 +230,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
       </main>
 
       {/* Modais */}

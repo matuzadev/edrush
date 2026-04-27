@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
-import { questions } from '@/db/schema';
+import { concursos } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import subjects from '@/data/subjects.json';
+import { getAreasForConcurso } from '@/lib/concurso-areas';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -17,21 +18,26 @@ export async function GET(request: NextRequest) {
   let areas: { slug: string; title: string }[] = [];
 
   if (concursoId) {
-    // Buscar disciplinas únicas das questões deste concurso
-    const rows = await db
-      .selectDistinct({ disciplina: questions.disciplina })
-      .from(questions)
-      .where(eq(questions.concurso_id, parseInt(concursoId)));
+    // 1. Buscar título do concurso
+    const concurso = await db.query.concursos.findFirst({
+      where: eq(concursos.id, parseInt(concursoId)),
+      columns: { titulo: true },
+    });
 
-    if (rows.length > 0) {
-      areas = rows.map((r) => ({
-        slug: r.disciplina.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        title: r.disciplina,
-      }));
+    if (concurso) {
+      // 2. Tentar mapeamento estático por título
+      const slugs = getAreasForConcurso(concurso.titulo);
+
+      if (slugs) {
+        const subjectsMap = subjects as Record<string, { title: string }>;
+        areas = slugs
+          .filter((slug) => subjectsMap[slug])
+          .map((slug) => ({ slug, title: subjectsMap[slug].title }));
+      }
     }
   }
 
-  // Fallback: usar subjects.json se não houver questões vinculadas ao concurso
+  // Fallback: todas as matérias do subjects.json
   if (areas.length === 0) {
     areas = Object.entries(subjects as Record<string, { title: string }>).map(
       ([slug, subj]) => ({ slug, title: subj.title })
