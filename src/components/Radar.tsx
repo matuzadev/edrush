@@ -1,4 +1,4 @@
-import { Twitter } from 'lucide-react';
+import { X as Twitter } from 'lucide-react';
 
 export default function Radar() {
   return (
