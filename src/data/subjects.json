@@ -386,5 +386,229 @@
       { "id": 10, "title": "Chaves primária e estrangeira" },
       { "id": 11, "title": "Relacionamentos" }
     ]
+  },
+
+  "raciocinio-logico": {
+    "title": "Raciocínio Lógico",
+    "chapters": [
+      { "id": 1, "title": "Lógica proposicional: conectivos e tabelas-verdade" },
+      { "id": 2, "title": "Silogismos e inferências" },
+      { "id": 3, "title": "Lógica de predicados" },
+      { "id": 4, "title": "Sequências e séries numéricas" },
+      { "id": 5, "title": "Raciocínio dedutivo e indutivo" },
+      { "id": 6, "title": "Diagramas lógicos (Euler-Venn)" },
+      { "id": 7, "title": "Análise combinatória" },
+      { "id": 8, "title": "Probabilidade" }
+    ]
+  },
+
+  "matematica-financeira": {
+    "title": "Matemática e Raciocínio Quantitativo",
+    "chapters": [
+      { "id": 1, "title": "Porcentagem e proporção" },
+      { "id": 2, "title": "Juros simples e compostos" },
+      { "id": 3, "title": "Séries de pagamento e amortização" },
+      { "id": 4, "title": "Desconto comercial e racional" },
+      { "id": 5, "title": "Análise de investimentos" },
+      { "id": 6, "title": "Estatística descritiva" },
+      { "id": 7, "title": "Funções, equações e inequações" },
+      { "id": 8, "title": "Geometria plana e espacial" }
+    ]
+  },
+
+  "matematica-basica": {
+    "title": "Matemática Básica",
+    "chapters": [
+      { "id": 1, "title": "Operações com números reais" },
+      { "id": 2, "title": "Porcentagem e razão" },
+      { "id": 3, "title": "Regra de três simples e composta" },
+      { "id": 4, "title": "Equações de 1º e 2º grau" },
+      { "id": 5, "title": "Geometria plana: áreas e perímetros" },
+      { "id": 6, "title": "Noções de probabilidade e estatística" }
+    ]
+  },
+
+  "direito-constitucional": {
+    "title": "Direito Constitucional",
+    "chapters": [
+      { "id": 1,  "title": "Princípios fundamentais da CF/88" },
+      { "id": 2,  "title": "Direitos e garantias fundamentais" },
+      { "id": 3,  "title": "Organização do Estado brasileiro" },
+      { "id": 4,  "title": "Organização dos poderes" },
+      { "id": 5,  "title": "Controle de constitucionalidade" },
+      { "id": 6,  "title": "Processo legislativo" },
+      { "id": 7,  "title": "Poder Executivo e atribuições" },
+      { "id": 8,  "title": "Poder Judiciário" },
+      { "id": 9,  "title": "Funções essenciais à Justiça" },
+      { "id": 10, "title": "Ordem econômica e financeira" },
+      { "id": 11, "title": "Direitos sociais" },
+      { "id": 12, "title": "Seguridade Social na CF/88" }
+    ]
+  },
+
+  "direito-administrativo": {
+    "title": "Direito Administrativo",
+    "chapters": [
+      { "id": 1,  "title": "Princípios da Administração Pública" },
+      { "id": 2,  "title": "Poderes administrativos" },
+      { "id": 3,  "title": "Atos administrativos" },
+      { "id": 4,  "title": "Agentes públicos e servidores" },
+      { "id": 5,  "title": "Órgãos e entidades da Administração" },
+      { "id": 6,  "title": "Licitações e contratos (Lei 14.133/2021)" },
+      { "id": 7,  "title": "Controle da Administração Pública" },
+      { "id": 8,  "title": "Responsabilidade civil do Estado" },
+      { "id": 9,  "title": "Processo administrativo (Lei 9.784/99)" },
+      { "id": 10, "title": "Improbidade administrativa" },
+      { "id": 11, "title": "Regime jurídico dos servidores federais (Lei 8.112/90)" }
+    ]
+  },
+
+  "direito-tributario": {
+    "title": "Direito Tributário",
+    "chapters": [
+      { "id": 1,  "title": "Sistema Tributário Nacional" },
+      { "id": 2,  "title": "Conceito e natureza jurídica do tributo" },
+      { "id": 3,  "title": "Espécies tributárias" },
+      { "id": 4,  "title": "Competência tributária" },
+      { "id": 5,  "title": "Princípios constitucionais tributários" },
+      { "id": 6,  "title": "Obrigação tributária principal e acessória" },
+      { "id": 7,  "title": "Fato gerador e hipótese de incidência" },
+      { "id": 8,  "title": "Lançamento tributário" },
+      { "id": 9,  "title": "Crédito tributário e extinção" },
+      { "id": 10, "title": "Impostos federais: IR, IPI, IOF, PIS, COFINS" },
+      { "id": 11, "title": "Processo administrativo fiscal" },
+      { "id": 12, "title": "Crimes contra a ordem tributária" }
+    ]
+  },
+
+  "legislacao-tributaria": {
+    "title": "Legislação Tributária Federal",
+    "chapters": [
+      { "id": 1, "title": "Código Tributário Nacional (CTN)" },
+      { "id": 2, "title": "Regulamento do Imposto de Renda (RIR)" },
+      { "id": 3, "title": "PIS/PASEP e COFINS" },
+      { "id": 4, "title": "Imposto sobre Produtos Industrializados (IPI)" },
+      { "id": 5, "title": "Contribuições Previdenciárias" },
+      { "id": 6, "title": "Simples Nacional" },
+      { "id": 7, "title": "IRPF e IRPJ" }
+    ]
+  },
+
+  "contabilidade-geral": {
+    "title": "Contabilidade Geral e Pública",
+    "chapters": [
+      { "id": 1,  "title": "Conceitos fundamentais de contabilidade" },
+      { "id": 2,  "title": "Patrimônio: ativo, passivo e patrimônio líquido" },
+      { "id": 3,  "title": "Escrituração contábil e livros obrigatórios" },
+      { "id": 4,  "title": "Balanço Patrimonial" },
+      { "id": 5,  "title": "Demonstração do Resultado do Exercício (DRE)" },
+      { "id": 6,  "title": "Demonstração de Fluxos de Caixa (DFC)" },
+      { "id": 7,  "title": "Normas Brasileiras de Contabilidade (NBC)" },
+      { "id": 8,  "title": "Contabilidade pública: PCASP e MCASP" },
+      { "id": 9,  "title": "Orçamento público" },
+      { "id": 10, "title": "Lei de Responsabilidade Fiscal" }
+    ]
+  },
+
+  "direito-previdenciario": {
+    "title": "Direito Previdenciário",
+    "chapters": [
+      { "id": 1,  "title": "Seguridade Social na CF/88" },
+      { "id": 2,  "title": "Regime Geral de Previdência Social (RGPS)" },
+      { "id": 3,  "title": "Segurados obrigatórios e facultativos" },
+      { "id": 4,  "title": "Benefícios previdenciários" },
+      { "id": 5,  "title": "Aposentadoria e pensão por morte" },
+      { "id": 6,  "title": "Auxílio-doença e auxílio-acidente" },
+      { "id": 7,  "title": "Salário-maternidade e salário-família" },
+      { "id": 8,  "title": "Custeio: contribuições e competências" },
+      { "id": 9,  "title": "Processo administrativo previdenciário" },
+      { "id": 10, "title": "Crimes previdenciários" }
+    ]
+  },
+
+  "medicina-legal": {
+    "title": "Medicina Legal e Criminalística",
+    "chapters": [
+      { "id": 1, "title": "Tanatologia forense" },
+      { "id": 2, "title": "Traumatologia forense" },
+      { "id": 3, "title": "Sexologia forense" },
+      { "id": 4, "title": "Toxicologia forense" },
+      { "id": 5, "title": "Identidade e identificação forense" },
+      { "id": 6, "title": "Documentoscopia" },
+      { "id": 7, "title": "Balística forense" }
+    ]
+  },
+
+  "criminologia": {
+    "title": "Criminologia",
+    "chapters": [
+      { "id": 1, "title": "Conceito e objeto da criminologia" },
+      { "id": 2, "title": "Teorias criminológicas" },
+      { "id": 3, "title": "Crime, criminoso e vítima" },
+      { "id": 4, "title": "Prevenção criminal" },
+      { "id": 5, "title": "Política criminal" },
+      { "id": 6, "title": "Criminologia e segurança pública" }
+    ]
+  },
+
+  "legislacao-transito": {
+    "title": "Legislação de Trânsito",
+    "chapters": [
+      { "id": 1, "title": "Código de Trânsito Brasileiro (CTB)" },
+      { "id": 2, "title": "Infrações e penalidades" },
+      { "id": 3, "title": "Habilitação e licenciamento" },
+      { "id": 4, "title": "Crimes de trânsito" },
+      { "id": 5, "title": "Normas de circulação e conduta" },
+      { "id": 6, "title": "Órgãos do SNATRAN" }
+    ]
+  },
+
+  "economia": {
+    "title": "Economia e Mercado Financeiro",
+    "chapters": [
+      { "id": 1, "title": "Microeconomia: oferta, demanda e equilíbrio" },
+      { "id": 2, "title": "Macroeconomia: PIB, inflação, câmbio" },
+      { "id": 3, "title": "Política monetária e fiscal" },
+      { "id": 4, "title": "Sistema Financeiro Nacional" },
+      { "id": 5, "title": "Mercado de capitais" },
+      { "id": 6, "title": "Banco Central e política cambial" },
+      { "id": 7, "title": "Finanças públicas e dívida pública" }
+    ]
+  },
+
+  "telecomunicacoes": {
+    "title": "Telecomunicações",
+    "chapters": [
+      { "id": 1, "title": "Fundamentos de telecomunicações" },
+      { "id": 2, "title": "Modulação: AM, FM, PM, QAM" },
+      { "id": 3, "title": "Transmissão digital: fibra óptica, radiofrequência" },
+      { "id": 4, "title": "Redes móveis: 3G, 4G LTE, 5G" },
+      { "id": 5, "title": "Regulação de telecomunicações (ANATEL)" },
+      { "id": 6, "title": "Espectro eletromagnético e licenciamento" },
+      { "id": 7, "title": "VoIP e comunicações IP" }
+    ]
+  },
+
+  "atendimento-cliente": {
+    "title": "Atendimento ao Cliente e Noções Comerciais",
+    "chapters": [
+      { "id": 1, "title": "Técnicas de atendimento ao público" },
+      { "id": 2, "title": "Código de Defesa do Consumidor" },
+      { "id": 3, "title": "Comunicação eficaz e relacionamento" },
+      { "id": 4, "title": "Serviços postais e logística básica" },
+      { "id": 5, "title": "Noções de vendas e marketing" }
+    ]
+  },
+
+  "fisica-basica": {
+    "title": "Física e Eletricidade Básica",
+    "chapters": [
+      { "id": 1, "title": "Grandezas e unidades (SI)" },
+      { "id": 2, "title": "Mecânica: cinemática e dinâmica" },
+      { "id": 3, "title": "Eletrostática e eletrodinâmica" },
+      { "id": 4, "title": "Eletromagnetismo" },
+      { "id": 5, "title": "Ondas e óptica geométrica" },
+      { "id": 6, "title": "Termodinâmica básica" }
+    ]
   }
 }

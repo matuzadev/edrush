@@ -4,16 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Filter, ChevronDown, ArrowUp, ArrowDown, LogOut, Zap } from 'lucide-react';
+import { Search, LogOut, Zap } from 'lucide-react';
 
 interface Question {
-  id: string;
-  subject: string;
-  difficulty: 'fácil' | 'médio' | 'difícil';
-  question: string;
-  answered: boolean;
-  score: number;
-  lastAttempt?: string;
+  id: number;
+  titulo: string;
+  disciplina: string;
+  capitulo: string;
+  dificuldade: 'fácil' | 'médio' | 'difícil';
+  enunciado: string;
+  fonte: string | null;
+  ano: number | null;
+  concurso?: { titulo: string; organizador: string } | null;
 }
 
 export default function SpreadsheetPage() {
@@ -25,40 +27,43 @@ export default function SpreadsheetPage() {
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'fácil' | 'médio' | 'difícil'>('all');
   const [sortBy, setSortBy] = useState<'recent' | 'difficulty' | 'score'>('recent');
 
-  // Mock data - later will come from Supabase
   useEffect(() => {
-    const mockQuestions: Question[] = [
-      { id: '1', subject: 'Criptografia', difficulty: 'difícil', question: 'O que é RSA?', answered: true, score: 85, lastAttempt: '2024-01-15' },
-      { id: '2', subject: 'Redes', difficulty: 'médio', question: 'Explique o modelo OSI', answered: true, score: 92, lastAttempt: '2024-01-14' },
-      { id: '3', subject: 'Sistemas Operacionais', difficulty: 'fácil', question: 'O que é um processo?', answered: false, score: 0 },
-      { id: '4', subject: 'Criptografia', difficulty: 'difícil', question: 'Qual a diferença entre AES e DES?', answered: true, score: 78 },
-      { id: '5', subject: 'Forense Digital', difficulty: 'médio', question: 'Como preservar evidências digitais?', answered: false, score: 0 },
-    ];
-    setQuestions(mockQuestions);
-    setFilteredQuestions(mockQuestions);
-  }, []);
+    async function fetchQuestions() {
+      try {
+        const res = await fetch('/api/questions?limit=200');
+        if (res.ok) {
+          const data = await res.json();
+          setQuestions(data);
+          setFilteredQuestions(data);
+        }
+      } catch {
+        setQuestions([]);
+        setFilteredQuestions([]);
+      }
+    }
+    if (!isLoading && user) fetchQuestions();
+  }, [isLoading, user]);
 
   // Apply filters
   useEffect(() => {
     let filtered = questions;
 
     if (difficultyFilter !== 'all') {
-      filtered = filtered.filter(q => q.difficulty === difficultyFilter);
+      filtered = filtered.filter(q => q.dificuldade === difficultyFilter);
     }
 
     if (searchTerm) {
+      const q = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        q => q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             q.subject.toLowerCase().includes(searchTerm.toLowerCase())
+        item => item.enunciado.toLowerCase().includes(q) ||
+                item.disciplina.toLowerCase().includes(q) ||
+                item.titulo.toLowerCase().includes(q)
       );
     }
 
-    // Sort
     if (sortBy === 'difficulty') {
       const order = { 'fácil': 0, 'médio': 1, 'difícil': 2 };
-      filtered.sort((a, b) => order[a.difficulty] - order[b.difficulty]);
-    } else if (sortBy === 'score') {
-      filtered.sort((a, b) => b.score - a.score);
+      filtered = [...filtered].sort((a, b) => order[a.dificuldade] - order[b.dificuldade]);
     }
 
     setFilteredQuestions(filtered);
@@ -82,8 +87,9 @@ export default function SpreadsheetPage() {
 
   const stats = {
     total: questions.length,
-    answered: questions.filter(q => q.answered).length,
-    avgScore: Math.round(questions.filter(q => q.answered).reduce((sum, q) => sum + q.score, 0) / Math.max(questions.filter(q => q.answered).length, 1)),
+    facil: questions.filter(q => q.dificuldade === 'fácil').length,
+    medio: questions.filter(q => q.dificuldade === 'médio').length,
+    dificil: questions.filter(q => q.dificuldade === 'difícil').length,
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -150,18 +156,22 @@ export default function SpreadsheetPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-[#0f172a] border border-white/5 rounded-lg p-6">
-            <p className="text-slate-400 text-sm mb-2">Total de Questões</p>
+            <p className="text-slate-400 text-sm mb-2">Total</p>
             <p className="text-3xl font-bold text-white">{stats.total}</p>
           </div>
           <div className="bg-[#0f172a] border border-white/5 rounded-lg p-6">
-            <p className="text-slate-400 text-sm mb-2">Respondidas</p>
-            <p className="text-3xl font-bold text-emerald-400">{stats.answered}</p>
+            <p className="text-slate-400 text-sm mb-2">Fácil</p>
+            <p className="text-3xl font-bold text-emerald-400">{stats.facil}</p>
           </div>
           <div className="bg-[#0f172a] border border-white/5 rounded-lg p-6">
-            <p className="text-slate-400 text-sm mb-2">Média de Pontuação</p>
-            <p className="text-3xl font-bold text-blue-400">{stats.avgScore}%</p>
+            <p className="text-slate-400 text-sm mb-2">Médio</p>
+            <p className="text-3xl font-bold text-yellow-400">{stats.medio}</p>
+          </div>
+          <div className="bg-[#0f172a] border border-white/5 rounded-lg p-6">
+            <p className="text-slate-400 text-sm mb-2">Difícil</p>
+            <p className="text-3xl font-bold text-red-400">{stats.dificil}</p>
           </div>
         </div>
 
@@ -213,11 +223,10 @@ export default function SpreadsheetPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5 bg-slate-900/50">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Tópico</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Questão</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Disciplina</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Enunciado</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Dificuldade</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Pontuação</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Banca / Ano</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300">Ação</th>
                 </tr>
               </thead>
@@ -225,37 +234,32 @@ export default function SpreadsheetPage() {
                 {filteredQuestions.length > 0 ? (
                   filteredQuestions.map((q) => (
                     <tr key={q.id} className="border-b border-white/5 hover:bg-slate-900/30 transition">
-                      <td className="px-6 py-4 text-sm text-slate-300">{q.subject}</td>
-                      <td className="px-6 py-4 text-sm text-slate-300 max-w-xs truncate">{q.question}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(q.difficulty)}`}>
-                          {q.difficulty}
+                        <div className="text-sm font-medium text-white">{q.disciplina}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{q.capitulo}</div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-300 max-w-sm">
+                        <span className="line-clamp-2">{q.enunciado}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(q.dificuldade)}`}>
+                          {q.dificuldade}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm">
-                        {q.answered ? (
-                          <span className="flex items-center gap-1 text-emerald-400">
-                            <ArrowUp className="w-4 h-4" /> Respondida
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1 text-slate-400">
-                            <ArrowDown className="w-4 h-4" /> Pendente
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-300">
-                        {q.answered ? <span className="font-semibold text-emerald-400">{q.score}%</span> : '-'}
+                      <td className="px-6 py-4 text-xs text-slate-400">
+                        {q.fonte && <div>{q.fonte}</div>}
+                        {q.ano && <div>{q.ano}</div>}
                       </td>
                       <td className="px-6 py-4">
-                        <button className="px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded text-sm transition">
-                          Responder
-                        </button>
+                        <Link href="/dashboard/study" className="px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded text-sm transition">
+                          Praticar
+                        </Link>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center">
+                    <td colSpan={5} className="px-6 py-12 text-center">
                       <p className="text-slate-400">Nenhuma questão encontrada</p>
                     </td>
                   </tr>
