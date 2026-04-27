@@ -12,23 +12,22 @@ export interface ConcursoAreaMap {
 export const CONCURSO_AREAS: ConcursoAreaMap[] = [
   // ─── POLÍCIA FEDERAL ───────────────────────────────────────────────────────
   {
+    // Baseado na Planilha PF & EsFCEX.xlsx — aba "Concurso PF"
     match: ['perito criminal federal', 'perito digital'],
     areas: [
+      // Conhecimentos Básicos
       'lingua-portuguesa',
+      'informatica-basica',
       'direito-penal',
-      'direito-constitucional',
-      'direito-administrativo',
       'criminalistica',
-      'medicina-legal',
+      // Conhecimentos Específicos
       'fundamentos-computacao',
-      'redes-de-computadores',
-      'seguranca-informacao',
       'bancos-de-dados',
+      'engenharia-reversa-malware',
       'linguagens-programacao',
       'estrutura-dados-algoritmos',
-      'engenharia-reversa-malware',
-      'computacao-nuvem',
       'prova-discursiva',
+      'banca-analise',
     ],
   },
   {
@@ -226,18 +225,35 @@ export const CONCURSO_AREAS: ConcursoAreaMap[] = [
 
   // ─── EXÉRCITO / ESFCEx ─────────────────────────────────────────────────────
   {
+    // Baseado na Planilha PF & EsFCEX.xlsx — aba "Concurso ESFCEX"
     match: ['esfcex', 'exercito brasileiro', 'exército brasileiro'],
     areas: [
-      'lingua-portuguesa',
-      'matematica-financeira',
-      'fisica-basica',
-      'raciocinio-logico',
+      // Conhecimentos Gerais
+      'compreensao-textos',
+      'gramatica-texto',
+      'semantica',
+      'reescrita-textual',
+      'historia-colonia',
+      'historia-imperio',
+      'historia-republica',
+      'historia-temas',
+      'geografia-fisica',
+      'geografia-humana',
+      'geografia-economica',
+      'organizacao-territorio',
+      // Conhecimentos Específicos
+      'fundamentos-informatica',
+      'escritorio-produtividade',
       'redes-de-computadores',
-      'fundamentos-computacao',
-      'bancos-de-dados',
-      'linguagens-programacao',
       'seguranca-informacao',
-      'estrutura-dados-algoritmos',
+      'computacao-nuvem',
+      'teoria-sistemas',
+      'camadas-aplicacao',
+      'sistemas-informacao',
+      'teoria-informacao',
+      'banco-de-dados',
+      // Extra recomendado
+      'extras-esfcex',
     ],
   },
 
