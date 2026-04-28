@@ -32,6 +32,8 @@ export const SubjectSelector: React.FC<Props> = ({ value, onChange, subjects = [
     }
   };
 
+
+
   return (
     <div>
       <label className="block text-sm font-bold text-slate-300 mb-2 uppercase tracking-widest">Matéria</label>
