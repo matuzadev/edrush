@@ -1,12 +1,10 @@
 @import "tailwindcss";
-
 /* =========================================================
-   THEME EXTENSIONS
+   THEME EXTENSIONS / BASE STYLES
+   Keep @tailwind directives at the top-level so PostCSS +
+   Tailwind can process them correctly in all environments.
 ========================================================= */
 
-/* =========================================================
-   BASE STYLES
-========================================================= */
 @layer base {
   *,
   *::before,
@@ -20,14 +18,14 @@
 
   body {
     min-height: 100vh;
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
+    background-color: theme("colors.slate.900");
+    color: theme("colors.slate.50");
+    font-family: theme("fontFamily.sans");
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-    /* =========================================================
-       BASE STYLES
-    ========================================================= */
-    @layer base {
   .hero {
     @apply relative flex min-h-screen w-full flex-col overflow-hidden;
   }
@@ -128,13 +126,5 @@
   /* -------- PERF -------- */
   .will-transform {
     will-change: transform;
-  }
-}
-    background-color: theme("colors.slate.900");
-    color: theme("colors.slate.50");
-    font-family: theme("fontFamily.sans");
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 }
