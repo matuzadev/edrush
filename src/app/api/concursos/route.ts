@@ -27,6 +27,45 @@ export async function GET(request: NextRequest) {
       limit: 50,
     });
 
+    // Se não houver resultados no banco (por exemplo em outra máquina),
+    // devolvemos um fallback com concursos de exemplo para permitir o fluxo
+    // de onboarding/seleção local durante desenvolvimento.
+    if (!resultado || resultado.length === 0) {
+      const statusFilter = status || 'ativo';
+      const fallback = [
+        {
+          id: 1001,
+          titulo: 'Concurso Simulado - Perito Federal',
+          organizador: 'Polícia Federal',
+          orgao: 'Ministério da Justiça',
+          descricao: 'Simulado para desenvolvimento local - área de Informática.',
+          vagas_total: 10,
+          status: 'ativo',
+          data_abertura_inscricoes: null,
+          data_fechamento_inscricoes: null,
+          banca: 'CESPE',
+          logo_url: '/imagens/foco-federal-logo.png',
+        },
+        {
+          id: 1002,
+          titulo: 'Concurso Simulado - ESFCEx',
+          organizador: 'ESFCEx',
+          orgao: 'Exército Brasileiro',
+          descricao: 'Simulado para desenvolvimento local - área geral.',
+          vagas_total: 5,
+          status: 'edital_proximo',
+          data_abertura_inscricoes: null,
+          data_fechamento_inscricoes: null,
+          banca: null,
+          logo_url: '/imagens/foco-federal-logo.png',
+        },
+      ];
+
+      // aplicar filtro de status se informado na querystring
+      const filteredFallback = status ? fallback.filter((c) => c.status === status) : fallback;
+      return NextResponse.json(filteredFallback);
+    }
+
     return NextResponse.json(resultado);
   } catch (error) {
     console.error('Erro ao buscar concursos:', error);
