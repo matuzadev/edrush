@@ -1,428 +1,220 @@
+import { BarChart2, BookOpen, Clock, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react';
+
+type Subject = {
+  name: string;
+  pct: number;
+  status: 'consolidado' | 'reforcar' | 'progredindo';
+};
+
+type Recall = {
+  title: string;
+  time: string;
+  urgent: boolean;
+};
+
+const subjects: Subject[] = [
+  { name: 'Direito Constitucional', pct: 91, status: 'consolidado' },
+  { name: 'Língua Portuguesa', pct: 65, status: 'reforcar' },
+  { name: 'Raciocínio Lógico', pct: 83, status: 'consolidado' },
+  { name: 'Administração Pública', pct: 74, status: 'progredindo' },
+];
+
+const recalls: Recall[] = [
+  { title: 'Princípios Constitucionais', time: 'Hoje às 16h', urgent: false },
+  { title: 'Interpretação de Texto', time: 'Amanhã às 10h', urgent: true },
+  { title: 'Simulado — Banca Cebraspe', time: 'Em 3 dias', urgent: false },
+];
+
+function StatusBadge({ status }: { status: Subject['status'] }) {
+  if (status === 'consolidado') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold uppercase tracking-wide">
+        <CheckCircle2 className="w-3 h-3" /> Consolidado
+      </span>
+    );
+  }
+  if (status === 'reforcar') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold uppercase tracking-wide">
+        <AlertTriangle className="w-3 h-3" /> Reforçar
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-[10px] font-bold uppercase tracking-wide">
+      <TrendingUp className="w-3 h-3" /> Progredindo
+    </span>
+  );
+}
+
+function barColor(status: Subject['status']) {
+  if (status === 'consolidado') return 'bg-gradient-to-r from-emerald-500 to-emerald-400';
+  if (status === 'reforcar') return 'bg-gradient-to-r from-amber-500 to-amber-400';
+  return 'bg-gradient-to-r from-blue-500 to-blue-400';
+}
+
 export default function Showcase() {
   return (
-    <section className="showcase" id="dashboard">
-      <div className="container">
-        <div className="flex flex-col items-center text-center mb-16 px-4">
-  {/* Badge Superior */}
-  <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 mb-6 animate-fade-in">
-    Dashboard Inteligente
-  </span>
+    <section id="dashboard" className="py-24 px-6 bg-[#020617] relative overflow-hidden">
 
-  {/* Título com Gradiente */}
-  <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6">
-    Acompanhe seu progresso <br className="hidden md:block" />
-    <span className="bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">
-      em Tempo Real
-    </span>
-  </h2>
+      {/* Glow decorativo */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl" />
+      </div>
 
-  {/* Subtítulo de Apoio */}
-  <p className="max-w-2xl text-slate-400 text-lg md:text-xl leading-relaxed">
-    Visualize sua evolução através de dados precisos. Nossa plataforma transforma seu esforço em métricas claras para acelerar sua aprovação.
-  </p>
+      <div className="max-w-6xl mx-auto relative z-10">
 
-  {/* Linha Decorativa (Opcional) */}
-  <div className="mt-8 h-1 w-24 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-full opacity-50"></div>
-</div>
+        {/* Header */}
+        <div className="flex flex-col items-center text-center mb-16">
+          <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 mb-6">
+            Dashboard Inteligente
+          </span>
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-5 leading-tight">
+            Acompanhe seu progresso{' '}
+            <span className="bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">
+              em Tempo Real
+            </span>
+          </h2>
+          <p className="max-w-2xl text-slate-400 text-base md:text-lg leading-relaxed">
+            Métricas precisas, alertas inteligentes e revisões no momento certo — tudo em um dashboard feito para aprovação.
+          </p>
+          <div className="mt-6 h-px w-20 bg-emerald-500 rounded-full" />
+        </div>
 
-        <div className="dashboard-preview">
-          {/* Main Dashboard Card */}
-          <div className="dashboard-card main-card">
-            <div className="card-header">
-              <h3>📊 Seu Dashboard Inteligente</h3>
-              <div className="card-date">Última atualização: Hoje às 14h</div>
+        {/* Dashboard mock */}
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm overflow-hidden shadow-2xl">
+
+          {/* Barra de título tipo app */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/80">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-red-500/60" />
+                <span className="w-3 h-3 rounded-full bg-amber-500/60" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500/60" />
+              </div>
+              <span className="text-slate-400 text-xs font-medium ml-2">Foco Federal — Dashboard</span>
             </div>
-            <div className="dashboard-grid">
-              {/* Stats Overview */}
-              <div className="stats-row">
-                <div className="stat-box">
-                  <div className="stat-value">4000</div>
-                  <div className="stat-label">Questões Resolvidas</div>
-                  <div className="stat-progress">
-                    <div className="progress-bar" style={{ width: '87%' }}></div>
-                  </div>
-                  <div className="stat-percentage">87%</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-value">8.2</div>
-                  <div className="stat-label">Nota Média (Cebraspe)</div>
-                  <div className="stat-progress">
-                    <div className="progress-bar success" style={{ width: '82%' }}></div>
-                  </div>
-                  <div className="stat-percentage">82%</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-value">15</div>
-                  <div className="stat-label">Dias de Sequência</div>
-                  <div className="stat-progress">
-                    <div className="progress-bar warning" style={{ width: '68%' }}></div>
-                  </div>
-                  <div className="stat-percentage">68 dias record</div>
-                </div>
-              </div>
-
-              {/* Subject Performance */}
-              <div className="subjects-section">
-                <h4>📚 Desempenho por Matéria</h4>
-                <div className="subject-bars">
-                  <div className="subject-bar">
-                    <div className="subject-name">Informática Forense</div>
-                    <div className="bar-container">
-                      <div className="bar-fill green" style={{ width: '92%' }}></div>
-                    </div>
-                    <div className="bar-value">92% ✅ CONSOLIDADO</div>
-                  </div>
-                  <div className="subject-bar">
-                    <div className="subject-name">Redes de Computadores</div>
-                    <div className="bar-container">
-                      <div className="bar-fill yellow" style={{ width: '68%' }}></div>
-                    </div>
-                    <div className="bar-value">68% 🚨 REFORÇAR</div>
-                  </div>
-                  <div className="subject-bar">
-                    <div className="subject-name">Banco de Dados</div>
-                    <div className="bar-container">
-                      <div className="bar-fill green" style={{ width: '85%' }}></div>
-                    </div>
-                    <div className="bar-value">85% ✅ CONSOLIDADO</div>
-                  </div>
-                  <div className="subject-bar">
-                    <div className="subject-name">Engenharia de Software</div>
-                    <div className="bar-container">
-                      <div className="bar-fill blue" style={{ width: '78%' }}></div>
-                    </div>
-                    <div className="bar-value">78% 📈 Progredindo</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="activity-section">
-                <h4>⚡ Próximas Revisões (Active Recall)</h4>
-                <div className="activity-items">
-                  <div className="activity-item">
-                    <div className="activity-dot"></div>
-                    <div className="activity-text">
-                      <div className="activity-title">Revisar: Criptografia Assimétrica</div>
-                      <div className="activity-time">Hoje às 16h</div>
-                    </div>
-                  </div>
-                  <div className="activity-item">
-                    <div className="activity-dot warning"></div>
-                    <div className="activity-text">
-                      <div className="activity-title">Revisar: SQL Avançado</div>
-                      <div className="activity-time">Amanhã às 10h</div>
-                    </div>
-                  </div>
-                  <div className="activity-item">
-                    <div className="activity-dot"></div>
-                    <div className="activity-text">
-                      <div className="activity-title">Simulado Completo: Perito PF</div>
-                      <div className="activity-time">Em 3 dias</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <span className="text-slate-500 text-xs">Última atualização: agora</span>
           </div>
 
-          {/* Feature Highlights */}
-          <div className="features-highlights">
-            <div className="feature-highlight-item">
-              <div className="feature-icon">📈</div>
-              <div className="feature-text">
-                <h4>Análise Profunda</h4>
-                <p>Gráficos e métricas que revelam seus padrões de aprendizado</p>
+          <div className="p-6 md:p-8">
+
+            {/* Stats row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+              {/* Questões */}
+              <div className="p-5 rounded-xl bg-slate-800/60 border border-slate-700/50">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 rounded-lg bg-emerald-500/15">
+                    <BarChart2 className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <span className="text-slate-400 text-xs font-medium">Questões Resolvidas</span>
+                </div>
+                <p className="text-3xl font-black text-emerald-400 leading-none mb-1">4.200</p>
+                <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-full w-[87%] bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
+                </div>
+                <p className="text-slate-500 text-[11px] mt-1.5">87% da meta mensal</p>
+              </div>
+
+              {/* Taxa de Acerto */}
+              <div className="p-5 rounded-xl bg-slate-800/60 border border-slate-700/50">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 rounded-lg bg-blue-500/15">
+                    <TrendingUp className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="text-slate-400 text-xs font-medium">Taxa de Acerto</span>
+                </div>
+                <p className="text-3xl font-black text-blue-400 leading-none mb-1">84%</p>
+                <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-full w-[84%] bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" />
+                </div>
+                <p className="text-slate-500 text-[11px] mt-1.5">Acima da média Cebraspe</p>
+              </div>
+
+              {/* Sequência */}
+              <div className="p-5 rounded-xl bg-slate-800/60 border border-slate-700/50">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 rounded-lg bg-amber-500/15">
+                    <Clock className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <span className="text-slate-400 text-xs font-medium">Dias de Sequência</span>
+                </div>
+                <p className="text-3xl font-black text-amber-400 leading-none mb-1">21</p>
+                <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-full w-[70%] bg-gradient-to-r from-amber-500 to-amber-400 rounded-full" />
+                </div>
+                <p className="text-slate-500 text-[11px] mt-1.5">Recorde pessoal: 45 dias</p>
               </div>
             </div>
-            <div className="feature-highlight-item">
-              <div className="feature-icon">🎯</div>
-              <div className="feature-text">
-                <h4>Metas Personalizadas</h4>
-                <p>O sistema se adapta ao seu ritmo e objetivos</p>
+
+            {/* Grid: Desempenho + Active Recall */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              {/* Desempenho por Matéria */}
+              <div className="rounded-xl bg-slate-800/40 border border-slate-700/50 p-5">
+                <div className="flex items-center gap-2 mb-5">
+                  <BookOpen className="w-4 h-4 text-slate-400" />
+                  <h4 className="text-slate-200 text-sm font-bold">Desempenho por Matéria</h4>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {subjects.map((s, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-slate-300 text-sm font-medium">{s.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-400 text-xs font-bold">{s.pct}%</span>
+                          <StatusBadge status={s.status} />
+                        </div>
+                      </div>
+                      <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${barColor(s.status)}`}
+                          style={{ width: `${s.pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="feature-highlight-item">
-              <div className="feature-icon">🔔</div>
-              <div className="feature-text">
-                <h4>Notificações Inteligentes</h4>
-                <p>Alertas no momento exato para máxima efetividade</p>
+
+              {/* Active Recall */}
+              <div className="rounded-xl bg-slate-800/40 border border-slate-700/50 p-5">
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <h4 className="text-slate-200 text-sm font-bold">Próximas Revisões (Active Recall)</h4>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {recalls.map((r, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-900/60 border border-slate-700/40">
+                      <div className={`mt-1 w-2.5 h-2.5 rounded-full flex-shrink-0 ${r.urgent ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                      <div>
+                        <p className="text-slate-200 text-sm font-semibold leading-tight">{r.title}</p>
+                        <p className="text-slate-500 text-xs mt-0.5">{r.time}</p>
+                      </div>
+                      {r.urgent && (
+                        <span className="ml-auto px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold uppercase tracking-wide flex-shrink-0">
+                          Urgente
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Protocolo resumo */}
+                <div className="mt-5 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                  <p className="text-emerald-400 text-xs font-semibold mb-0.5">Protocolo 1-7-30 ativo</p>
+                  <p className="text-slate-500 text-[11px] leading-relaxed">
+                    Revisões programadas nos dias 1, 7 e 30 após cada estudo — retenção de 92%.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .showcase {
-          padding: 100px 0;
-          background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
-        }
-
-        .dashboard-preview {
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
-        }
-
-        .dashboard-card {
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          border-radius: 20px;
-          padding: 40px;
-          backdrop-filter: blur(10px);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 30px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid rgba(51, 65, 85, 0.3);
-        }
-
-        .card-header h3 {
-          font-size: 1.5rem;
-          font-weight: 800;
-          color: #f8fafc;
-        }
-
-        .card-date {
-          font-size: 0.85rem;
-          color: #94a3b8;
-        }
-
-        .dashboard-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 30px;
-        }
-
-        .stats-row {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 20px;
-        }
-
-        .stat-box {
-          background: rgba(30, 41, 59, 0.5);
-          border: 1px solid rgba(51, 65, 85, 0.3);
-          border-radius: 14px;
-          padding: 20px;
-          text-align: center;
-        }
-
-        .stat-value {
-          font-size: 2.5rem;
-          font-weight: 900;
-          color: #10b981;
-          margin-bottom: 5px;
-        }
-
-        .stat-label {
-          font-size: 0.9rem;
-          color: #94a3b8;
-          margin-bottom: 12px;
-          font-weight: 600;
-        }
-
-        .stat-progress {
-          width: 100%;
-          height: 8px;
-          background: rgba(51, 65, 85, 0.3);
-          border-radius: 4px;
-          overflow: hidden;
-          margin-bottom: 8px;
-        }
-
-        .progress-bar {
-          height: 100%;
-          background: linear-gradient(90deg, #10b981, #059669);
-          border-radius: 4px;
-          transition: width 0.5s ease;
-        }
-
-        .progress-bar.success {
-          background: linear-gradient(90deg, #10b981, #34d399);
-        }
-
-        .progress-bar.warning {
-          background: linear-gradient(90deg, #f59e0b, #fbbf24);
-        }
-
-        .stat-percentage {
-          font-size: 0.8rem;
-          color: #64748b;
-        }
-
-        .subjects-section {
-          margin-top: 20px;
-        }
-
-        .subjects-section h4 {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #f8fafc;
-          margin-bottom: 15px;
-        }
-
-        .subject-bars {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .subject-bar {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .subject-name {
-          font-size: 0.95rem;
-          font-weight: 600;
-          color: #e2e8f0;
-        }
-
-        .bar-container {
-          width: 100%;
-          height: 10px;
-          background: rgba(51, 65, 85, 0.3);
-          border-radius: 5px;
-          overflow: hidden;
-        }
-
-        .bar-fill {
-          height: 100%;
-          border-radius: 5px;
-          transition: width 0.5s ease;
-        }
-
-        .bar-fill.green {
-          background: linear-gradient(90deg, #10b981, #34d399);
-        }
-
-        .bar-fill.yellow {
-          background: linear-gradient(90deg, #f59e0b, #fbbf24);
-        }
-
-        .bar-fill.blue {
-          background: linear-gradient(90deg, #3b82f6, #60a5fa);
-        }
-
-        .bar-value {
-          font-size: 0.8rem;
-          color: #cbd5e1;
-          font-weight: 500;
-        }
-
-        .activity-section {
-          margin-top: 20px;
-        }
-
-        .activity-section h4 {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #f8fafc;
-          margin-bottom: 15px;
-        }
-
-        .activity-items {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .activity-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          padding: 12px;
-          background: rgba(30, 41, 59, 0.5);
-          border-radius: 10px;
-        }
-
-        .activity-dot {
-          width: 12px;
-          height: 12px;
-          background: #10b981;
-          border-radius: 50%;
-          margin-top: 4px;
-          flex-shrink: 0;
-        }
-
-        .activity-dot.warning {
-          background: #f59e0b;
-        }
-
-        .activity-text {
-          flex: 1;
-        }
-
-        .activity-title {
-          font-size: 0.95rem;
-          color: #e2e8f0;
-          font-weight: 600;
-        }
-
-        .activity-time {
-          font-size: 0.8rem;
-          color: #94a3b8;
-          margin-top: 3px;
-        }
-
-        .features-highlights {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
-        }
-
-        .feature-highlight-item {
-          display: flex;
-          gap: 16px;
-          padding: 20px;
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          border-radius: 14px;
-          backdrop-filter: blur(10px);
-        }
-
-        .feature-icon {
-          font-size: 2rem;
-          flex-shrink: 0;
-        }
-
-        .feature-text h4 {
-          font-size: 1rem;
-          font-weight: 700;
-          color: #f8fafc;
-          margin-bottom: 4px;
-        }
-
-        .feature-text p {
-          font-size: 0.9rem;
-          color: #cbd5e1;
-          line-height: 1.4;
-        }
-
-        @media (max-width: 768px) {
-          .dashboard-card {
-            padding: 24px;
-          }
-
-          .card-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-          }
-
-          .stats-row {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
     </section>
   );
 }
