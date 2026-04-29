@@ -2,30 +2,19 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { useSession } from 'next-auth/react';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const { status } = useSession();
 
   useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        // O Supabase trata automaticamente o código de confirmação
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          router.push('/dashboard');
-        } else {
-          router.push('/auth/login');
-        }
-      } catch (error) {
-        console.error('Erro no callback:', error);
-        router.push('/auth/login');
-      }
-    };
-
-    handleCallback();
-  }, [router]);
+    if (status === 'authenticated') {
+      router.push('/dashboard');
+    } else if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] flex items-center justify-center">
