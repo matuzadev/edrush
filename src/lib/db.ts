@@ -1,102 +1,41 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import path from 'path';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
 
-// Criar diretório de dados se não existir
-const dbPath = path.join(process.cwd(), 'data', 'foco-federal.db');
+const client = createClient({
+  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
 
-// Inicializar banco de dados
-const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
+export const db = drizzle(client, { schema });
 
-export const db = drizzle(sqlite, { schema });
-
-// Adicionar colunas de onboarding em bancos já existentes
-function runMigrations() {
-  const columns = sqlite.prepare("PRAGMA table_info(users)").all() as { name: string }[];
-  const names = columns.map((c) => c.name);
-
-  if (!names.includes('onboarding_completed')) {
-    sqlite.exec('ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0');
-  }
-  if (!names.includes('selected_concurso_id')) {
-    sqlite.exec('ALTER TABLE users ADD COLUMN selected_concurso_id INTEGER');
-  }
-  if (!names.includes('selected_concurso_slug')) {
-    sqlite.exec('ALTER TABLE users ADD COLUMN selected_concurso_slug TEXT');
-  }
-  if (!names.includes('selected_areas')) {
-    sqlite.exec('ALTER TABLE users ADD COLUMN selected_areas TEXT');
-  }
-
-  // Migração: colunas faltantes em concursos
-  const concursosCols = sqlite.prepare("PRAGMA table_info(concursos)").all() as { name: string }[];
-  const cc = new Set(concursosCols.map((c) => c.name));
-  const concursosMigrations: [string, string][] = [
-    ['orgao',                      "TEXT NOT NULL DEFAULT ''"],
-    ['descricao',                  'TEXT'],
-    ['vagas_total',                'INTEGER'],
-    ['vagas_por_funcao',           'TEXT'],
-    ['data_publicacao_edital',     'TEXT'],
-    ['data_abertura_inscricoes',   'TEXT'],
-    ['data_fechamento_inscricoes', 'TEXT'],
-    ['data_prova_objetiva',        'TEXT'],
-    ['data_prova_discursiva',      'TEXT'],
-    ['data_resultado_final',       'TEXT'],
-    ['url_edital',                 'TEXT'],
-    ['url_site_oficial',           'TEXT'],
-    ['banca',                      'TEXT'],
-    ['remuneracao_inicial',        'REAL'],
-    ['nivel_escolaridade',         'TEXT'],
-    ['fonte_scrape',               'TEXT'],
-    ['logo_url',                   'TEXT'],
-  ];
-  for (const [col, def] of concursosMigrations) {
-    if (!cc.has(col)) {
-      sqlite.exec(`ALTER TABLE concursos ADD COLUMN ${col} ${def}`);
-    }
-  }
-}
-
-// Criar tabelas se não existirem
-export function initializeDatabase() {
+export async function initializeDatabase() {
   try {
-    // Verificar se tabelas existem
-    const tables = sqlite
-      .prepare(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-      )
-      .all();
-
-    if (tables.length === 0) {
-      console.log('📦 Criando tabelas no banco de dados...');
-      
-      // Criar tabelas manualmente (Drizzle não cria automaticamente em SQLite)
-      sqlite.exec(`
-        CREATE TABLE IF NOT EXISTS ufs (
+    // Criar tabelas em lotes para evitar timeouts
+    await client.batch(
+      [
+        `CREATE TABLE IF NOT EXISTS ufs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           codigo_ibge INTEGER NOT NULL UNIQUE,
           sigla TEXT NOT NULL UNIQUE,
           nome TEXT NOT NULL,
           regiao TEXT NOT NULL,
           criado_em TEXT NOT NULL
-        );
+        )`,
 
-        CREATE TABLE IF NOT EXISTS cidades (
+        `CREATE TABLE IF NOT EXISTS cidades (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           codigo_ibge INTEGER NOT NULL UNIQUE,
           nome TEXT NOT NULL,
           uf_id INTEGER NOT NULL,
           criado_em TEXT NOT NULL,
           FOREIGN KEY (uf_id) REFERENCES ufs(id)
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_cidades_uf_id ON cidades(uf_id);
-        CREATE INDEX IF NOT EXISTS idx_cidades_nome ON cidades(nome);
+        `CREATE INDEX IF NOT EXISTS idx_cidades_uf_id ON cidades(uf_id)`,
+        `CREATE INDEX IF NOT EXISTS idx_cidades_nome ON cidades(nome)`,
 
-        CREATE TABLE IF NOT EXISTS users (
+        `CREATE TABLE IF NOT EXISTS users (
           id TEXT PRIMARY KEY,
           email TEXT NOT NULL UNIQUE,
           senha_hash TEXT,
@@ -109,24 +48,26 @@ export function initializeDatabase() {
           subscription_status TEXT DEFAULT 'free',
           subscription_expires_at TEXT,
           stripe_customer_id TEXT,
-          pagbank_customer_id TEXT,
+          onboarding_completed INTEGER DEFAULT 0,
+          selected_concurso_id INTEGER,
+          selected_concurso_slug TEXT,
+          selected_areas TEXT,
           criado_em TEXT NOT NULL,
           atualizado_em TEXT NOT NULL,
           FOREIGN KEY (uf_id) REFERENCES ufs(id),
           FOREIGN KEY (cidade_id) REFERENCES cidades(id)
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-        CREATE INDEX IF NOT EXISTS idx_users_provider_id ON users(provider_id);
-        CREATE INDEX IF NOT EXISTS idx_users_uf_id ON users(uf_id);
-        CREATE INDEX IF NOT EXISTS idx_users_cidade_id ON users(cidade_id);
+        `CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`,
+        `CREATE INDEX IF NOT EXISTS idx_users_provider_id ON users(provider_id)`,
 
-        CREATE TABLE IF NOT EXISTS concursos (
+        `CREATE TABLE IF NOT EXISTS concursos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           titulo TEXT NOT NULL,
           organizador TEXT NOT NULL,
-          orgao TEXT NOT NULL,
+          orgao TEXT NOT NULL DEFAULT '',
           descricao TEXT,
+          slug TEXT,
           uf_id INTEGER,
           cidade_id INTEGER,
           vagas_total INTEGER,
@@ -143,18 +84,17 @@ export function initializeDatabase() {
           banca TEXT,
           remuneracao_inicial REAL,
           nivel_escolaridade TEXT,
+          fonte_scrape TEXT,
+          logo_url TEXT,
           criado_em TEXT NOT NULL,
           atualizado_em TEXT NOT NULL,
-          fonte_scrape TEXT,
           FOREIGN KEY (uf_id) REFERENCES ufs(id),
           FOREIGN KEY (cidade_id) REFERENCES cidades(id)
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_concursos_status ON concursos(status);
-        CREATE INDEX IF NOT EXISTS idx_concursos_uf_id ON concursos(uf_id);
-        CREATE INDEX IF NOT EXISTS idx_concursos_data_inscricoes ON concursos(data_abertura_inscricoes);
+        `CREATE INDEX IF NOT EXISTS idx_concursos_status ON concursos(status)`,
 
-        CREATE TABLE IF NOT EXISTS editais (
+        `CREATE TABLE IF NOT EXISTS editais (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           concurso_id INTEGER NOT NULL,
           numero_edital TEXT NOT NULL,
@@ -163,13 +103,10 @@ export function initializeDatabase() {
           versao INTEGER DEFAULT 1,
           alteracoes_descritas TEXT,
           criado_em TEXT NOT NULL,
-          UNIQUE(concurso_id, numero_edital),
           FOREIGN KEY (concurso_id) REFERENCES concursos(id)
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_editais_concurso_id ON editais(concurso_id);
-
-        CREATE TABLE IF NOT EXISTS concurso_candidato (
+        `CREATE TABLE IF NOT EXISTS concurso_candidato (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           user_id TEXT NOT NULL,
           concurso_id INTEGER NOT NULL,
@@ -182,13 +119,9 @@ export function initializeDatabase() {
           atualizado_em TEXT NOT NULL,
           FOREIGN KEY (user_id) REFERENCES users(id),
           FOREIGN KEY (concurso_id) REFERENCES concursos(id)
-          
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_concurso_candidato_user ON concurso_candidato(user_id);
-        CREATE INDEX IF NOT EXISTS idx_concurso_candidato_concurso ON concurso_candidato(concurso_id);
-
-        CREATE TABLE IF NOT EXISTS questions (
+        `CREATE TABLE IF NOT EXISTS questions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           titulo TEXT NOT NULL,
           disciplina TEXT NOT NULL,
@@ -206,14 +139,12 @@ export function initializeDatabase() {
           criado_em TEXT NOT NULL,
           atualizado_em TEXT NOT NULL,
           FOREIGN KEY (concurso_id) REFERENCES concursos(id)
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_questions_disciplina ON questions(disciplina);
-        CREATE INDEX IF NOT EXISTS idx_questions_capitulo ON questions(capitulo);
-        CREATE INDEX IF NOT EXISTS idx_questions_concurso_id ON questions(concurso_id);
-        CREATE INDEX IF NOT EXISTS idx_questions_dificuldade ON questions(dificuldade);
+        `CREATE INDEX IF NOT EXISTS idx_questions_disciplina ON questions(disciplina)`,
+        `CREATE INDEX IF NOT EXISTS idx_questions_concurso_id ON questions(concurso_id)`,
 
-        CREATE TABLE IF NOT EXISTS user_responses (
+        `CREATE TABLE IF NOT EXISTS user_responses (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           user_id TEXT NOT NULL,
           question_id INTEGER NOT NULL,
@@ -223,29 +154,23 @@ export function initializeDatabase() {
           respondida_em TEXT NOT NULL,
           FOREIGN KEY (user_id) REFERENCES users(id),
           FOREIGN KEY (question_id) REFERENCES questions(id)
-        );
+        )`,
 
-        CREATE INDEX IF NOT EXISTS idx_user_responses_user_id ON user_responses(user_id);
-        CREATE INDEX IF NOT EXISTS idx_user_responses_question_id ON user_responses(question_id);
-        CREATE INDEX IF NOT EXISTS idx_user_responses_respondida_em ON user_responses(respondida_em);
-      `);
+        `CREATE INDEX IF NOT EXISTS idx_user_responses_user_id ON user_responses(user_id)`,
 
-      console.log('✅ Tabelas criadas com sucesso!');
+      ],
+      'write'
+    );
 
-      // Inserir dados de UFs e Cidades (dados brasileiros)
-      seedUFsAndCidades(sqlite);
-    }
-
-    // Rodar migrações para bancos já existentes (adiciona colunas novas)
-    runMigrations();
+    await seedUFs();
+    console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar banco de dados:', error);
     throw error;
   }
 }
 
-// Função para popular UFs e Cidades
-function seedUFsAndCidades(sqlite: Database.Database) {
+async function seedUFs() {
   const ufData = [
     { codigo_ibge: 11, sigla: 'RO', nome: 'Rondônia', regiao: 'Norte' },
     { codigo_ibge: 12, sigla: 'AC', nome: 'Acre', regiao: 'Norte' },
@@ -276,15 +201,13 @@ function seedUFsAndCidades(sqlite: Database.Database) {
     { codigo_ibge: 53, sigla: 'DF', nome: 'Distrito Federal', regiao: 'Centro-Oeste' },
   ];
 
-  const insertUf = sqlite.prepare(
-    'INSERT OR IGNORE INTO ufs (codigo_ibge, sigla, nome, regiao, criado_em) VALUES (?, ?, ?, ?, ?)'
-  );
-
-  console.log('📍 Inserindo UFs...');
+  const now = new Date().toISOString();
   for (const uf of ufData) {
-    insertUf.run(uf.codigo_ibge, uf.sigla, uf.nome, uf.regiao, new Date().toISOString());
+    await client.execute({
+      sql: 'INSERT OR IGNORE INTO ufs (codigo_ibge, sigla, nome, regiao, criado_em) VALUES (?, ?, ?, ?, ?)',
+      args: [uf.codigo_ibge, uf.sigla, uf.nome, uf.regiao, now],
+    });
   }
-  console.log('✅ UFs inseridas!');
 }
 
 export default db;

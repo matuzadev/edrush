@@ -1,5 +1,3 @@
-import { supabase } from '@/lib/supabase';
-
 export type QuestionType = 'multipla' | 'verdadeiro_falso' | 'discursiva';
 
 export interface Question {
@@ -162,46 +160,26 @@ export const getQuestionsForReview = (questions: Question[]): Question[] => {
     });
 };
 
-// Salvar resposta no Supabase
+// Salvar resposta no banco via API
 export const saveQuestionAnswer = async (
   userId: string,
   questionId: string,
   userAnswer: string,
   isCorrect: boolean,
-  qualityRating: number
+  _qualityRating: number
 ) => {
   try {
-    const { data, error } = await supabase
-      .from('question_answers')
-      .insert({
-        user_id: userId,
-        question_id: questionId,
-        user_answer: userAnswer,
-        is_correct: isCorrect,
-        quality_rating: qualityRating,
-        answered_at: new Date().toISOString(),
-      });
-
-    if (error) throw error;
-    return data;
+    await fetch('/api/submit-answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, questionId, userAnswer, isCorrect }),
+    });
   } catch (error) {
     console.error('Erro ao salvar resposta:', error);
-    throw error;
   }
 };
 
-// Carregar questões do usuário do Supabase
-export const fetchUserQuestions = async (userId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('questions')
-      .select('*')
-      .eq('user_id', userId);
-
-    if (error) throw error;
-    return data || MOCK_QUESTIONS;
-  } catch (error) {
-    console.error('Erro ao buscar questões:', error);
-    return MOCK_QUESTIONS;
-  }
+// Carregar questões — por enquanto retorna mock (pendente integração completa com DB)
+export const fetchUserQuestions = async (_userId: string): Promise<Question[]> => {
+  return MOCK_QUESTIONS;
 };
