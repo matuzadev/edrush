@@ -1,43 +1,89 @@
+import Link from 'next/link';
+import { ShieldCheck, CreditCard } from 'lucide-react';
+
 export default function Footer() {
   return (
-    <footer className="bg-[#0f172a] border-t border-cyan-500/10 pt-12 pb-6 text-slate-400">
+    <footer className="bg-[#0f172a] border-t border-slate-800 pt-12 pb-6 text-slate-400">
       <div className="max-w-7xl mx-auto px-4">
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
 
+          {/* Sobre */}
           <div className="space-y-4">
-            <h3 className="text-white font-bold tracking-widest uppercase text-sm">Foco Federal</h3>
+            <h3 className="text-white font-black tracking-tight text-base">
+              Foco<span className="text-emerald-400">Federal</span>
+            </h3>
             <p className="text-xs leading-relaxed">
-              Especialistas em metodologias avançadas para Perito Criminal Federal e EsFCEx.
-              Nossa missão é transformar dados em aprovação através do Active Recall e Inteligência Forense.
+              Plataforma de preparação inteligente para todos os concursos públicos do Brasil.
+              Combinamos Active Recall científico e Técnica de Feynman para transformar seu estudo
+              em aprovação.
             </p>
           </div>
 
+          {/* Navegação */}
           <div className="space-y-4">
-            <h3 className="text-white font-bold tracking-widest uppercase text-sm">Navegação</h3>
-            <ul className="text-xs space-y-2">
-              <li><a href="#" className="hover:text-cyan-400 transition">Início</a></li>
-              <li><a href="planilha.html" className="hover:text-cyan-400 transition">A Planilha</a></li>
+            <h3 className="text-white font-bold tracking-widest uppercase text-xs">
+              Navegação
+            </h3>
+            <ul className="text-xs space-y-2.5">
+              <li>
+                <Link href="/" className="hover:text-emerald-400 transition-colors no-underline">
+                  Início
+                </Link>
+              </li>
+              <li>
+                <Link href="/#beneficios" className="hover:text-emerald-400 transition-colors no-underline">
+                  Benefícios
+                </Link>
+              </li>
+              <li>
+                <Link href="/#oferta" className="hover:text-emerald-400 transition-colors no-underline">
+                  Ver Planos
+                </Link>
+              </li>
+              <li>
+                <Link href="/auth/login" className="hover:text-emerald-400 transition-colors no-underline">
+                  Entrar
+                </Link>
+              </li>
+              <li>
+                <Link href="/auth/signup" className="hover:text-emerald-400 transition-colors no-underline">
+                  Criar Conta
+                </Link>
+              </li>
             </ul>
           </div>
 
+          {/* Segurança */}
           <div className="space-y-4">
-            <h3 className="text-white font-bold tracking-widest uppercase text-sm">Segurança</h3>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-green-500 text-lg">🛡️</span>
-              <span>Ambiente 100% Criptografado</span>
+            <h3 className="text-white font-bold tracking-widest uppercase text-xs">
+              Segurança
+            </h3>
+            <div className="flex items-center gap-3 text-xs">
+              <ShieldCheck className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <span>Ambiente 100% criptografado</span>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-blue-500 text-lg">💳</span>
-              <span>Pagamento Seguro via Kirvano</span>
+            <div className="flex items-center gap-3 text-xs">
+              <CreditCard className="w-4 h-4 text-blue-400 flex-shrink-0" />
+              <span>Pagamento Seguro via Stripe</span>
             </div>
+            <p className="text-[11px] leading-relaxed text-slate-500 pt-1">
+              Seus dados financeiros nunca passam pelos nossos servidores.
+              Toda transacao e processada diretamente pelo Stripe.
+            </p>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-tighter">
-          <p>&copy; 2026 Foco Federal - Todos os direitos reservados.</p>
+        {/* Bottom bar */}
+        <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest">
+          <p>&copy; 2026 Foco Federal — Todos os direitos reservados.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white">Termos de Uso</a>
-            <a href="#" className="hover:text-white">Políticas de Privacidade</a>
+            <a href="#" className="hover:text-white transition-colors">
+              Termos de Uso
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              Privacidade
+            </a>
           </div>
         </div>
       </div>

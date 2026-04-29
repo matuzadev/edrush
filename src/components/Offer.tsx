@@ -1,353 +1,148 @@
-import { CheckCircle2, Zap, Target, Award } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle2, Zap, Users, Lock, RefreshCw } from 'lucide-react';
+
+const benefits: { title: string; desc: string }[] = [
+  {
+    title: '+12.000 Questões Comentadas',
+    desc: 'Base completa para todos os concursos do Brasil, atualizada constantemente.',
+  },
+  {
+    title: 'Active Recall Automático',
+    desc: 'Revisões inteligentes no ciclo 1-7-30 para retenção máxima.',
+  },
+  {
+    title: 'Técnica de Feynman',
+    desc: 'Explique com suas palavras e o sistema identifica o que você ainda não domina.',
+  },
+  {
+    title: 'Analytics em Tempo Real',
+    desc: 'Dashboard completo: acertos por matéria, evolução e projeção de nota.',
+  },
+  {
+    title: 'Mapa de Concursos',
+    desc: 'Editais abertos e datas de prova para todo o Brasil em um só lugar.',
+  },
+  {
+    title: 'Cancela quando quiser',
+    desc: 'Sem fidelidade, sem multa. Assine e cancele com 1 clique.',
+  },
+];
 
 export default function Offer() {
   return (
     <section id="oferta" className="py-24 bg-[#030712] relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+      {/* Glows */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/8 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/8 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="offer-wrapper">
-          {/* Left Side - Benefits */}
-          <div className="offer-benefits">
-            <h2 className="section-title text-left mb-8">Tudo que você precisa para passar</h2>
-            
-            <div className="benefits-list">
-              <div className="benefit-row">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-white">Dashboard Completo</p>
-                  <p className="text-slate-400 text-sm">Analytics em tempo real de seu desempenho</p>
-                </div>
-              </div>
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
 
-              <div className="benefit-row">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-white">+10.000 Questões</p>
-                  <p className="text-slate-400 text-sm">Base completa e verticalizada para Polícia Federal</p>
-                </div>
-              </div>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold tracking-widest uppercase mb-4">
+            Vagas limitadas desta semana
+          </span>
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
+            Comece hoje por{' '}
+            <span className="text-emerald-400">R$9,90/mês</span>
+          </h2>
+          <p className="text-slate-400 text-sm">
+            Menos que um café por semana. Cancela quando quiser.
+          </p>
+        </div>
 
-              <div className="benefit-row">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-white">Active Recall Automático</p>
-                  <p className="text-slate-400 text-sm">Revisões inteligentes no ciclo 1-7-30</p>
-                </div>
-              </div>
+        {/* Corpo da oferta: benefícios + card de preço */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-              <div className="benefit-row">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+          {/* Benefícios */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white font-bold text-xl mb-2">
+              O que está incluído no plano
+            </h3>
+            {benefits.map((b, i) => (
+              <div key={i} className="flex gap-4 items-start">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-white">Simulador Cebraspe</p>
-                  <p className="text-slate-400 text-sm">Cálculo de nota com o padrão real de correção</p>
+                  <p className="text-white font-semibold text-sm">{b.title}</p>
+                  <p className="text-slate-400 text-xs leading-relaxed mt-0.5">{b.desc}</p>
                 </div>
               </div>
+            ))}
 
-              <div className="benefit-row">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-white">Diagnóstico de Fraquezas</p>
-                  <p className="text-slate-400 text-sm">IA identifica seus pontos fracos por matéria</p>
-                </div>
-              </div>
-
-              <div className="benefit-row">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-white">Acesso Vitalício</p>
-                  <p className="text-slate-400 text-sm">Sem mensalidades, sem limites de tempo</p>
-                </div>
-              </div>
+            {/* Social proof */}
+            <div className="mt-4 flex items-center gap-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+              <Users className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <p className="text-sm text-slate-300">
+                <span className="text-white font-black">847 estudantes</span> ativos agora na plataforma
+              </p>
+              <span className="ml-auto flex items-center gap-1 text-xs text-emerald-400 font-semibold">
+                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                ao vivo
+              </span>
             </div>
           </div>
 
-          {/* Right Side - Pricing Card */}
-          <div className="price-card">
-            <div className="price-header">
-              <span className="price-badge">OFERTA EXCLUSIVA</span>
-            </div>
+          {/* Card de preço */}
+          <div className="relative rounded-2xl p-px bg-gradient-to-b from-emerald-500/40 to-slate-800/20">
+            <div className="rounded-2xl bg-[#0b1628] p-8 overflow-hidden relative">
 
-            <div className="price-content">
-              <h3 className="text-2xl font-black text-white mb-4">Plano Completo</h3>
-              
-              <div className="price-display">
-                <div className="price-original">De R$ 99,90</div>
-                <div className="price-main">
-                  <span className="price-currency">R$</span>
-                  <span className="price-amount">29</span>
-                  <span className="price-cents">,90</span>
+              {/* Reflexo decorativo */}
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10">
+                <span className="inline-block px-3 py-1 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-bold uppercase tracking-widest mb-5">
+                  Plano Mensal — Mais Popular
+                </span>
+
+                {/* Preço */}
+                <div className="rounded-xl bg-slate-900/70 border border-slate-700/50 p-5 mb-6">
+                  <p className="text-slate-400 text-sm line-through mb-1">De R$ 49,90/mês</p>
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span className="text-slate-400 text-base">R$</span>
+                    <span className="text-emerald-400 text-5xl font-black leading-none">9</span>
+                    <span className="text-emerald-400 text-2xl font-bold">,90</span>
+                    <span className="text-slate-400 text-sm">/mês</span>
+                  </div>
+                  <p className="text-slate-300 text-xs font-semibold">
+                    Assinatura mensal — cancela quando quiser
+                  </p>
                 </div>
-                <div className="price-interval">Pagamento único • Acesso para sempre</div>
+
+                {/* Mini features */}
+                <div className="flex flex-col gap-3 mb-7">
+                  <div className="flex items-center gap-3 text-slate-200 text-sm">
+                    <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span>Ativação imediata após o pagamento</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-200 text-sm">
+                    <Lock className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Pagamento 100% seguro via Stripe</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-200 text-sm">
+                    <RefreshCw className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>Cancele a qualquer momento, sem burocracia</span>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <Link
+                  href="/checkout?plan=starter"
+                  className="block w-full text-center py-4 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base uppercase tracking-wide transition-all hover:scale-[1.02] hover:shadow-[0_10px_40px_rgba(16,185,129,0.4)] no-underline"
+                >
+                  GARANTIR MEU ACESSO AGORA
+                </Link>
+
+                <p className="text-slate-500 text-xs text-center mt-4 leading-relaxed">
+                  Garantia de satisfação de 7 dias. Suporte via email 24h.
+                </p>
               </div>
-
-              <div className="features-inline">
-                <div className="inline-feature">
-                  <Zap className="w-5 h-5 text-amber-400" />
-                  <span>Ativação Imediata</span>
-                </div>
-                <div className="inline-feature">
-                  <Target className="w-5 h-5 text-emerald-400" />
-                  <span>100% Verticalizado</span>
-                </div>
-                <div className="inline-feature">
-                  <Award className="w-5 h-5 text-blue-400" />
-                  <span>Suporte Prioritário</span>
-                </div>
-              </div>
-
-              <button className="btn-cta-primary w-full">
-                Começar Agora - Acesso Imediato
-              </button>
-
-              <p className="text-slate-400 text-xs text-center mt-4">
-                ✓ Garantia de satisfação<br/>
-                ✓ Sem compromisso de prazo<br/>
-                ✓ Suporte via email 24h
-              </p>
             </div>
-
-            {/* Testimonial inside card */}
-            
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .offer-wrapper {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 40px;
-          align-items: center;
-        }
-
-        .offer-badge {
-          display: inline-block;
-          background: rgba(16, 185, 129, 0.15);
-          color: #10b981;
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 0.85rem;
-          font-weight: 700;
-          margin-bottom: 20px;
-          border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .offer-benefits {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .benefits-list {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .benefit-row {
-          display: flex;
-          gap: 16px;
-        }
-
-        .price-card {
-          background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-          border: 1px solid rgba(16, 185, 129, 0.3);
-          border-radius: 20px;
-          padding: 40px;
-          backdrop-filter: blur(10px);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .price-card::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          right: -50%;
-          width: 300px;
-          height: 300px;
-          background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent);
-          pointer-events: none;
-        }
-
-        .price-header {
-          margin-bottom: 20px;
-        }
-
-        .price-badge {
-          display: inline-block;
-          background: rgba(59, 130, 246, 0.2);
-          color: #60a5fa;
-          padding: 6px 14px;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        .price-content {
-          position: relative;
-          z-index: 1;
-        }
-
-        .price-original {
-          font-size: 0.95rem;
-          color: #94a3b8;
-          text-decoration: line-through;
-          margin-bottom: 8px;
-        }
-
-        .price-display {
-          background: rgba(30, 41, 59, 0.6);
-          border-radius: 14px;
-          padding: 24px;
-          margin-bottom: 24px;
-          border: 1px solid rgba(51, 65, 85, 0.3);
-        }
-
-        .price-main {
-          display: flex;
-          align-items: baseline;
-          gap: 4px;
-          margin-bottom: 8px;
-        }
-
-        .price-currency {
-          font-size: 1rem;
-          color: #94a3b8;
-        }
-
-        .price-amount {
-          font-size: 3.5rem;
-          font-weight: 900;
-          color: #10b981;
-          line-height: 1;
-        }
-
-        .price-cents {
-          font-size: 1.5rem;
-          color: #94a3b8;
-        }
-
-        .price-interval {
-          font-size: 0.85rem;
-          color: #cbd5e1;
-          font-weight: 600;
-        }
-
-        .features-inline {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          margin-bottom: 24px;
-        }
-
-        .inline-feature {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 0.95rem;
-          color: #e2e8f0;
-        }
-
-        .btn-cta-primary {
-          width: 100%;
-          padding: 14px 24px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          color: white;
-          border: none;
-          border-radius: 12px;
-          font-weight: 700;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: all 0.3s;
-          box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-cta-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
-        }
-
-        .testimonial-mini {
-          margin-top: 24px;
-          padding-top: 24px;
-          border-top: 1px solid rgba(51, 65, 85, 0.3);
-        }
-
-        .testimonial-mini p:first-child {
-          font-size: 0.9rem;
-          color: #cbd5e1;
-          margin-bottom: 12px;
-          line-height: 1.5;
-        }
-
-        .testimonial-author {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .author-avatar {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, #10b981, #059669);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          color: white;
-          font-size: 0.85rem;
-        }
-
-        .testimonial-author p {
-          margin: 0;
-        }
-
-        .testimonial-author p:first-child {
-          font-size: 0.9rem;
-          color: #e2e8f0;
-        }
-
-        @media (max-width: 1024px) {
-          .offer-wrapper {
-            grid-template-columns: 1fr;
-            gap: 30px;
-          }
-
-          .price-card {
-            padding: 30px;
-          }
-
-          .price-amount {
-            font-size: 2.5rem;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .offer-wrapper {
-            gap: 20px;
-          }
-
-          .benefits-list {
-            gap: 15px;
-          }
-
-          .benefit-row {
-            gap: 12px;
-          }
-
-          .price-card {
-            padding: 24px;
-          }
-        }
-      `}</style>
     </section>
   );
 }
