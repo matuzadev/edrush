@@ -7,8 +7,8 @@ import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
-// Inicializar banco ao carregar
-initializeDatabase();
+// Inicializar banco ao carregar (async, fire-and-forget na inicialização do módulo)
+initializeDatabase().catch(console.error);
 
 export const authOptions: NextAuthOptions = {
   providers: [

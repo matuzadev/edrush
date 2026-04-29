@@ -42,7 +42,6 @@ export const users = sqliteTable(
     subscription_status: text('subscription_status').default('free'), // free, active, cancelled
     subscription_expires_at: text('subscription_expires_at'),
     stripe_customer_id: text('stripe_customer_id'),
-    pagbank_customer_id: text('pagbank_customer_id'),
     // Onboarding
     onboarding_completed: integer('onboarding_completed').default(0), // 0 = false, 1 = true
     selected_concurso_id: integer('selected_concurso_id'),
@@ -88,6 +87,7 @@ export const concursos = sqliteTable(
     atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
     fonte_scrape: text('fonte_scrape'), // gov.br, PC, IADES, etc
     logo_url: text('logo_url'), // URL da logo do órgão (ex: /logos/orgaos/pf.png)
+    slug: text('slug'), // slug para URL amigável
   },
   (table) => [
     index('idx_concursos_status').on(table.status),

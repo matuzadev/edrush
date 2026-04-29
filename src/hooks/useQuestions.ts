@@ -20,11 +20,7 @@ export function useQuestions() {
     try {
       setIsLoading(true);
       // Em produção, buscar do Supabase
-      // const { data, error } = await supabase
-      //   .from('questions')
-      //   .select('*')
-      //   .eq('user_id', user?.id);
-      
+      // TODO: buscar questões do Turso via /api/questions quando integração estiver pronta
       // Por enquanto, usar mock data
       setQuestions(MOCK_QUESTIONS);
     } catch (err) {

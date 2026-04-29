@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { db } from '@/lib/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,21 +15,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Buscar user no Supabase
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('subscription_status, subscription_expires_at')
-      .eq('email', userEmail)
-      .single();
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, userEmail),
+    });
 
-    if (error || !user) {
-      console.error('Erro ao buscar usuário:', error);
+    if (!user) {
       return NextResponse.json({ isActive: false });
     }
 
-    // Verificar se assinatura está ativa
     const isActive =
       user.subscription_status === 'active' &&
+      !!user.subscription_expires_at &&
       new Date(user.subscription_expires_at) > new Date();
 
     return NextResponse.json({ isActive });

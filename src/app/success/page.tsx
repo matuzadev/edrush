@@ -5,17 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { CheckCircle2 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+interface SubscriptionInfo {
+  status: string;
+  hasAccess: boolean;
+  isPaid: boolean;
+  expiresAt: string | null;
+}
 
 export default function SuccessPage() {
   const router = useRouter();
   const { user, signOut, isLoading: authLoading } = useAuth();
-  const [subscription, setSubscription] = useState<any>(null);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,32 +26,15 @@ export default function SuccessPage() {
     }
 
     if (user) {
-      fetchSubscription();
+      fetch('/api/user/subscription')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data) setSubscription(data);
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }
   }, [user, authLoading, router]);
-
-  const fetchSubscription = async () => {
-    try {
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (data) {
-        setSubscription(data);
-      }
-    } catch (err) {
-      console.error('Erro:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    router.push('/');
-  };
 
   if (authLoading || loading) {
     return (
@@ -63,15 +47,7 @@ export default function SuccessPage() {
     );
   }
 
-  if (!user) {
-    return null;
-  }
-
-  const planNames: { [key: string]: string } = {
-    starter: 'Starter',
-    pro: 'Pro',
-    enterprise: 'Enterprise',
-  };
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617]">
@@ -81,9 +57,8 @@ export default function SuccessPage() {
             <Link href="/" className="text-xl font-bold text-white hover:text-emerald-400 transition">
               Foco Federal
             </Link>
-
             <button
-              onClick={handleLogout}
+              onClick={() => signOut()}
               className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition text-sm"
             >
               Sair
@@ -97,7 +72,6 @@ export default function SuccessPage() {
           <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
             <CheckCircle2 className="w-12 h-12 text-emerald-400" />
           </div>
-
           <h1 className="text-4xl font-bold text-white mb-3">Pagamento Confirmado!</h1>
           <p className="text-xl text-slate-400">
             Bem-vindo à plataforma Foco Federal. Sua assinatura está ativa!
@@ -109,24 +83,19 @@ export default function SuccessPage() {
 
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center pb-4 border-b border-white/10">
-              <span className="text-slate-400">Plano:</span>
-              <span className="text-white font-semibold">
-                {subscription ? planNames[subscription.plan_id] || subscription.plan_id : 'Carregando...'}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center pb-4 border-b border-white/10">
               <span className="text-slate-400">Status:</span>
               <span className="flex items-center gap-2 text-emerald-400">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
-                {subscription?.status || 'Ativo'}
+                {subscription?.isPaid ? 'Ativo' : 'Processando...'}
               </span>
             </div>
 
             <div className="flex justify-between items-center pb-4 border-b border-white/10">
               <span className="text-slate-400">Válido até:</span>
               <span className="text-white font-semibold">
-                {subscription ? new Date(subscription.expiry_date).toLocaleDateString('pt-BR') : 'Carregando...'}
+                {subscription?.expiresAt
+                  ? new Date(subscription.expiresAt).toLocaleDateString('pt-BR')
+                  : 'Processando...'}
               </span>
             </div>
 
@@ -156,7 +125,7 @@ export default function SuccessPage() {
           <h3 className="text-lg font-semibold text-blue-300 mb-3">Próximos Passos</h3>
           <ul className="text-blue-200 space-y-2 text-sm">
             <li>✓ Acesse o dashboard para começar seus estudos</li>
-            <li>✓ Explore questões de Perito PF e ESFCEx</li>
+            <li>✓ Explore questões de todos os concursos disponíveis</li>
             <li>✓ Configure suas metas e comece o Active Recall</li>
             <li>✓ Acompanhe seu progresso em tempo real</li>
           </ul>

@@ -58,7 +58,7 @@ export async function scraperGovBr() {
   }
 }
 
-export async function scraperPolicia Federal() {
+export async function scraperPoliciaFederal() {
   try {
     console.log('🔍 Iniciando scraper da Polícia Federal...');
     
@@ -162,7 +162,7 @@ export async function scraperNoticiasGovBr() {
 // Executar scrapers periodicamente
 export async function runScrapers() {
   await scraperGovBr();
-  await scraperPolicia Federal();
+  await scraperPoliciaFederal();
   await scraperNoticiasGovBr();
 }
 
