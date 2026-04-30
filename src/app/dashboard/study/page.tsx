@@ -22,7 +22,7 @@ function StudyPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, signOut, isLoading } = useAuth();
-  const { profile, addCorrectAnswer, addIncorrectAnswer, completeChapter } = usUserProfile();
+  const { profile, addCorrectAnswer, addIncorrectAnswer, completeChapter, saveStudySession } = usUserProfile();
   
   // Pegar Matéria da URL (ex: ?subject=portugues)
   const subject = searchParams.get('subject');
@@ -71,13 +71,18 @@ function StudyPageContent() {
       addIncorrectAnswer();
     }
 
-    // Simular salvamento
-    setTimeout(() => {
+    setTimeout(async () => {
       if (currentQuestionIndex < sessionQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
         completeChapter();
         setIsFinished(true);
+        // Persistir sessão no banco — fire-and-forget (não bloquear UI)
+        await saveStudySession({
+          questionsAnswered: sessionQuestions.length,
+          correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,
+          subject: subject ?? undefined,
+        });
       }
       setIsSubmitting(false);
     }, 400);
