@@ -42,6 +42,7 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = useCallback(async () => {
@@ -100,6 +101,39 @@ export function NotificationBell() {
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch {
       // ignorar
+    }
+  };
+
+  const handleFriendRequestAction = async (notificationId: number, friendshipId: string | null, action: 'accept' | 'reject') => {
+    if (!friendshipId) return;
+    setActionLoadingId(notificationId);
+
+    try {
+      const res = await fetch(`/api/friends/${friendshipId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+
+      if (!res.ok) {
+        return;
+      }
+
+      const title = action === 'accept' ? 'Solicitação Aceita' : 'Solicitação Rejeitada';
+      const bodyText = action === 'accept'
+        ? 'Você aceitou a solicitação de amizade.'
+        : 'Você rejeitou a solicitação de amizade.';
+
+      setNotifications(prev => prev.map(n => n.id === notificationId ? {
+        ...n,
+        read: 1,
+        title,
+        body: bodyText,
+        type: action === 'accept' ? 'friend_accepted' : 'admin_message',
+      } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -163,6 +197,25 @@ export function NotificationBell() {
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{notif.body}</p>
                     <p className="text-xs text-slate-600 mt-1">{timeAgo(notif.criado_em)}</p>
+
+                    {notif.type === 'friend_request' && notif.related_id && notif.read === 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          onClick={() => handleFriendRequestAction(notif.id, notif.related_id, 'accept')}
+                          disabled={actionLoadingId === notif.id}
+                          className="rounded-full bg-emerald-500 text-white text-xs px-3 py-2 hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {actionLoadingId === notif.id ? 'Aguarde...' : 'Aceitar'}
+                        </button>
+                        <button
+                          onClick={() => handleFriendRequestAction(notif.id, notif.related_id, 'reject')}
+                          disabled={actionLoadingId === notif.id}
+                          className="rounded-full bg-slate-700 text-slate-200 text-xs px-3 py-2 hover:bg-slate-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {actionLoadingId === notif.id ? 'Aguarde...' : 'Rejeitar'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                   {notif.read === 0 && (
                     <button
