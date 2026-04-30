@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Loader2,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 import subjects from '@/data/subjects.json';
 
 interface UserSession {
@@ -149,6 +150,7 @@ export default function PersonalizedDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <NotificationBell />
           <Link href="/dashboard/profile" className="text-slate-400 hover:text-emerald-400 transition">
             <User className="w-5 h-5" />
           </Link>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { NotificationBell } from '@/components/NotificationBell';
 import { LogOut, CheckCircle, Lock, PlayCircle, Star, User } from 'lucide-react';
 
 // Exemplo de estrutura de dados para as trilhas
@@ -58,6 +59,7 @@ export default function DashboardPage() {
         </Link>
         
         <div className="flex items-center gap-4">
+          <NotificationBell />
           <Link href="/dashboard/profile" className="text-slate-400 hover:text-emerald-400 transition">
             <User className="w-5 h-5" />
           </Link>

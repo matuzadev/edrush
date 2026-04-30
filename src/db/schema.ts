@@ -47,6 +47,12 @@ export const users = sqliteTable(
     selected_concurso_id: integer('selected_concurso_id'),
     selected_concurso_slug: text('selected_concurso_slug'),
     selected_areas: text('selected_areas'), // JSON array of disciplina strings
+    // Perfil customizável
+    username: text('username'),
+    bio: text('bio'),
+    birthday: text('birthday'), // YYYY-MM-DD
+    location: text('location'),
+    avatar_id: integer('avatar_id').default(1),
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
@@ -184,6 +190,66 @@ export const user_responses = sqliteTable(
   ]
 );
 
+// Tabela de Sessões de Estudo
+// Registra agregados de cada sessão finalizada — não depende da tabela questions,
+// pois questões ainda vêm do localStorage durante a migração em progresso.
+export const study_sessions = sqliteTable(
+  'study_sessions',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    session_date: text('session_date').notNull(), // YYYY-MM-DD
+    questions_answered: integer('questions_answered').notNull().default(0),
+    correct_answers: integer('correct_answers').notNull().default(0),
+    concurso_slug: text('concurso_slug'),
+    subject: text('subject'), // matéria/disciplina da sessão
+    criado_em: text('criado_em').notNull(),
+  },
+  (table) => [
+    index('idx_study_sessions_user_id').on(table.user_id),
+    index('idx_study_sessions_date').on(table.session_date),
+    index('idx_study_sessions_user_date').on(table.user_id, table.session_date),
+  ]
+);
+
+// Tabela de Amizades
+export const friendships = sqliteTable(
+  'friendships',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    requester_id: text('requester_id').notNull().references(() => users.id),
+    receiver_id: text('receiver_id').notNull().references(() => users.id),
+    status: text('status').notNull().default('pending'), // pending, accepted, rejected
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  },
+  (table) => [
+    index('idx_friendships_requester').on(table.requester_id),
+    index('idx_friendships_receiver').on(table.receiver_id),
+    index('idx_friendships_status').on(table.status),
+  ]
+);
+
+// Tabela de Notificações
+export const notifications = sqliteTable(
+  'notifications',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    type: text('type').notNull(), // friend_request, friend_accepted, achievement, admin_message
+    title: text('title').notNull(),
+    body: text('body').notNull(),
+    read: integer('read').notNull().default(0), // 0 = false, 1 = true
+    related_id: text('related_id'), // ID da solicitação, achievement, etc.
+    criado_em: text('criado_em').notNull(),
+  },
+  (table) => [
+    index('idx_notifications_user_id').on(table.user_id),
+    index('idx_notifications_read').on(table.read),
+    index('idx_notifications_user_read').on(table.user_id, table.read),
+  ]
+);
+
 // Relações
 export const ufsRelations = relations(ufs, ({ many }) => ({
   cidades: many(cidades),
@@ -259,5 +325,30 @@ export const user_responsesRelations = relations(user_responses, ({ one }) => ({
   question: one(questions, {
     fields: [user_responses.question_id],
     references: [questions.id],
+  }),
+}));
+
+export const studySessionsRelations = relations(study_sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [study_sessions.user_id],
+    references: [users.id],
+  }),
+}));
+
+export const friendshipsRelations = relations(friendships, ({ one }) => ({
+  requester: one(users, {
+    fields: [friendships.requester_id],
+    references: [users.id],
+  }),
+  receiver: one(users, {
+    fields: [friendships.receiver_id],
+    references: [users.id],
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.user_id],
+    references: [users.id],
   }),
 }));

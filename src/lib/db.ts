@@ -158,9 +158,73 @@ export async function initializeDatabase() {
 
         `CREATE INDEX IF NOT EXISTS idx_user_responses_user_id ON user_responses(user_id)`,
 
+        `CREATE TABLE IF NOT EXISTS study_sessions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          session_date TEXT NOT NULL,
+          questions_answered INTEGER NOT NULL DEFAULT 0,
+          correct_answers INTEGER NOT NULL DEFAULT 0,
+          concurso_slug TEXT,
+          subject TEXT,
+          criado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )`,
+
+        `CREATE INDEX IF NOT EXISTS idx_study_sessions_user_id ON study_sessions(user_id)`,
+        `CREATE INDEX IF NOT EXISTS idx_study_sessions_date ON study_sessions(session_date)`,
+        `CREATE INDEX IF NOT EXISTS idx_study_sessions_user_date ON study_sessions(user_id, session_date)`,
+
+        `CREATE TABLE IF NOT EXISTS friendships (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          requester_id TEXT NOT NULL,
+          receiver_id TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'pending',
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (requester_id) REFERENCES users(id),
+          FOREIGN KEY (receiver_id) REFERENCES users(id)
+        )`,
+
+        `CREATE INDEX IF NOT EXISTS idx_friendships_requester ON friendships(requester_id)`,
+        `CREATE INDEX IF NOT EXISTS idx_friendships_receiver ON friendships(receiver_id)`,
+        `CREATE INDEX IF NOT EXISTS idx_friendships_status ON friendships(status)`,
+
+        `CREATE TABLE IF NOT EXISTS notifications (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          type TEXT NOT NULL,
+          title TEXT NOT NULL,
+          body TEXT NOT NULL,
+          read INTEGER NOT NULL DEFAULT 0,
+          related_id TEXT,
+          criado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )`,
+
+        `CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id)`,
+        `CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read)`,
+        `CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, read)`,
+
       ],
       'write'
     );
+
+    // Adicionar colunas novas em users (safe: try/catch por coluna)
+    const newUserColumns = [
+      `ALTER TABLE users ADD COLUMN username TEXT`,
+      `ALTER TABLE users ADD COLUMN bio TEXT`,
+      `ALTER TABLE users ADD COLUMN birthday TEXT`,
+      `ALTER TABLE users ADD COLUMN location TEXT`,
+      `ALTER TABLE users ADD COLUMN avatar_id INTEGER DEFAULT 1`,
+    ];
+
+    for (const sql of newUserColumns) {
+      try {
+        await client.execute(sql);
+      } catch {
+        // Coluna já existe — ignorar
+      }
+    }
 
     await seedUFs();
     console.log('✅ Banco de dados inicializado com sucesso');
