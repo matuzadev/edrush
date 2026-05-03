@@ -278,6 +278,69 @@ export const notifications = sqliteTable(
   ]
 );
 
+// Tabela de Capítulos/Blocos (módulos de estudo com 10+ questões por dificuldade)
+export const chapters = sqliteTable(
+  'chapters',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    disciplina: text('disciplina').notNull(), // Direito Penal, Português, etc
+    numero: integer('numero').notNull(), // 1, 2, 3, etc.
+    titulo: text('titulo').notNull(), // Nome do bloco (ex: "Conceitos Básicos")
+    descricao: text('descricao'), // Descrição do conteúdo
+    ordem: integer('ordem').notNull().default(0), // Ordem de exibição
+    is_primeiro: integer('is_primeiro').default(0), // 0 = false, 1 = true (primeiro é sempre desbloqueado)
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_chapters_disciplina').on(table.disciplina),
+    index('idx_chapters_numero').on(table.numero),
+    index('idx_chapters_ordem').on(table.ordem),
+  ]
+);
+
+// Tabela de Progresso do Usuário nos Capítulos
+export const user_chapter_progress = sqliteTable(
+  'user_chapter_progress',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    chapter_id: integer('chapter_id').notNull().references(() => chapters.id),
+    is_unlocked: integer('is_unlocked').default(0), // 0 = locked, 1 = unlocked
+    is_completed: integer('is_completed').default(0), // 0 = false, 1 = true (quando termina com sucesso)
+    acertos_total: integer('acertos_total').default(0),
+    questoes_respondidas: integer('questoes_respondidas').default(0),
+    percentual_acerto: real('percentual_acerto').default(0),
+    tempo_estudo_ms: integer('tempo_estudo_ms').default(0), // Total de tempo em ms
+    iniciado_em: text('iniciado_em'),
+    completado_em: text('completado_em'),
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+    atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_user_chprog_user_id').on(table.user_id),
+    index('idx_user_chprog_chapter_id').on(table.chapter_id),
+    index('idx_user_chprog_user_chapter').on(table.user_id, table.chapter_id),
+    index('idx_user_chprog_unlocked').on(table.is_unlocked),
+  ]
+);
+
+// Tabela de Desbloqueios (qual capítulo desbloqueia qual)
+export const chapter_unlocks = sqliteTable(
+  'chapter_unlocks',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    chapter_id_origem: integer('chapter_id_origem').notNull().references(() => chapters.id),
+    chapter_id_destino: integer('chapter_id_destino').notNull().references(() => chapters.id),
+    percentual_necessario: real('percentual_necessario').default(80), // % de acerto necessário
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_unlocks_origem').on(table.chapter_id_origem),
+    index('idx_unlocks_destino').on(table.chapter_id_destino),
+    primaryKey({ columns: [table.chapter_id_origem, table.chapter_id_destino] }),
+  ]
+);
+
 // Relações
 export const ufsRelations = relations(ufs, ({ many }) => ({
   cidades: many(cidades),
@@ -383,5 +446,35 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
     fields: [notifications.user_id],
     references: [users.id],
+  }),
+}));
+
+export const chaptersRelations = relations(chapters, ({ many }) => ({
+  user_progress: many(user_chapter_progress),
+  unlocks_de: many(chapter_unlocks, { relationName: 'unlocks_de' }),
+  unlocks_para: many(chapter_unlocks, { relationName: 'unlocks_para' }),
+}));
+
+export const user_chapter_progressRelations = relations(user_chapter_progress, ({ one }) => ({
+  user: one(users, {
+    fields: [user_chapter_progress.user_id],
+    references: [users.id],
+  }),
+  chapter: one(chapters, {
+    fields: [user_chapter_progress.chapter_id],
+    references: [chapters.id],
+  }),
+}));
+
+export const chapter_unlocksRelations = relations(chapter_unlocks, ({ one }) => ({
+  chapter_origem: one(chapters, {
+    fields: [chapter_unlocks.chapter_id_origem],
+    references: [chapters.id],
+    relationName: 'unlocks_de',
+  }),
+  chapter_destino: one(chapters, {
+    fields: [chapter_unlocks.chapter_id_destino],
+    references: [chapters.id],
+    relationName: 'unlocks_para',
   }),
 }));

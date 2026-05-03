@@ -8,7 +8,7 @@ import Testimonials from "@/components/Testimonials";
 import Offer from "@/components/Offer";
 import Radar from "@/components/Radar";
 import Footer from "@/components/Footer";
-import ContactMenu from "@/components/ContactMenu";
+import { BugReportButton } from "@/components/BugReportButton";
 import ReferralBanner from "@/components/ReferralBanner";
 
 export default function Home() {
@@ -56,7 +56,7 @@ export default function Home() {
       <ReferralBanner />
       <Radar data-reveal="bottom" />
       <Footer />
-      <ContactMenu />
+      <BugReportButton />
     </main>
   );
 }

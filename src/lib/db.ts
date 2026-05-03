@@ -273,6 +273,69 @@ export async function initializeDatabase() {
       }
     }
 
+    // Criar tabela de Capítulos/Blocos
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS chapters (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          disciplina TEXT NOT NULL,
+          numero INTEGER NOT NULL,
+          titulo TEXT NOT NULL,
+          descricao TEXT,
+          ordem INTEGER NOT NULL DEFAULT 0,
+          is_primeiro INTEGER DEFAULT 0,
+          criado_em TEXT NOT NULL
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_disciplina ON chapters(disciplina)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_numero ON chapters(numero)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_ordem ON chapters(ordem)`);
+    } catch { /* já existe */ }
+
+    // Criar tabela de Progresso do Usuário nos Capítulos
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_chapter_progress (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          chapter_id INTEGER NOT NULL,
+          is_unlocked INTEGER DEFAULT 0,
+          is_completed INTEGER DEFAULT 0,
+          acertos_total INTEGER DEFAULT 0,
+          questoes_respondidas INTEGER DEFAULT 0,
+          percentual_acerto REAL DEFAULT 0,
+          tempo_estudo_ms INTEGER DEFAULT 0,
+          iniciado_em TEXT,
+          completado_em TEXT,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_user_id ON user_chapter_progress(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_chapter_id ON user_chapter_progress(chapter_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_user_chapter ON user_chapter_progress(user_id, chapter_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_unlocked ON user_chapter_progress(is_unlocked)`);
+    } catch { /* já existe */ }
+
+    // Criar tabela de Desbloqueios
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS chapter_unlocks (
+          chapter_id_origem INTEGER NOT NULL,
+          chapter_id_destino INTEGER NOT NULL,
+          percentual_necessario REAL DEFAULT 80,
+          criado_em TEXT NOT NULL,
+          PRIMARY KEY (chapter_id_origem, chapter_id_destino),
+          FOREIGN KEY (chapter_id_origem) REFERENCES chapters(id),
+          FOREIGN KEY (chapter_id_destino) REFERENCES chapters(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_unlocks_origem ON chapter_unlocks(chapter_id_origem)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_unlocks_destino ON chapter_unlocks(chapter_id_destino)`);
+    } catch { /* já existe */ }
+
     await seedUFs();
     console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {
