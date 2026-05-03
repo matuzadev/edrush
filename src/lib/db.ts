@@ -226,6 +226,53 @@ export async function initializeDatabase() {
       }
     }
 
+    // Adicionar colunas novas em users (xp, level, referral)
+    const newUsersColumns = [
+      `ALTER TABLE users ADD COLUMN xp INTEGER DEFAULT 0`,
+      `ALTER TABLE users ADD COLUMN level INTEGER DEFAULT 1`,
+      `ALTER TABLE users ADD COLUMN referral_code TEXT`,
+      `ALTER TABLE users ADD COLUMN referred_by_code TEXT`,
+    ];
+    for (const sql of newUsersColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
+    // Criar tabela de referrals
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS referrals (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          referrer_id TEXT NOT NULL,
+          referred_id TEXT,
+          referral_code TEXT NOT NULL,
+          referred_email TEXT,
+          status TEXT NOT NULL DEFAULT 'registered',
+          reward_granted_at TEXT,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (referrer_id) REFERENCES users(id),
+          FOREIGN KEY (referred_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_code ON referrals(referral_code)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_status ON referrals(status)`);
+    } catch { /* já existe */ }
+
+    // Adicionar colunas novas em user_responses (safe: try/catch por coluna)
+    const newResponseColumns = [
+      `ALTER TABLE user_responses ADD COLUMN disciplina TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN capitulo TEXT`,
+    ];
+
+    for (const sql of newResponseColumns) {
+      try {
+        await client.execute(sql);
+      } catch {
+        // Coluna já existe — ignorar
+      }
+    }
+
     await seedUFs();
     console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {

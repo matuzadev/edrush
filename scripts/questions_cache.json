@@ -828,5 +828,114 @@
       "fonte": "Hardcoded",
       "ano": null
     }
+  ],
+  "estrutura-dados-algoritmos::Complexidade (Big-O)": [
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "Qual e a complexidade de tempo do algoritmo de busca binaria em um array ordenado de N elementos?",
+      "opcoes": "[\"A) O(1)\", \"B) O(log N)\", \"C) O(N)\", \"D) O(N log N)\", \"E) O(N²)\"]",
+      "resposta_correta": "B",
+      "explicacao": "A busca binaria divide o espaco de busca pela metade a cada comparacao, eliminando metade dos elementos restantes. Com N elementos, sao necessarias no maximo log2(N) comparacoes, resultando em complexidade O(log N). E muito mais eficiente que a busca linear O(N) para grandes datasets.",
+      "dica": "Busca binaria = divide ao meio a cada passo = O(log N). Busca linear = percorre um por um = O(N).",
+      "dificuldade": "facil",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    },
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "O algoritmo Quicksort tem complexidade de tempo media de O(N log N), porem seu pior caso e",
+      "opcoes": "[\"A) O(log N)\", \"B) O(N)\", \"C) O(N log N)\", \"D) O(N²)\", \"E) O(2^N)\"]",
+      "resposta_correta": "D",
+      "explicacao": "O pior caso do Quicksort ocorre quando o pivo escolhido e sempre o menor ou maior elemento (array ja ordenado ou inversamente ordenado com pivo fixo), resultando em particoes desequilibradas de tamanho 1 e N-1, levando a O(N²). Na media, com boa escolha de pivo, e O(N log N).",
+      "dica": "Quicksort: media O(N log N), pior caso O(N²). Mergesort: sempre O(N log N) mas usa O(N) de espaco extra.",
+      "dificuldade": "medio",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    },
+    {
+      "tipo": "verdadeiro_falso",
+      "enunciado": "Um algoritmo com complexidade O(1) tem tempo de execucao constante, independentemente do tamanho da entrada.",
+      "opcoes": null,
+      "resposta_correta": "Verdadeiro",
+      "explicacao": "O(1) significa complexidade de tempo constante: o tempo de execucao nao aumenta com o tamanho da entrada (N). Exemplos: acesso a elemento de array por indice, operacoes em pilha/fila com ponteiro, operacoes em tabela hash sem colisao.",
+      "dica": "O(1) = tempo constante. Nao importa se N=10 ou N=1.000.000, o tempo e o mesmo.",
+      "dificuldade": "facil",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    }
+  ],
+  "estrutura-dados-algoritmos::Arvores": [
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "Em uma arvore binaria de busca (BST), a complexidade de busca, insercao e remocao no melhor e caso medio e",
+      "opcoes": "[\"A) O(1)\", \"B) O(log N)\", \"C) O(N)\", \"D) O(N log N)\", \"E) O(N²)\"]",
+      "resposta_correta": "B",
+      "explicacao": "Em uma BST balanceada, a altura da arvore e proporcional a log N, onde N e o numero de nos. Operacoes de busca, insercao e remocao percorrem no maximo a altura da arvore, resultando em O(log N). No pior caso (arvore degenerada/lista), e O(N).",
+      "dica": "BST balanceada = O(log N). BST degenerada (virou lista) = O(N). Arvores AVL/Red-Black garantem O(log N) no pior caso.",
+      "dificuldade": "medio",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    }
+  ],
+  "estrutura-dados-algoritmos::Ordenacao": [
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "Qual algoritmo de ordenacao e considerado 'estavel' e possui complexidade de tempo O(N log N) no pior caso, sendo preferido quando a estabilidade e essencial?",
+      "opcoes": "[\"A) Quicksort\", \"B) Heapsort\", \"C) Mergesort\", \"D) Selection Sort\", \"E) Shell Sort\"]",
+      "resposta_correta": "C",
+      "explicacao": "Mergesort e um algoritmo de ordenacao estavel (mantem a ordem relativa de elementos iguais) com complexidade O(N log N) garantida em todos os casos (melhor, medio e pior). Utiliza o paradigma divisao e conquista. Desvantagem: requer O(N) de espaco adicional.",
+      "dica": "MERGESORT = estavel + O(N log N) garantido. QUICKSORT = instavel, O(N log N) media, O(N²) pior caso. HEAPSORT = instavel, O(N log N) garantido.",
+      "dificuldade": "medio",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    }
+  ],
+  "banca-analise::Cadeia de custodia aplicada a informatica": [
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "Na pericia forense computacional, qual e o primeiro e mais critico passo ao chegar a uma cena de crime com computadores ligados?",
+      "opcoes": "[\"A) Desligar imediatamente todos os equipamentos para evitar alteracao de dados.\", \"B) Decidir se deve-se preservar a volatilidade da memoria RAM antes de desligar, coletando dados volateis.\", \"C) Formatar os discos e reinstalar o sistema operacional para analise limpa.\", \"D) Conectar os equipamentos a rede para sincronizar logs com a nuvem.\", \"E) Aguardar o advogado do suspeito para iniciar a coleta.\"]",
+      "resposta_correta": "B",
+      "explicacao": "Sistemas ligados possuem dados volateis (RAM, processos em execucao, conexoes de rede ativas, chaves de criptografia na memoria) que sao perdidos ao desligar. A ordem de volatilidade da RFC 3227 orienta coletar primeiro os dados mais volateis. O perito deve avaliar o custo-beneficio de preservar dados volateis vs. alterar o estado do sistema.",
+      "dica": "Ordem de volatilidade (RFC 3227): RAM > processos > conexoes rede > registros sistema > disco. Coleta do mais volatil para o menos.",
+      "dificuldade": "dificil",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    },
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "Para garantir a integridade de uma imagem forense de disco rigido, o perito deve",
+      "opcoes": "[\"A) copiar apenas os arquivos suspeitos para agilizar a investigacao.\", \"B) realizar uma copia bit a bit do disco e calcular o hash (MD5/SHA-256) tanto do original quanto da copia.\", \"C) compactar os arquivos do disco para facilitar o armazenamento da evidencia.\", \"D) realizar a analise diretamente no disco original para nao perder tempo.\", \"E) desabilitar o antivirus do computador periciado antes de coletar a imagem.\"]",
+      "resposta_correta": "B",
+      "explicacao": "A imagem forense e uma copia bit a bit (sector-by-sector) do disco original, incluindo espaco nao alocado e arquivos deletados. O hash criptografico (MD5/SHA-256) do original e da copia deve ser identico, comprovando que a copia e integra e que o original nao foi alterado durante a coleta.",
+      "dica": "Imagem forense = copia bit a bit. Hash = MD5 ou SHA-256. Se hash original = hash copia, prova integridade.",
+      "dificuldade": "medio",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    },
+    {
+      "tipo": "verdadeiro_falso",
+      "enunciado": "Na forense computacional, o uso de um bloqueador de escrita (write blocker) durante a aquisicao da imagem forense e uma pratica recomendada para garantir que o disco original nao seja modificado durante o processo de copia.",
+      "opcoes": null,
+      "resposta_correta": "Verdadeiro",
+      "explicacao": "O bloqueador de escrita (hardware ou software) impede que qualquer dado seja escrito no disco original durante a conexao com o computador forense, preservando a integridade da evidencia. Sem ele, o sistema operacional pode modificar o disco (atualizar timestamps, criar arquivos temporarios etc.).",
+      "dica": "Write blocker = escudo que impede escrita no disco original. OBRIGATORIO na aquisicao forense.",
+      "dificuldade": "facil",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    }
+  ],
+  "banca-analise::Como elaborar um laudo pericial tecnico": [
+    {
+      "tipo": "multipla_escolha",
+      "enunciado": "Um laudo pericial de informatica forense deve ser estruturado de forma que",
+      "opcoes": "[\"A) contenha exclusivamente informacoes tecnicas em linguagem especializada, direcionada apenas a outros peritos.\", \"B) apresente metodologia clara, reproducivel, com conclusoes fundamentadas e linguagem acessivel ao julgador.\", \"C) omita detalhes tecnicos para nao revelar metodologias sigilosas.\", \"D) seja redigido em ingles para seguir o padrao internacional.\", \"E) contenha a opiniao pessoal do perito sobre a culpabilidade do acusado.\"]",
+      "resposta_correta": "B",
+      "explicacao": "O laudo pericial deve ser tecnicamente preciso, mas tambem compreensivel ao juiz e demais operadores do direito. Deve apresentar metodologia clara (reproducivel por outro perito), fundamentar todas as conclusoes com evidencias e evitar opinar sobre culpa ou inocencia, que e funcao do juiz.",
+      "dica": "Laudo: metodologia clara + fundamentacao tecnica + linguagem acessivel. Perito NAO julga culpa, apenas apresenta evidencias tecnicas.",
+      "dificuldade": "facil",
+      "fonte": "CESPE/CEBRASPE",
+      "ano": null
+    }
   ]
 }

@@ -9,6 +9,7 @@ import Offer from "@/components/Offer";
 import Radar from "@/components/Radar";
 import Footer from "@/components/Footer";
 import ContactMenu from "@/components/ContactMenu";
+import ReferralBanner from "@/components/ReferralBanner";
 
 export default function Home() {
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function Home() {
       <Showcase data-reveal="left" />
       <Testimonials data-reveal="right" />
       <Offer data-reveal="top" />
+      <ReferralBanner />
       <Radar data-reveal="bottom" />
       <Footer />
       <ContactMenu />

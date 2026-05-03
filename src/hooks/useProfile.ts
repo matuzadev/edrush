@@ -1,11 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export interface Achievement {
-  id: string;
-  label: string;
-  description: string;
-  unlocked: boolean;
-}
+import type { Medal } from '@/lib/levels';
+
+export type Achievement = Medal;
 
 export interface ActivityDay {
   date: string;
@@ -25,6 +22,16 @@ export interface UserProfile {
   location?: string | null;
   bio?: string | null;
   criado_em: string;
+  // XP & Level
+  xp: number;
+  level: number;
+  levelName: string;
+  levelColor: string;
+  levelBg: string;
+  levelBorder: string;
+  xpIntoLevel: number;
+  xpNeeded: number;
+  xpProgressPct: number;
   // Stats
   totalQuestionsAnswered: number;
   totalQuestionsCorrect: number;
@@ -32,6 +39,7 @@ export interface UserProfile {
   accuracy: number;
   streak: number;
   medals: number;
+  totalMedals: number;
   achievements: Achievement[];
   activityLog: ActivityDay[];
 }
@@ -44,12 +52,22 @@ const DEFAULT_PROFILE: UserProfile = {
   foto_url: null,
   avatar_id: 1,
   criado_em: new Date().toISOString(),
+  xp: 0,
+  level: 1,
+  levelName: 'Recruta',
+  levelColor: 'text-slate-400',
+  levelBg: 'bg-slate-500/15',
+  levelBorder: 'border-slate-500/40',
+  xpIntoLevel: 0,
+  xpNeeded: 150,
+  xpProgressPct: 0,
   totalQuestionsAnswered: 0,
   totalQuestionsCorrect: 0,
   totalSessions: 0,
   accuracy: 0,
   streak: 0,
   medals: 0,
+  totalMedals: 21,
   achievements: [],
   activityLog: [],
 };

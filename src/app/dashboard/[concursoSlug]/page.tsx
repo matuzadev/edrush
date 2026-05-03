@@ -138,7 +138,7 @@ export default function PersonalizedDashboardPage() {
       <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <Link
-            href="/"
+            href="/dashboard"
             className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
           >
             FOCO FEDERAL
@@ -182,45 +182,56 @@ export default function PersonalizedDashboardPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-10">
         {/* Cabeçalho personalizado */}
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Target size={16} className="text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
-              Seu painel personalizado
-            </span>
+        <div className="mb-6 relative overflow-hidden rounded-2xl bg-slate-900/80 border border-white/8 p-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 via-transparent to-cyan-500/5 pointer-events-none" />
+          <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <Target size={13} className="text-emerald-400" />
+              </div>
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+                Seu painel personalizado
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">{concursoDisplayName}</h1>
+            <p className="text-slate-500 text-sm">
+              {displaySubjects.length} matéria{displaySubjects.length !== 1 ? 's' : ''} selecionada
+              {displaySubjects.length !== 1 ? 's' : ''}
+            </p>
           </div>
-          <h1 className="text-3xl font-black text-white mb-1">{concursoDisplayName}</h1>
-          <p className="text-slate-400 text-sm">
-            {displaySubjects.length} matéria{displaySubjects.length !== 1 ? 's' : ''} selecionada
-            {displaySubjects.length !== 1 ? 's' : ''}
-          </p>
         </div>
 
         {/* Cards de métricas */}
-        <div className="grid grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-3 gap-3 mb-6">
           {[
-            { icon: BookOpen, label: 'Matérias', value: displaySubjects.length, color: 'emerald' },
-            { icon: TrendingUp, label: 'Respondidas', value: stats.totalAnswered, color: 'blue' },
+            { icon: BookOpen, label: 'Matérias', value: displaySubjects.length, color: 'emerald', accent: '#10b981' },
+            { icon: TrendingUp, label: 'Respondidas', value: stats.totalAnswered, color: 'blue', accent: '#3b82f6' },
             {
               icon: Target,
               label: 'Acertos',
               value: stats.totalAnswered > 0 ? `${stats.accuracy}%` : '-',
               color: 'violet',
+              accent: '#8b5cf6',
             },
           ].map((metric) => {
             const Icon = metric.icon;
             return (
               <div
                 key={metric.label}
-                className="bg-slate-900/60 border border-white/5 rounded-2xl p-4 text-center"
+                className="relative overflow-hidden bg-slate-900/60 border border-white/8 rounded-2xl p-4 text-center group transition-all hover:border-white/15 hover:-translate-y-0.5"
               >
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2 bg-${metric.color}-500/10`}
+                  className="absolute top-0 left-0 right-0 h-px opacity-70"
+                  style={{ background: `linear-gradient(90deg, transparent, ${metric.accent}, transparent)` }}
+                />
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-${metric.color}-500/10 group-hover:bg-${metric.color}-500/15 transition-colors`}
                 >
                   <Icon size={18} className={`text-${metric.color}-400`} />
                 </div>
-                <div className="text-2xl font-black text-white">{metric.value}</div>
-                <div className="text-xs text-slate-500 mt-0.5">{metric.label}</div>
+                <div className="text-2xl font-black text-white leading-none mb-1">{metric.value}</div>
+                <div className="text-xs text-slate-500">{metric.label}</div>
               </div>
             );
           })}
@@ -230,14 +241,14 @@ export default function PersonalizedDashboardPage() {
         <div className="flex gap-3 mb-10 flex-wrap">
           <Link
             href="/questions"
-            className="px-5 py-2 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 rounded-full text-sm font-semibold transition"
+            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-[#020617] rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_28px_rgba(16,185,129,0.35)]"
           >
             Ir para Questões
           </Link>
           <button
             onClick={handleChangeConcurso}
             disabled={isResetting}
-            className="sm:hidden flex items-center gap-1.5 px-5 py-2 bg-slate-800 border border-white/10 hover:border-emerald-500/30 text-slate-300 hover:text-emerald-400 rounded-full text-sm font-semibold transition"
+            className="sm:hidden flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 border border-white/10 hover:border-emerald-500/30 text-slate-300 hover:text-emerald-400 rounded-full text-sm font-semibold transition"
           >
             {isResetting ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
             Trocar concurso
