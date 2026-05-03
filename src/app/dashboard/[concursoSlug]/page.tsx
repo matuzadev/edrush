@@ -148,7 +148,7 @@ export default function PersonalizedDashboardPage() {
             {concursoDisplayName}
           </span>
         </div>
-
+        
         <div className="flex items-center gap-3">
           <NotificationBell />
           <Link href="/dashboard/profile" className="text-slate-400 hover:text-emerald-400 transition">
@@ -243,7 +243,7 @@ export default function PersonalizedDashboardPage() {
             href="/questions"
             className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-[#020617] rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_28px_rgba(16,185,129,0.35)]"
           >
-            Ir para simulado
+            Ir para simulado aplicado
           </Link>
           <button
             onClick={handleChangeConcurso}
