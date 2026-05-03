@@ -6,3 +6,5 @@ export { Input } from './Input';
 export { FeatureItem } from './FeatureItem';
 export { GradientText } from './GradientText';
 export { Container } from './Container';
+export { Tabs } from './Tabs';
+export type { Tab } from './Tabs';

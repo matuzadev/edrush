@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { BugReportButton } from "@/components/BugReportButton";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
@@ -28,6 +29,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <BugReportButton />
       </body>
     </html>
   );

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
-import { study_sessions } from '@/db/schema';
+import { study_sessions, users } from '@/db/schema';
+import { eq, sql } from 'drizzle-orm';
+import { xpForSession, computeLevel } from '@/lib/levels';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -32,9 +34,11 @@ export async function POST(req: NextRequest) {
   }
 
   const now = new Date();
-  const sessionDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const sessionDate = now.toISOString().split('T')[0];
+  const earned = xpForSession(correctAnswers, questionsAnswered);
 
   try {
+    // Insert session + update user XP atomically
     await db.insert(study_sessions).values({
       user_id: userId,
       session_date: sessionDate,
@@ -45,7 +49,23 @@ export async function POST(req: NextRequest) {
       criado_em: now.toISOString(),
     });
 
-    return NextResponse.json({ ok: true });
+    if (earned > 0) {
+      // Fetch current xp to compute new level
+      const userRow = await db.query.users.findFirst({
+        where: eq(users.id, userId),
+        columns: { xp: true },
+      });
+      const currentXp = userRow?.xp ?? 0;
+      const newXp = currentXp + earned;
+      const newLevel = computeLevel(newXp).level;
+
+      await db
+        .update(users)
+        .set({ xp: newXp, level: newLevel, atualizado_em: now.toISOString() })
+        .where(eq(users.id, userId));
+    }
+
+    return NextResponse.json({ ok: true, xpEarned: earned });
   } catch (error) {
     console.error('Erro ao salvar sessão de estudo:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

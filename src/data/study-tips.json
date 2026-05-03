@@ -1,0 +1,876 @@
+{
+  "portugues": {
+    "quickReview": "A banca CESPE/CEBRASPE privilegia a interpretação de texto, coerência e coesão textual, além de questões de gramática contextualizada. O candidato deve dominar análise sintática, regência, concordância e figuras de linguagem aplicadas ao texto.",
+    "keyTopics": [
+      "Interpretação e compreensão de textos",
+      "Concordância verbal e nominal",
+      "Regência verbal e nominal",
+      "Crase e pontuação",
+      "Coesão e coerência textual",
+      "Figuras de linguagem"
+    ],
+    "references": [
+      { "title": "Gramática do Português Culto Escrito no Brasil", "type": "livro", "author": "Rodolfo Ilari" },
+      { "title": "Manual de Redação Oficial da Presidência da República", "type": "lei", "author": "Brasil" },
+      { "title": "Português para Concursos", "type": "livro", "author": "Cláudio Moura" },
+      { "title": "Nova Gramática do Português Contemporâneo", "type": "livro", "author": "Celso Cunha e Lindley Cintra" }
+    ],
+    "strategy": "Leia textos jornalísticos e literários diariamente e resolva questões comentadas da CESPE para familiarizar-se com o estilo da banca. Foque em interpretação antes de gramática."
+  },
+  "redes-de-computadores": {
+    "quickReview": "Redes de computadores abrange o modelo OSI e TCP/IP, protocolos de comunicação, endereçamento IP (IPv4 e IPv6), sub-redes e equipamentos de rede. A CESPE costuma cobrar protocolos de aplicação, roteamento e segurança em redes.",
+    "keyTopics": [
+      "Modelo OSI e TCP/IP (camadas e funções)",
+      "Endereçamento IPv4, IPv6 e sub-redes (CIDR)",
+      "Protocolos HTTP, HTTPS, FTP, SMTP, DNS, DHCP",
+      "Roteamento estático e dinâmico (OSPF, BGP, RIP)",
+      "Switching, VLANs e Spanning Tree",
+      "Segurança em redes: firewall, VPN, IDS/IPS"
+    ],
+    "references": [
+      { "title": "Redes de Computadores", "type": "livro", "author": "Andrew S. Tanenbaum" },
+      { "title": "Redes de Computadores e a Internet", "type": "livro", "author": "James F. Kurose e Keith W. Ross" },
+      { "title": "RFC 791 - Internet Protocol", "type": "lei", "author": "IETF" }
+    ],
+    "strategy": "Estude o modelo OSI camada por camada associando cada protocolo à sua camada. Pratique cálculo de sub-redes com exercícios de CIDR, pois é tema recorrente em concursos de TI."
+  },
+  "lingua-portuguesa": {
+    "quickReview": "Língua Portuguesa em concursos avalia competência leitora, domínio gramatical e redação oficial. As bancas exigem conhecimento de morfologia, sintaxe, semântica e tipologia textual, sempre com foco em textos autênticos.",
+    "keyTopics": [
+      "Morfologia: classes de palavras e flexões",
+      "Sintaxe: análise de períodos compostos",
+      "Semântica: polissemia, sinonímia e antonímia",
+      "Tipologia e gêneros textuais",
+      "Ortografia e acentuação gráfica",
+      "Redação oficial: características e normas"
+    ],
+    "references": [
+      { "title": "Manual de Redação Oficial da Presidência da República", "type": "lei", "author": "Brasil" },
+      { "title": "Gramática Normativa da Língua Portuguesa", "type": "livro", "author": "Rocha Lima" },
+      { "title": "Português para Concursos Públicos", "type": "apostila", "author": "Gran Cursos Online" }
+    ],
+    "strategy": "Resolva provas anteriores da banca organizadora do seu concurso e anote os erros recorrentes. Dedique pelo menos 30 minutos diários à leitura de textos variados."
+  },
+  "informatica-basica": {
+    "quickReview": "Informática básica para concursos cobre sistemas operacionais (Windows e Linux), pacote Office, internet e segurança da informação. A CESPE frequentemente aborda questões de editor de texto, planilhas e navegadores.",
+    "keyTopics": [
+      "Windows 10/11: configurações e recursos básicos",
+      "Microsoft Office: Word, Excel e PowerPoint",
+      "Internet: navegadores, e-mail e protocolos básicos",
+      "Segurança digital: vírus, malware e boas práticas",
+      "Armazenamento em nuvem e computação em nuvem básica",
+      "Redes básicas e hardware"
+    ],
+    "references": [
+      { "title": "Informática para Concursos", "type": "livro", "author": "Patrícia Lima Quintão" },
+      { "title": "Apostila de Informática para Concursos", "type": "apostila", "author": "Estratégia Concursos" },
+      { "title": "Microsoft Office 365 - Guia do Usuário", "type": "site", "author": "Microsoft" }
+    ],
+    "strategy": "Pratique diretamente nos aplicativos Office e use emuladores online para testar atalhos de teclado. Questões de informática básica são resolvidas com prática repetida."
+  },
+  "direito-penal": {
+    "quickReview": "Direito Penal abrange a teoria do crime, tipicidade, ilicitude, culpabilidade, punibilidade e as penas previstas no Código Penal. A CESPE cobra muito a parte geral, crimes em espécie e legislação extravagante como Lei de Drogas e Estatuto do Desarmamento.",
+    "keyTopics": [
+      "Teoria do crime: fato típico, ilicitude e culpabilidade",
+      "Iter criminis: tentativa, consumação e desistência voluntária",
+      "Concurso de pessoas e de crimes",
+      "Extinção da punibilidade e prescrição",
+      "Crimes contra a pessoa e contra o patrimônio",
+      "Legislação especial: Lei 11.343/06, Lei 10.826/03"
+    ],
+    "references": [
+      { "title": "Código Penal Brasileiro - Decreto-Lei 2.848/1940", "type": "lei", "author": "Brasil" },
+      { "title": "Direito Penal - Parte Geral", "type": "livro", "author": "Rogério Greco" },
+      { "title": "Manual de Direito Penal", "type": "livro", "author": "Guilherme de Souza Nucci" },
+      { "title": "Lei de Drogas - Lei 11.343/2006", "type": "lei", "author": "Brasil" }
+    ],
+    "strategy": "Estude a parte geral do CP com base em esquemas e mapas mentais, depois aplique o conhecimento aos crimes em espécie. Resolva questões CESPE para perceber o padrão de assertivas."
+  },
+  "criminalistica": {
+    "quickReview": "Criminalística estuda os métodos científicos aplicados à investigação criminal, incluindo local de crime, vestígios, documentoscopia e identificação. É disciplina central em concursos policiais e da área forense.",
+    "keyTopics": [
+      "Local de crime: conceito, classificação e procedimentos",
+      "Vestígios, indícios e evidências",
+      "Documentoscopia e grafotécnica",
+      "Identificação humana: papiloscopia e DNA",
+      "Balística forense",
+      "Cadeia de custódia e preservação de provas"
+    ],
+    "references": [
+      { "title": "Criminalística", "type": "livro", "author": "Adalberto José Queiroz Telles de Camargo Aranha" },
+      { "title": "Código de Processo Penal - Decreto-Lei 3.689/1941", "type": "lei", "author": "Brasil" },
+      { "title": "Manual de Criminalística", "type": "livro", "author": "Alberi Espindula" }
+    ],
+    "strategy": "Foque nos procedimentos do local de crime e na cadeia de custódia, pois são os temas mais cobrados. Associe sempre a teoria à prática forense descrita em casos reais."
+  },
+  "fundamentos-computacao": {
+    "quickReview": "Fundamentos de computação envolvem sistemas numéricos, álgebra booleana, arquitetura de computadores, sistemas operacionais e lógica de programação. São a base teórica para qualquer área de TI em concursos.",
+    "keyTopics": [
+      "Sistemas de numeração: binário, octal, hexadecimal e conversões",
+      "Álgebra booleana e portas lógicas",
+      "Arquitetura de von Neumann: CPU, memória e E/S",
+      "Hierarquia de memória: cache, RAM e armazenamento",
+      "Representação de dados: ponto flutuante, ASCII, Unicode",
+      "Conceitos básicos de sistemas operacionais"
+    ],
+    "references": [
+      { "title": "Organização Estruturada de Computadores", "type": "livro", "author": "Andrew S. Tanenbaum" },
+      { "title": "Arquitetura e Organização de Computadores", "type": "livro", "author": "William Stallings" },
+      { "title": "Introdução à Ciência da Computação", "type": "livro", "author": "Behrouz A. Forouzan" }
+    ],
+    "strategy": "Domine as conversões entre bases numéricas e a álgebra booleana com exercícios práticos. Esses temas rendem pontos fáceis quando bem treinados."
+  },
+  "bancos-de-dados": {
+    "quickReview": "Bancos de dados abrange modelagem relacional, linguagem SQL, normalização, transações e conceitos de NoSQL. A CESPE cobra muito SQL (SELECT, JOIN, subconsultas), modelo ER e formas normais.",
+    "keyTopics": [
+      "Modelo Entidade-Relacionamento (ER) e mapeamento relacional",
+      "SQL: DDL, DML, DCL e TCL",
+      "Joins: INNER, LEFT, RIGHT, FULL e CROSS",
+      "Normalização: 1FN, 2FN, 3FN e BCNF",
+      "Transações: ACID, controle de concorrência e recuperação",
+      "NoSQL: tipos (documento, chave-valor, grafo, coluna) e casos de uso"
+    ],
+    "references": [
+      { "title": "Sistemas de Banco de Dados", "type": "livro", "author": "Ramez Elmasri e Shamkant Navathe" },
+      { "title": "Introdução a Sistemas de Banco de Dados", "type": "livro", "author": "C.J. Date" },
+      { "title": "SQL: Guia Prático", "type": "livro", "author": "Jonathan Gennick" }
+    ],
+    "strategy": "Pratique SQL em bancos reais (PostgreSQL ou MySQL online) e resolva exercícios de modelagem ER. A normalização deve ser dominada com exemplos concretos de dependências funcionais."
+  },
+  "engenharia-reversa-malware": {
+    "quickReview": "Engenharia reversa e análise de malware são temas de concursos da área de segurança cibernética, cobrindo técnicas de análise estática e dinâmica, classificação de malware e ferramentas forenses. Essencial para concursos como ABIN e Polícia Federal.",
+    "keyTopics": [
+      "Tipos de malware: vírus, worm, trojan, ransomware, rootkit",
+      "Análise estática: desmontagem e descompilação",
+      "Análise dinâmica: sandboxing e monitoramento de comportamento",
+      "Ferramentas: IDA Pro, Ghidra, OllyDbg, Wireshark",
+      "Técnicas de ofuscação e empacotamento de malware",
+      "Indicadores de comprometimento (IoC)"
+    ],
+    "references": [
+      { "title": "Practical Malware Analysis", "type": "livro", "author": "Michael Sikorski e Andrew Honig" },
+      { "title": "The Art of Memory Forensics", "type": "livro", "author": "Michael Ligh et al." },
+      { "title": "OWASP Foundation - Recursos de Segurança", "type": "site", "author": "OWASP" }
+    ],
+    "strategy": "Configure um laboratório virtual (VirtualBox ou VMware) para praticar análise dinâmica com segurança. Combine leitura teórica com prática hands-on em amostras controladas."
+  },
+  "linguagens-programacao": {
+    "quickReview": "Linguagens de programação em concursos cobrem paradigmas (imperativo, funcional, orientado a objetos, lógico), características de linguagens como C, Java, Python e conceitos de compiladores. A CESPE testa teoria e leitura de código.",
+    "keyTopics": [
+      "Paradigmas: imperativo, funcional, OO e lógico",
+      "Compiladores vs. interpretadores e fases de compilação",
+      "Tipagem estática e dinâmica, forte e fraca",
+      "Orientação a objetos: herança, polimorfismo, encapsulamento",
+      "Linguagem C: ponteiros, alocação dinâmica e estruturas",
+      "Python e Java: sintaxe básica e bibliotecas padrão"
+    ],
+    "references": [
+      { "title": "Conceitos de Linguagens de Programação", "type": "livro", "author": "Robert W. Sebesta" },
+      { "title": "Compiladores: Princípios, Técnicas e Ferramentas", "type": "livro", "author": "Aho, Lam, Sethi e Ullman" },
+      { "title": "The C Programming Language", "type": "livro", "author": "Brian W. Kernighan e Dennis M. Ritchie" }
+    ],
+    "strategy": "Entenda profundamente os paradigmas e pratique leitura de código em C e Java, que são as linguagens mais cobradas. Questões de compiladores exigem estudo teórico sólido."
+  },
+  "estrutura-dados-algoritmos": {
+    "quickReview": "Estruturas de dados e algoritmos cobrem listas, pilhas, filas, árvores, grafos e algoritmos de busca e ordenação. A análise de complexidade (notação Big-O) é fundamental para qualquer concurso de TI.",
+    "keyTopics": [
+      "Listas lineares: arrays, listas ligadas, pilhas e filas",
+      "Árvores: binárias, AVL, B, B+ e heaps",
+      "Grafos: representação, busca em largura (BFS) e profundidade (DFS)",
+      "Algoritmos de ordenação: quicksort, mergesort, heapsort",
+      "Análise de complexidade: notação Big-O, Theta e Omega",
+      "Tabelas hash: funções de hash e tratamento de colisões"
+    ],
+    "references": [
+      { "title": "Algoritmos: Teoria e Prática", "type": "livro", "author": "Cormen, Leiserson, Rivest e Stein" },
+      { "title": "Estruturas de Dados e Algoritmos em Java", "type": "livro", "author": "Michael T. Goodrich e Roberto Tamassia" },
+      { "title": "The Algorithm Design Manual", "type": "livro", "author": "Steven S. Skiena" }
+    ],
+    "strategy": "Implemente cada estrutura de dados do zero antes de estudar as operações teóricas. Resolva problemas no LeetCode ou HackerRank para consolidar o raciocínio algorítmico."
+  },
+  "prova-discursiva": {
+    "quickReview": "A prova discursiva avalia capacidade de argumentação, domínio da norma culta e organização textual. A banca espera dissertações com tese clara, desenvolvimento fundamentado e conclusão coerente, além de redação oficial quando exigido.",
+    "keyTopics": [
+      "Estrutura dissertativa: introdução, desenvolvimento e conclusão",
+      "Argumentação: tipos de argumentos e estratégias retóricas",
+      "Coesão textual: conectivos e elementos de referenciação",
+      "Norma culta: concordância, regência e pontuação",
+      "Redação oficial: ofício, memorando e relatório",
+      "Temas recorrentes em concursos: segurança pública, tecnologia, meio ambiente"
+    ],
+    "references": [
+      { "title": "Manual de Redação Oficial da Presidência da República", "type": "lei", "author": "Brasil" },
+      { "title": "Redação para Concursos", "type": "livro", "author": "Wyllys Felix" },
+      { "title": "A Arte de Escrever Bem", "type": "livro", "author": "João Bosco Medeiros" }
+    ],
+    "strategy": "Escreva uma redação por semana sobre temas de concurso e peça feedback de um professor ou corrija você mesmo com o gabarito da banca. A prática constante é insubstituível."
+  },
+  "compreensao-textos": {
+    "quickReview": "Compreensão de textos testa a capacidade de extrair informações explícitas e implícitas, identificar a ideia central, reconhecer inferências e distinguir fato de opinião. A CESPE usa textos autênticos de diversas fontes.",
+    "keyTopics": [
+      "Localização de informações explícitas no texto",
+      "Inferências e pressupostos",
+      "Ideia principal e ideias secundárias",
+      "Distinção entre fato, opinião e julgamento de valor",
+      "Vocabulário contextual e polissemia",
+      "Estrutura e progressão temática do texto"
+    ],
+    "references": [
+      { "title": "Compreensão e Interpretação de Textos", "type": "livro", "author": "Ernani Terra" },
+      { "title": "Português para Concursos", "type": "apostila", "author": "Estratégia Concursos" },
+      { "title": "Guia de Leitura Crítica", "type": "site", "author": "Portal CESPE/CEBRASPE" }
+    ],
+    "strategy": "Leia o texto completo antes de responder, sublinhando a tese principal. Questões da CESPE costumam ser assertivas que pedem julgamento (certo/errado) sobre o conteúdo do texto."
+  },
+  "gramatica-texto": {
+    "quickReview": "Gramática aplicada ao texto aborda concordância, regência, crase, pontuação e morfossintaxe dentro de contextos textuais reais. A abordagem é sempre funcional, vinculada ao sentido do texto.",
+    "keyTopics": [
+      "Concordância verbal: casos especiais e sujeito composto",
+      "Concordância nominal: adjetivos e particípios",
+      "Regência verbal e nominal",
+      "Crase: emprego obrigatório, facultativo e proibido",
+      "Pontuação: vírgula, ponto-e-vírgula e dois-pontos",
+      "Colocação pronominal: próclise, ênclise e mesóclise"
+    ],
+    "references": [
+      { "title": "Gramática Normativa da Língua Portuguesa", "type": "livro", "author": "Rocha Lima" },
+      { "title": "Gramática do Português Contemporâneo", "type": "livro", "author": "Celso Cunha e Lindley Cintra" },
+      { "title": "Português: Gramática e Redação para Concursos", "type": "apostila", "author": "Gran Cursos Online" }
+    ],
+    "strategy": "Estude cada tópico gramatical com exemplos retirados de provas anteriores. Para a CESPE, priorize os casos especiais e as exceções, pois são o foco das questões."
+  },
+  "semantica": {
+    "quickReview": "Semântica estuda o significado das palavras e suas relações: sinonímia, antonímia, polissemia, homonímia, paronímia e figuras de linguagem. Em concursos, é cobrada principalmente na interpretação e na correção de textos.",
+    "keyTopics": [
+      "Sinonímia e antonímia",
+      "Polissemia e homonímia",
+      "Paronímia e cacofonia",
+      "Denotação e conotação",
+      "Figuras de linguagem: metáfora, metonímia, ironia",
+      "Campos semânticos e isotopia textual"
+    ],
+    "references": [
+      { "title": "Semântica e Discurso", "type": "livro", "author": "Oswald Ducrot e Tzvetan Todorov" },
+      { "title": "Introdução à Semântica", "type": "livro", "author": "Margarida Salomão" },
+      { "title": "Dicionário Aurélio da Língua Portuguesa", "type": "site", "author": "Aurélio Buarque de Holanda" }
+    ],
+    "strategy": "Estude as figuras de linguagem com exemplos literários e jornalísticos. Mantenha um vocabulário ativo consultando o dicionário ao encontrar palavras desconhecidas em textos."
+  },
+  "reescrita-textual": {
+    "quickReview": "Reescrita textual é um tema recorrente da CESPE que avalia se o candidato consegue reformular frases mantendo o sentido original, ajustando concordância, regência e conectivos. Exige domínio simultâneo de gramática e semântica.",
+    "keyTopics": [
+      "Equivalência semântica na reescrita",
+      "Transformação de voz ativa em passiva e vice-versa",
+      "Substituição de conectivos sem alteração de sentido",
+      "Reformulação mantendo concordância e regência",
+      "Nominalização e verbalização",
+      "Paralelismo sintático e textual"
+    ],
+    "references": [
+      { "title": "Gramática Normativa da Língua Portuguesa", "type": "livro", "author": "Rocha Lima" },
+      { "title": "Português para Concursos - CESPE", "type": "apostila", "author": "Estratégia Concursos" },
+      { "title": "Manual de Redação Oficial da Presidência da República", "type": "lei", "author": "Brasil" }
+    ],
+    "strategy": "Pratique reescrevendo parágrafos de jornais de diferentes maneiras e compare com o original. Questões CESPE de reescrita exigem atenção máxima às nuances de sentido."
+  },
+  "historia-colonia": {
+    "quickReview": "História Colonial do Brasil abrange o período de 1500 a 1822, incluindo a exploração do pau-brasil, as capitanias hereditárias, a escravidão indígena e africana, o sistema de plantation e a administração colonial portuguesa.",
+    "keyTopics": [
+      "Pré-colonial e chegada dos portugueses (1500-1530)",
+      "Capitanias hereditárias e Governo-Geral",
+      "Sistema plantation e escravidão africana",
+      "Invasões holandesas e francesas",
+      "Revoltas coloniais: Inconfidência Mineira, Conjuração Baiana",
+      "Economia colonial: ciclos do pau-brasil, cana e ouro"
+    ],
+    "references": [
+      { "title": "Formação do Brasil Contemporâneo", "type": "livro", "author": "Caio Prado Júnior" },
+      { "title": "História do Brasil", "type": "livro", "author": "Boris Fausto" },
+      { "title": "O Brasil Colônia", "type": "livro", "author": "João Lucio de Azevedo" }
+    ],
+    "strategy": "Construa uma linha do tempo comentada do período colonial associando eventos econômicos, políticos e sociais. Questões de história colonial costumam relacionar causas e consequências."
+  },
+  "historia-imperio": {
+    "quickReview": "O período imperial (1822-1889) compreende a Independência, o Primeiro Reinado, a Regência e o Segundo Reinado. Os temas mais cobrados são a abolição da escravidão, a Guerra do Paraguai e as tensões que levaram à Proclamação da República.",
+    "keyTopics": [
+      "Independência do Brasil e o Primeiro Reinado (1822-1831)",
+      "Período Regencial: revoltas e instabilidade (1831-1840)",
+      "Segundo Reinado: política do café com leite e modernização",
+      "Guerra do Paraguai (1864-1870)",
+      "Lei Áurea e abolição da escravidão (1888)",
+      "Crise do Império e Proclamação da República (1889)"
+    ],
+    "references": [
+      { "title": "História do Brasil", "type": "livro", "author": "Boris Fausto" },
+      { "title": "O Brasil Imperial", "type": "livro", "author": "Emília Viotti da Costa" },
+      { "title": "A Construção da Ordem", "type": "livro", "author": "José Murilo de Carvalho" }
+    ],
+    "strategy": "Estude o Segundo Reinado com ênfase nas reformas e contradições sociais. Para concursos, conecte os eventos políticos às transformações econômicas e sociais do período."
+  },
+  "historia-republica": {
+    "quickReview": "A História da República Brasileira (1889-presente) é extensa e cobre a República Velha, Era Vargas, República Populista, Ditadura Militar e Nova República. A CESPE prioriza os períodos de ruptura institucional e as grandes transformações sociais.",
+    "keyTopics": [
+      "República Velha: política dos governadores e coronelismo (1889-1930)",
+      "Era Vargas: tenentismo, Revolução de 30 e Estado Novo (1930-1945)",
+      "República Populista: JK, Jango e reformas de base (1945-1964)",
+      "Ditadura Militar: AI-5, milagre econômico e abertura (1964-1985)",
+      "Nova República: redemocratização e Constituição de 1988",
+      "Brasil contemporâneo: Plano Real, Lula, Dilma e impeachment"
+    ],
+    "references": [
+      { "title": "História do Brasil", "type": "livro", "author": "Boris Fausto" },
+      { "title": "O Brasil Republicano", "type": "livro", "author": "Jorge Ferreira e Lucília Neves Delgado" },
+      { "title": "Constituição Federal de 1988", "type": "lei", "author": "Brasil" }
+    ],
+    "strategy": "Divida a República em fases e estude cada uma com ênfase nos documentos históricos (manifestos, decretos, constituições). Questões de concurso adoram datas e marcos legais."
+  },
+  "historia-temas": {
+    "quickReview": "Temas de história geral e do Brasil incluem movimentos sociais, história da África, história indígena, revoluções mundiais e relações internacionais do Brasil. Cada vez mais cobrados por bancas como CESPE e FGV.",
+    "keyTopics": [
+      "História da África e relações com o Brasil",
+      "Povos indígenas: diversidade e contato com europeus",
+      "Revoluções Industrial e Francesa e seus impactos",
+      "Primeira e Segunda Guerras Mundiais",
+      "Guerra Fria e geopolítica contemporânea",
+      "Movimentos sociais brasileiros: trabalhismo, feminismo, MST"
+    ],
+    "references": [
+      { "title": "História Geral e do Brasil", "type": "livro", "author": "Cláudio Vicentino e Gianpaolo Dorigo" },
+      { "title": "História da África para Iniciantes", "type": "livro", "author": "Alberto da Costa e Silva" },
+      { "title": "O Mundo Contemporâneo", "type": "livro", "author": "Demétrio Magnoli" }
+    ],
+    "strategy": "Foque nos temas transversais que conectam Brasil e mundo. Questões sobre história indígena e africana têm crescido em concursos federais após a Lei 10.639/03."
+  },
+  "geografia-fisica": {
+    "quickReview": "Geografia Física abrange relevo, clima, hidrografia, vegetação e solos do Brasil e do mundo. A CESPE costuma cobrar biomas brasileiros, bacia hidrográfica do São Francisco e Amazonas, além de fenômenos climáticos.",
+    "keyTopics": [
+      "Relevo brasileiro: planaltos, planícies e depressões",
+      "Clima do Brasil: tropical, equatorial, semiárido e subtropical",
+      "Biomas: Amazônia, Cerrado, Caatinga, Mata Atlântica, Pampa e Pantanal",
+      "Hidrografia: bacias hidrográficas do Brasil",
+      "Formação geológica e tipos de solo",
+      "Fenômenos climáticos: El Niño, La Niña e desertificação"
+    ],
+    "references": [
+      { "title": "Geografia do Brasil", "type": "livro", "author": "Jurandyr Ross" },
+      { "title": "Geografia: Contextos e Redes", "type": "livro", "author": "Rogério Haesbaert" },
+      { "title": "Atlas Nacional do Brasil", "type": "site", "author": "IBGE" }
+    ],
+    "strategy": "Use mapas físicos do Brasil como material de estudo central. Vincule cada bioma às suas características climáticas, hidrográficas e de fauna e flora."
+  },
+  "geografia-humana": {
+    "quickReview": "Geografia Humana estuda populações, urbanização, migrações e questões culturais. No contexto brasileiro, são prioritários a distribuição demográfica, o êxodo rural, a metropolização e as desigualdades regionais.",
+    "keyTopics": [
+      "Demografia brasileira: distribuição, densidade e crescimento",
+      "Urbanização no Brasil: megalópoles e problemas urbanos",
+      "Migrações internas e internacionais",
+      "Regiões metropolitanas e conurbação",
+      "Índices socioeconômicos: IDH, Gini, IDHM",
+      "Diversidade cultural e identidade regional"
+    ],
+    "references": [
+      { "title": "Geografia da População", "type": "livro", "author": "Pedro Geiger" },
+      { "title": "A Urbanização Brasileira", "type": "livro", "author": "Milton Santos" },
+      { "title": "Censo Demográfico", "type": "site", "author": "IBGE" }
+    ],
+    "strategy": "Atualize-se com os dados do último Censo (IBGE 2022) e compare com as tendências históricas. Questões de geografia humana frequentemente associam dados estatísticos a fenômenos sociais."
+  },
+  "geografia-economica": {
+    "quickReview": "Geografia Econômica analisa a distribuição das atividades produtivas, o comércio internacional, a geopolítica dos recursos naturais e o desenvolvimento desigual. Para concursos brasileiros, destaca-se a matriz energética e o agronegócio.",
+    "keyTopics": [
+      "Setores da economia: primário, secundário e terciário",
+      "Agronegócio brasileiro: commodities e exportações",
+      "Industrialização e desindustrialização no Brasil",
+      "Matriz energética: hidrelétrica, eólica, solar e petróleo",
+      "Comércio exterior e balança comercial do Brasil",
+      "Blocos econômicos: Mercosul, União Europeia, BRICS"
+    ],
+    "references": [
+      { "title": "Geografia Econômica", "type": "livro", "author": "Elias Nunes e Amir El-Kareh" },
+      { "title": "O Espaço Geográfico", "type": "livro", "author": "Milton Santos" },
+      { "title": "Anuário Estatístico do Brasil", "type": "site", "author": "IBGE" }
+    ],
+    "strategy": "Leia notícias econômicas relacionando-as com os conceitos teóricos da geografia econômica. Questões sobre blocos econômicos exigem conhecimento atualizado das relações internacionais."
+  },
+  "organizacao-territorio": {
+    "quickReview": "Organização do território brasileiro abrange a divisão político-administrativa, as macrorregiões, o planejamento territorial e os desequilíbrios regionais. O IBGE, o IPEA e as políticas regionais do governo federal são fontes essenciais.",
+    "keyTopics": [
+      "Divisão político-administrativa: estados, municípios e DF",
+      "Macrorregiões brasileiras: Norte, Nordeste, Centro-Oeste, Sudeste e Sul",
+      "Regiões geoeconômicas e complexos regionais",
+      "Políticas de desenvolvimento regional: SUDENE, SUDAM",
+      "Fronteiras e questões geopolíticas brasileiras",
+      "Desigualdades regionais: índices e causas históricas"
+    ],
+    "references": [
+      { "title": "A Questão Regional no Brasil", "type": "livro", "author": "Francisco de Oliveira" },
+      { "title": "Regiões e Redes", "type": "livro", "author": "Sandra Lencioni" },
+      { "title": "IBGE - Divisão Regional do Brasil", "type": "site", "author": "IBGE" }
+    ],
+    "strategy": "Domine a divisão regional do IBGE e as características de cada macrorregião. Questões sobre desequilíbrios regionais costumam exigir conhecimento de políticas públicas específicas."
+  },
+  "fundamentos-informatica": {
+    "quickReview": "Fundamentos de informática para concursos envolve hardware, software, sistemas operacionais, redes básicas e segurança. A CESPE aborda desde conceitos elementares de hardware até uso de aplicativos e segurança digital.",
+    "keyTopics": [
+      "Hardware: componentes do computador e periféricos",
+      "Software: tipos, licenças e sistemas operacionais",
+      "Sistemas operacionais: Windows, Linux e macOS",
+      "Internet e intranet: conceitos básicos e protocolos",
+      "Segurança da informação: conceitos fundamentais",
+      "Ferramentas de produtividade: editores, planilhas e apresentações"
+    ],
+    "references": [
+      { "title": "Informática para Concursos", "type": "livro", "author": "Patrícia Lima Quintão" },
+      { "title": "Introdução à Informática", "type": "apostila", "author": "Estratégia Concursos" },
+      { "title": "NIST - Cybersecurity Framework", "type": "site", "author": "NIST" }
+    ],
+    "strategy": "Resolva simulados específicos de informática básica da sua banca. Muitas questões são sobre funcionalidades específicas de aplicativos, então pratique nos próprios programas."
+  },
+  "escritorio-produtividade": {
+    "quickReview": "Aplicativos de escritório e produtividade incluem Microsoft Office 365 (Word, Excel, PowerPoint, Outlook) e equivalentes como Google Workspace e LibreOffice. A CESPE cobra funcionalidades específicas, atalhos e configurações.",
+    "keyTopics": [
+      "Word: formatação, estilos, tabelas e mala direta",
+      "Excel: fórmulas, funções (PROCV, SE, SOMASE), tabelas dinâmicas",
+      "PowerPoint: slides, transições, animações e apresentação",
+      "Outlook: configuração de e-mail, calendário e tarefas",
+      "Google Workspace: Docs, Sheets, Drive e Meet",
+      "LibreOffice: equivalências com Microsoft Office"
+    ],
+    "references": [
+      { "title": "Microsoft Office 365 Para Concursos", "type": "apostila", "author": "Gran Cursos Online" },
+      { "title": "Excel - Guia Completo", "type": "site", "author": "Microsoft Support" },
+      { "title": "LibreOffice Documentation", "type": "site", "author": "The Document Foundation" }
+    ],
+    "strategy": "Pratique cada aplicativo resolvendo tarefas reais: crie planilhas, formate documentos e monte apresentações. O aprendizado prático é muito mais eficiente que apenas ler sobre os aplicativos."
+  },
+  "seguranca-informacao": {
+    "quickReview": "Segurança da informação abrange confidencialidade, integridade e disponibilidade (CID), criptografia, gestão de riscos, normas ISO 27001/27002, políticas de segurança e resposta a incidentes. É tema crescente em concursos de TI.",
+    "keyTopics": [
+      "Princípios CID: confidencialidade, integridade e disponibilidade",
+      "Criptografia simétrica e assimétrica, hash e PKI",
+      "Autenticação: fatores, biometria e SSO",
+      "Gestão de riscos: identificação, análise e tratamento",
+      "Normas ISO 27001 e 27002",
+      "Ataques: phishing, ransomware, SQL injection, DDoS"
+    ],
+    "references": [
+      { "title": "Segurança da Informação para Concursos", "type": "livro", "author": "Patrícia Lima Quintão" },
+      { "title": "ISO/IEC 27002:2022 - Controles de Segurança", "type": "lei", "author": "ABNT" },
+      { "title": "Cryptography and Network Security", "type": "livro", "author": "William Stallings" }
+    ],
+    "strategy": "Estude a tríade CID como ponto central e expanda para os mecanismos que garantem cada pilar. As normas ISO são obrigatórias para concursos de nível superior em TI."
+  },
+  "computacao-nuvem": {
+    "quickReview": "Computação em nuvem abrange modelos de serviço (IaaS, PaaS, SaaS), modelos de implantação (pública, privada, híbrida, comunitária) e os principais provedores (AWS, Azure, GCP). A CESPE cobra características, vantagens e desafios da nuvem.",
+    "keyTopics": [
+      "Modelos de serviço: IaaS, PaaS, SaaS e FaaS",
+      "Modelos de implantação: pública, privada, híbrida e comunitária",
+      "Características essenciais: elasticidade, escalabilidade e autoatendimento",
+      "Principais provedores: AWS, Microsoft Azure e Google Cloud",
+      "Virtualização: hypervisors tipo 1 e tipo 2, containers",
+      "Segurança em nuvem e LGPD/GDPR"
+    ],
+    "references": [
+      { "title": "Cloud Computing: Concepts, Technology & Architecture", "type": "livro", "author": "Thomas Erl" },
+      { "title": "NIST SP 800-145 - The NIST Definition of Cloud Computing", "type": "lei", "author": "NIST" },
+      { "title": "AWS Well-Architected Framework", "type": "site", "author": "Amazon Web Services" }
+    ],
+    "strategy": "Memorize as definições do NIST para nuvem, pois são referência oficial adotada pelas bancas. Crie uma conta gratuita na AWS ou GCP para experimentar os conceitos na prática."
+  },
+  "teoria-sistemas": {
+    "quickReview": "Teoria Geral dos Sistemas (TGS) e análise de sistemas aplicados à TI abordam conceitos como sistema, subsistema, ambiente, entropia, homeostase e feedback. Em TI, abrange sistemas de informação, modelagem e análise de requisitos.",
+    "keyTopics": [
+      "Conceitos da TGS: sistema, componentes, fronteira e ambiente",
+      "Propriedades: entropia, homeostase, equifinalidade e sinergia",
+      "Sistemas abertos e fechados",
+      "Ciclo de vida de sistemas de informação (SDLC)",
+      "Modelagem: UML, BPMN e DFD",
+      "Análise de requisitos: técnicas e documentação"
+    ],
+    "references": [
+      { "title": "Teoria Geral dos Sistemas", "type": "livro", "author": "Ludwig von Bertalanffy" },
+      { "title": "Análise e Projeto de Sistemas", "type": "livro", "author": "Ken Laudon e Jane Laudon" },
+      { "title": "UML 2 e a Unified Process", "type": "livro", "author": "Arlow e Neustadt" }
+    ],
+    "strategy": "Domine os conceitos básicos da TGS e conecte-os à análise de sistemas de informação. Para concursos de TI, a UML é essencial e deve ser praticada com diagramas reais."
+  },
+  "camadas-aplicacao": {
+    "quickReview": "A camada de aplicação do modelo TCP/IP e OSI engloba protocolos como HTTP/HTTPS, DNS, DHCP, FTP, SMTP, POP3, IMAP e SNMP. É uma das camadas mais cobradas em concursos de TI por sua aplicação direta no dia a dia.",
+    "keyTopics": [
+      "HTTP e HTTPS: métodos, status codes e funcionamento",
+      "DNS: resolução de nomes, tipos de registros (A, MX, CNAME)",
+      "DHCP: processo DORA e configuração dinâmica de IPs",
+      "Protocolos de e-mail: SMTP (envio), POP3 e IMAP (recebimento)",
+      "FTP e SFTP: transferência de arquivos",
+      "SNMP: gerenciamento de rede"
+    ],
+    "references": [
+      { "title": "Redes de Computadores e a Internet", "type": "livro", "author": "James Kurose e Keith Ross" },
+      { "title": "RFC 2616 - HTTP/1.1", "type": "lei", "author": "IETF" },
+      { "title": "RFC 1034 e 1035 - Domain Names", "type": "lei", "author": "IETF" }
+    ],
+    "strategy": "Associe cada protocolo à sua porta padrão e à sua função. Monte uma tabela de referência com protocolo, porta, função e camada OSI para revisões rápidas."
+  },
+  "sistemas-informacao": {
+    "quickReview": "Sistemas de informação abrangem TPS, MIS, DSS, EIS e ERP, além de conceitos de BI, Big Data e gestão do conhecimento. Em concursos, é cobrada a classificação dos sistemas, seus componentes e aplicações organizacionais.",
+    "keyTopics": [
+      "Classificação: TPS, MIS, DSS, EIS e ERP",
+      "Business Intelligence (BI) e Data Warehouse",
+      "Big Data: volume, velocidade, variedade e veracidade",
+      "Gestão do conhecimento e sistemas especializados",
+      "ERP: módulos, integração e implementação",
+      "CRM: gestão do relacionamento com o cliente"
+    ],
+    "references": [
+      { "title": "Sistemas de Informação Gerenciais", "type": "livro", "author": "Ken Laudon e Jane Laudon" },
+      { "title": "Administração de Sistemas de Informação", "type": "livro", "author": "George Reynolds" },
+      { "title": "Fundamentos de Sistemas de Informação", "type": "apostila", "author": "Estratégia Concursos" }
+    ],
+    "strategy": "Crie uma tabela comparativa dos tipos de sistemas de informação com exemplos práticos de uso organizacional. A CESPE gosta de questões que confundem os níveis hierárquicos dos sistemas."
+  },
+  "teoria-informacao": {
+    "quickReview": "Teoria da Informação, fundada por Claude Shannon, trata de quantificação da informação, entropia, codificação e capacidade de canal. Em concursos de TI e telecomunicações, aborda compressão de dados, detecção e correção de erros.",
+    "keyTopics": [
+      "Conceito de informação e entropia de Shannon",
+      "Codificação de fonte: Huffman e aritmética",
+      "Codificação de canal: detecção e correção de erros",
+      "Capacidade de canal e teorema de Shannon-Hartley",
+      "Redundância e compressão de dados",
+      "Bits, bytes e representação digital da informação"
+    ],
+    "references": [
+      { "title": "A Mathematical Theory of Communication", "type": "livro", "author": "Claude E. Shannon" },
+      { "title": "Elementos de Teoria da Informação", "type": "livro", "author": "Thomas Cover e Joy Thomas" },
+      { "title": "Processamento Digital de Sinais", "type": "livro", "author": "Alan Oppenheim" }
+    ],
+    "strategy": "Comece pelo conceito de entropia e probabilidade, pois são a base matemática da teoria. Resolva exercícios de codificação de Huffman, que é um tema muito frequente."
+  },
+  "banco-de-dados": {
+    "quickReview": "Banco de dados em concursos cobre modelagem conceitual e lógica, SQL avançado, normalização, índices, transações, segurança e administração. A CESPE privilegia SQL (especialmente JOINs e subconsultas) e modelo relacional.",
+    "keyTopics": [
+      "Modelo relacional: tuplas, atributos e restrições de integridade",
+      "Modelagem ER: entidades, relacionamentos e cardinalidade",
+      "SQL: SELECT avançado com JOINs, GROUP BY e subconsultas",
+      "Normalização: formas normais (1FN a BCNF)",
+      "Transações ACID e controle de concorrência (locks, MVCC)",
+      "Índices: B-tree, hash e bitmap; plano de execução"
+    ],
+    "references": [
+      { "title": "Sistemas de Banco de Dados", "type": "livro", "author": "Ramez Elmasri e Shamkant Navathe" },
+      { "title": "SQL: The Complete Reference", "type": "livro", "author": "James Groff e Paul Weinberg" },
+      { "title": "PostgreSQL Documentation", "type": "site", "author": "PostgreSQL Global Development Group" }
+    ],
+    "strategy": "Pratique SQL em ambiente real (SQLFiddle, DB Fiddle ou banco local). Foque em JOINs complexos e subconsultas correlacionadas, que são os temas que mais reprovam candidatos."
+  },
+  "raciocinio-logico": {
+    "quickReview": "Raciocínio lógico em concursos abrange lógica proposicional, quantificadores, diagramas lógicos, sequências e raciocínio analítico. A CESPE costuma combinar lógica formal com problemas de raciocínio dedutivo e indutivo.",
+    "keyTopics": [
+      "Proposições: conectivos lógicos (e, ou, se...então, sse)",
+      "Tabelas-verdade e tautologias",
+      "Equivalências lógicas e negação de proposições compostas",
+      "Silogismos e inferência lógica",
+      "Lógica de predicados: quantificadores universal e existencial",
+      "Problemas de raciocínio analítico e sequências"
+    ],
+    "references": [
+      { "title": "Raciocínio Lógico para Concursos", "type": "livro", "author": "Lógica e Argumentação - Paulo Veloso" },
+      { "title": "Lógica para Concursos Públicos", "type": "apostila", "author": "Estratégia Concursos" },
+      { "title": "Matemática e Raciocínio Lógico", "type": "livro", "author": "Marco Alencar Ramos" }
+    ],
+    "strategy": "Monte as tabelas-verdade para cada conectivo e memorize as equivalências mais importantes (De Morgan, contraposição). Resolva muitos problemas de lógica situacional para ganhar velocidade."
+  },
+  "matematica-financeira": {
+    "quickReview": "Matemática financeira abrange juros simples e compostos, desconto, séries de pagamentos, amortização e análise de investimentos. A CESPE cobra principalmente juros compostos, cálculo de prestações e Taxa Interna de Retorno (TIR).",
+    "keyTopics": [
+      "Juros simples: conceito, fórmula e aplicações",
+      "Juros compostos: fórmula, montante e taxa efetiva x nominal",
+      "Desconto simples (comercial e racional) e composto",
+      "Séries de pagamentos: anuidade vencida, antecipada e diferida",
+      "Sistemas de amortização: SAC e PRICE",
+      "Análise de investimentos: VPL, TIR e payback"
+    ],
+    "references": [
+      { "title": "Matemática Financeira", "type": "livro", "author": "Hazzan e Pompeo" },
+      { "title": "Matemática Financeira para Concursos", "type": "apostila", "author": "Gran Cursos Online" },
+      { "title": "Calculadora HP 12C - Manual de Uso", "type": "site", "author": "HP" }
+    ],
+    "strategy": "Domine os cálculos de juros compostos e amortização SAC/PRICE, pois rendem muitas questões. Use a HP 12C ou simulador online para praticar e conferir os resultados."
+  },
+  "matematica-basica": {
+    "quickReview": "Matemática básica para concursos envolve aritmética, álgebra, geometria, porcentagem, regra de três e razão e proporção. É base para raciocínio lógico-quantitativo e está presente em praticamente todos os concursos públicos.",
+    "keyTopics": [
+      "Aritmética: operações com inteiros, frações e decimais",
+      "Porcentagem e variação percentual",
+      "Razão, proporção e regra de três simples e composta",
+      "Álgebra: equações de 1° e 2° grau e sistemas",
+      "Geometria: perímetro, área e volume das figuras principais",
+      "Progressões aritméticas e geométricas"
+    ],
+    "references": [
+      { "title": "Matemática para Concursos", "type": "livro", "author": "Neto Dante" },
+      { "title": "Fundamentos de Matemática para Concursos", "type": "apostila", "author": "Estratégia Concursos" },
+      { "title": "Khan Academy - Matemática Básica", "type": "site", "author": "Khan Academy" }
+    ],
+    "strategy": "Resolva pelo menos 20 questões diárias de matemática básica, focando nos erros para identificar as lacunas. A velocidade de cálculo mental é decisiva no dia da prova."
+  },
+  "direito-constitucional": {
+    "quickReview": "Direito Constitucional é a disciplina mais cobrada em concursos federais. Abrange a Constituição de 1988, direitos fundamentais, organização do Estado, poderes da República e controle de constitucionalidade.",
+    "keyTopics": [
+      "Princípios fundamentais e objetivos da República (arts. 1° a 4°)",
+      "Direitos e garantias fundamentais (arts. 5° a 17)",
+      "Organização do Estado: União, estados, DF e municípios",
+      "Poderes da República: Executivo, Legislativo e Judiciário",
+      "Processo legislativo e espécies normativas",
+      "Controle de constitucionalidade: difuso e concentrado"
+    ],
+    "references": [
+      { "title": "Constituição Federal de 1988", "type": "lei", "author": "Brasil" },
+      { "title": "Curso de Direito Constitucional", "type": "livro", "author": "Gilmar Mendes e Paulo Gustavo Gonet Branco" },
+      { "title": "Direito Constitucional Esquematizado", "type": "livro", "author": "Pedro Lenza" }
+    ],
+    "strategy": "Leia a Constituição Federal diretamente, especialmente o art. 5°, que concentra as questões sobre direitos fundamentais. Para a CESPE, associe o texto constitucional à jurisprudência do STF."
+  },
+  "direito-administrativo": {
+    "quickReview": "Direito Administrativo abrange os princípios constitucionais da Administração Pública (LIMPE), atos administrativos, contratos, licitações (Lei 14.133/21), agentes públicos, responsabilidade do Estado e controle da Administração.",
+    "keyTopics": [
+      "Princípios constitucionais: legalidade, impessoalidade, moralidade, publicidade e eficiência",
+      "Atos administrativos: requisitos, atributos e vícios",
+      "Licitações e contratos: Lei 14.133/2021",
+      "Servidores públicos: regime jurídico e estabilidade",
+      "Responsabilidade civil do Estado: teoria objetiva",
+      "Controle da Administração: interno, externo e popular"
+    ],
+    "references": [
+      { "title": "Constituição Federal de 1988 (art. 37 a 43)", "type": "lei", "author": "Brasil" },
+      { "title": "Lei 14.133/2021 - Nova Lei de Licitações", "type": "lei", "author": "Brasil" },
+      { "title": "Curso de Direito Administrativo", "type": "livro", "author": "Celso Antônio Bandeira de Mello" },
+      { "title": "Direito Administrativo Esquematizado", "type": "livro", "author": "Ricardo Alexandre e João de Deus" }
+    ],
+    "strategy": "Domine os princípios do art. 37 da CF e a Nova Lei de Licitações (14.133/21), que substituiu a Lei 8.666/93. Para CESPE, estude os enunciados de súmulas do STJ e STF sobre Administração Pública."
+  },
+  "direito-tributario": {
+    "quickReview": "Direito Tributário abrange o Sistema Tributário Nacional, princípios tributários, espécies de tributos, competências tributárias, obrigação tributária e processo administrativo fiscal. O CTN (Lei 5.172/66) é a principal fonte.",
+    "keyTopics": [
+      "Sistema Tributário Nacional: competências e repartição de receitas",
+      "Princípios tributários: legalidade, anterioridade, irretroatividade",
+      "Espécies tributárias: impostos, taxas, contribuições e empréstimo compulsório",
+      "Fato gerador, base de cálculo e alíquotas",
+      "Obrigação tributária principal e acessória",
+      "Crédito tributário: lançamento, suspensão, extinção e exclusão"
+    ],
+    "references": [
+      { "title": "Código Tributário Nacional - Lei 5.172/1966", "type": "lei", "author": "Brasil" },
+      { "title": "Constituição Federal de 1988 (arts. 145 a 162)", "type": "lei", "author": "Brasil" },
+      { "title": "Direito Tributário Esquematizado", "type": "livro", "author": "Ricardo Alexandre" }
+    ],
+    "strategy": "O CTN deve ser lido e relido, pois a maioria das questões de direito tributário deriva de sua literalidade. Estude os princípios constitucionais tributários com casos práticos."
+  },
+  "legislacao-tributaria": {
+    "quickReview": "Legislação tributária específica abrange normas sobre IR, ICMS, ISS, PIS/COFINS, Simples Nacional e regras de fiscalização. Em concursos fiscais (Receita Federal, SEFAZ), é um dos temas de maior peso.",
+    "keyTopics": [
+      "Imposto de Renda: tributação de pessoas físicas e jurídicas",
+      "ICMS: regras constitucionais e convênios CONFAZ",
+      "ISS: competência municipal e lista de serviços tributáveis",
+      "PIS/COFINS: regimes cumulativo e não-cumulativo",
+      "Simples Nacional: enquadramento, alíquotas e obrigações",
+      "Processo administrativo fiscal federal e estadual"
+    ],
+    "references": [
+      { "title": "Regulamento do Imposto de Renda - Decreto 9.580/2018", "type": "lei", "author": "Brasil" },
+      { "title": "Lei Complementar 116/2003 - ISS", "type": "lei", "author": "Brasil" },
+      { "title": "Lei Complementar 123/2006 - Simples Nacional", "type": "lei", "author": "Brasil" },
+      { "title": "Direito Tributário para Concursos Fiscais", "type": "apostila", "author": "Estratégia Concursos" }
+    ],
+    "strategy": "Para concursos da Receita Federal, domine a legislação do IR e o RIR/2018. Para SEFAZ estadual, priorize o ICMS da sua UF. Combine leitura da lei com resolução de questões comentadas."
+  },
+  "contabilidade-geral": {
+    "quickReview": "Contabilidade geral abrange o patrimônio, balanço patrimonial, DRE, variações patrimoniais, escrituração contábil e análise das demonstrações financeiras. É obrigatória em concursos das áreas fiscal, financeira e de controle.",
+    "keyTopics": [
+      "Conceitos básicos: patrimônio, bens, direitos e obrigações",
+      "Balanço Patrimonial: ativo, passivo e patrimônio líquido",
+      "Demonstração do Resultado do Exercício (DRE)",
+      "Escrituração: livro diário, razão e balancete",
+      "Depreciação, amortização e exaustão",
+      "Análise das demonstrações: liquidez, rentabilidade e endividamento"
+    ],
+    "references": [
+      { "title": "Contabilidade Geral para Concursos", "type": "livro", "author": "Wilson Russo" },
+      { "title": "Lei 6.404/1976 - Lei das Sociedades por Ações", "type": "lei", "author": "Brasil" },
+      { "title": "NBC TG - Normas Brasileiras de Contabilidade", "type": "lei", "author": "CFC" },
+      { "title": "Contabilidade Geral Esquematizada", "type": "apostila", "author": "Gran Cursos Online" }
+    ],
+    "strategy": "Resolva lançamentos contábeis diariamente para fixar o mecanismo débito-crédito. Monte balanços patrimoniais completos do zero para dominar as demonstrações contábeis."
+  },
+  "direito-previdenciario": {
+    "quickReview": "Direito Previdenciário abrange a Seguridade Social, benefícios do RGPS, custeio, regras de concessão e o RPPS. É matéria central em concursos do INSS, Receita Federal e carreiras jurídicas federais.",
+    "keyTopics": [
+      "Seguridade Social: saúde, previdência e assistência social",
+      "Benefícios do RGPS: aposentadorias, auxílios e pensões",
+      "Segurados: obrigatórios, facultativos e especiais",
+      "Custeio: contribuições de empregados, empregadores e autônomos",
+      "Reforma da Previdência: EC 103/2019 e suas regras de transição",
+      "Processo administrativo e judicial previdenciário"
+    ],
+    "references": [
+      { "title": "Constituição Federal de 1988 (arts. 194 a 204)", "type": "lei", "author": "Brasil" },
+      { "title": "Lei 8.213/1991 - Plano de Benefícios da Previdência Social", "type": "lei", "author": "Brasil" },
+      { "title": "Lei 8.212/1991 - Custeio da Seguridade Social", "type": "lei", "author": "Brasil" },
+      { "title": "Direito Previdenciário Esquematizado", "type": "livro", "author": "Carlos Alberto Pereira de Castro" }
+    ],
+    "strategy": "Estude a EC 103/2019 (Reforma da Previdência) com detalhamento das regras de transição. Para o concurso do INSS, as Leis 8.212 e 8.213 devem ser lidas integralmente."
+  },
+  "medicina-legal": {
+    "quickReview": "Medicina Legal é disciplina que aplica conhecimentos médicos ao direito, cobrindo tanatologia forense, traumatologia, sexologia forense, toxicologia e documentos médico-legais. É essencial em concursos policiais e do Ministério Público.",
+    "keyTopics": [
+      "Tanatologia: fenômenos cadavéricos, morte real e presumida",
+      "Traumatologia: tipos de lesões e seu mecanismo de produção",
+      "Asfixias mecânicas: enforcamento, estrangulamento e afogamento",
+      "Sexologia forense: delitos sexuais e vestígios",
+      "Toxicologia forense: drogas, venenos e exame de alcoolemia",
+      "Documentos médico-legais: laudo, atestado e auto de corpo de delito"
+    ],
+    "references": [
+      { "title": "Medicina Legal", "type": "livro", "author": "Genival Veloso de França" },
+      { "title": "Compêndio de Medicina Legal", "type": "livro", "author": "Flamínio Fávero" },
+      { "title": "Código de Processo Penal - arts. 158 a 184", "type": "lei", "author": "Brasil" }
+    ],
+    "strategy": "Estude as classificações das lesões e os fenômenos cadavéricos com imagens e esquemas. A medicina legal exige memorização precisa de terminologia técnica e suas definições legais."
+  },
+  "criminologia": {
+    "quickReview": "Criminologia estuda o crime, o criminoso, a vítima e o controle social, abrangendo as principais escolas criminológicas, teorias etiológicas da criminalidade, vitimologia e política criminal. É cobrada em concursos policiais e do MP.",
+    "keyTopics": [
+      "Escolas criminológicas: clássica, positiva, sociológica e crítica",
+      "Teorias etiológicas: anomia, associação diferencial, labeling approach",
+      "Criminologia crítica e minimalismo penal",
+      "Vitimologia: tipologia das vítimas e proteção",
+      "Prevenção da criminalidade: primária, secundária e terciária",
+      "Política criminal: punitivismo e garantismo"
+    ],
+    "references": [
+      { "title": "Criminologia", "type": "livro", "author": "Cézar Roberto Bitencourt" },
+      { "title": "Manual de Criminologia", "type": "livro", "author": "Sérgio Salomão Shecaira" },
+      { "title": "Criminologia Crítica e Crítica do Direito Penal", "type": "livro", "author": "Alessandro Baratta" }
+    ],
+    "strategy": "Estude as teorias criminológicas cronologicamente para entender a evolução do pensamento. Para a CESPE, os conceitos de vitimologia e as correntes contemporâneas têm sido cada vez mais cobrados."
+  },
+  "legislacao-transito": {
+    "quickReview": "Legislação de trânsito abrange o Código de Trânsito Brasileiro (CTB - Lei 9.503/97), infrações e penalidades, habilitação, registro de veículos e crimes de trânsito. É matéria central em concursos de PRF, DETRAN e PM.",
+    "keyTopics": [
+      "Disposições gerais e conceitos do CTB",
+      "Sistema Nacional de Trânsito: órgãos e competências",
+      "Normas de circulação: preferências, ultrapassagem e estacionamento",
+      "Infrações de trânsito: classificação e penalidades (multa, suspensão)",
+      "Habilitação: categorias, processo e renovação",
+      "Crimes de trânsito: homicídio culposo, embriaguez e fuga"
+    ],
+    "references": [
+      { "title": "Código de Trânsito Brasileiro - Lei 9.503/1997", "type": "lei", "author": "Brasil" },
+      { "title": "Resolução CONTRAN 798/2020 - Habilitação", "type": "lei", "author": "CONTRAN" },
+      { "title": "CTB Comentado para Concursos", "type": "apostila", "author": "Estratégia Concursos" }
+    ],
+    "strategy": "Leia o CTB artigo por artigo marcando as infrações e suas penalidades. A tabela de infrações com pontuação e valores de multa é indispensável para o dia da prova."
+  },
+  "economia": {
+    "quickReview": "Economia em concursos abrange micro e macroeconomia, política fiscal e monetária, comércio internacional e economia brasileira. A CESPE privilegia conceitos de demanda, oferta, equilíbrio de mercado, inflação, PIB e balança de pagamentos.",
+    "keyTopics": [
+      "Microeconomia: oferta, demanda, elasticidades e estruturas de mercado",
+      "Macroeconomia: PIB, inflação, desemprego e crescimento econômico",
+      "Política monetária: instrumentos do BACEN (Selic, compulsório)",
+      "Política fiscal: receitas, despesas e resultado primário",
+      "Comércio internacional: vantagens comparativas e balança comercial",
+      "Economia brasileira: planos econômicos e Plano Real"
+    ],
+    "references": [
+      { "title": "Introdução à Economia", "type": "livro", "author": "N. Gregory Mankiw" },
+      { "title": "Manual de Macroeconomia", "type": "livro", "author": "Lopes e Vasconcellos" },
+      { "title": "Boletim do Banco Central do Brasil", "type": "site", "author": "Banco Central do Brasil" }
+    ],
+    "strategy": "Domine os conceitos básicos de micro e macro antes de aprofundar em política econômica. Para concursos do BACEN e Receita Federal, a macroeconomia e a política monetária são prioritárias."
+  },
+  "telecomunicacoes": {
+    "quickReview": "Telecomunicações abrange sinais analógicos e digitais, modulação, espectro eletromagnético, redes de telefonia, tecnologias de acesso (DSL, fibra, 4G/5G) e regulação do setor pela ANATEL. Essencial para concursos do setor.",
+    "keyTopics": [
+      "Sinais analógicos e digitais: amostragem e teorema de Nyquist",
+      "Modulação: AM, FM, ASK, FSK, PSK e QAM",
+      "Espectro eletromagnético e alocação de frequências",
+      "Redes celulares: evolução 2G, 3G, 4G LTE e 5G",
+      "Fibra óptica: monomodo, multimodo e tecnologias FTTH",
+      "Regulação: ANATEL, concessões e outorgas"
+    ],
+    "references": [
+      { "title": "Comunicações Analógicas e Digitais", "type": "livro", "author": "Simon Haykin" },
+      { "title": "Princípios de Comunicações", "type": "livro", "author": "Bruce Carlson" },
+      { "title": "Lei Geral de Telecomunicações - Lei 9.472/1997", "type": "lei", "author": "Brasil" }
+    ],
+    "strategy": "Foque nas tecnologias de modulação e nas diferenças entre gerações de redes celulares (2G a 5G). Para concursos da ANATEL, o marco regulatório e a LGT são leitura obrigatória."
+  },
+  "atendimento-cliente": {
+    "quickReview": "Atendimento ao cliente e público abrange técnicas de comunicação, qualidade no serviço público, direitos do consumidor, SAC e gestão de reclamações. Cobrado em concursos de agências bancárias, serviços públicos e empresas estatais.",
+    "keyTopics": [
+      "Técnicas de atendimento: comunicação verbal e não-verbal",
+      "Qualidade no atendimento público: decreto 9.094/2017",
+      "Direitos do consumidor: CDC - Lei 8.078/1990",
+      "Atendimento multicanal: presencial, telefônico e digital",
+      "Gestão de reclamações e resolução de conflitos",
+      "Ética no atendimento e sigilo bancário"
+    ],
+    "references": [
+      { "title": "Código de Defesa do Consumidor - Lei 8.078/1990", "type": "lei", "author": "Brasil" },
+      { "title": "Decreto 9.094/2017 - Serviços ao Cidadão", "type": "lei", "author": "Brasil" },
+      { "title": "Atendimento ao Público para Concursos", "type": "apostila", "author": "Gran Cursos Online" }
+    ],
+    "strategy": "Leia o CDC e o Decreto 9.094/2017 na íntegra, pois são as principais fontes de questões. Pratique situações de atendimento simuladas para fixar os procedimentos corretos."
+  },
+  "fisica-basica": {
+    "quickReview": "Física básica em concursos cobre mecânica, termologia, óptica, eletricidade e ondas. Apesar de mais frequente em concursos militares e técnicos, aparece em provas de nível superior quando aplicada a contextos tecnológicos.",
+    "keyTopics": [
+      "Mecânica: cinemática, dinâmica e leis de Newton",
+      "Energia: trabalho, potência e conservação de energia",
+      "Termologia: temperatura, calor, dilatação e termometria",
+      "Eletricidade: lei de Ohm, circuitos e potência elétrica",
+      "Óptica geométrica: reflexão, refração e lentes",
+      "Ondas: propriedades, som e eletromagnetismo básico"
+    ],
+    "references": [
+      { "title": "Fundamentos de Física", "type": "livro", "author": "Halliday, Resnick e Walker" },
+      { "title": "Física para o Ensino Médio", "type": "livro", "author": "Ramalho, Ferraro e Toledo" },
+      { "title": "Khan Academy - Física", "type": "site", "author": "Khan Academy" }
+    ],
+    "strategy": "Resolva problemas práticos de cada tópico antes de avançar para o seguinte. Para concursos militares, a física exige cálculo preciso, então pratique com cronômetro."
+  },
+  "banca-analise": {
+    "quickReview": "Análise de bancas (CESPE/CEBRASPE, FGV, VUNESP, FCC, QUADRIX) é fundamental para adaptar o estudo ao estilo de cada organizadora. A CESPE usa itens certo/errado com alto índice de assertivas falsas; a FCC privilegia alternativas mais tradicionais.",
+    "keyTopics": [
+      "CESPE/CEBRASPE: itens certo/errado, negativas e assertivas parcialmente falsas",
+      "FGV: questões interpretativas e textos-base extensos",
+      "FCC: questões objetivas com alternativas bem elaboradas",
+      "VUNESP: foco em legislação e aplicação prática",
+      "QUADRIX: perfil semelhante ao CESPE com algumas variações",
+      "Estratégias de prova: tempo por questão, gestão de incerteza e recursos"
+    ],
+    "references": [
+      { "title": "Provas anteriores CESPE/CEBRASPE", "type": "site", "author": "CEBRASPE" },
+      { "title": "Provas anteriores FGV Projetos", "type": "site", "author": "FGV" },
+      { "title": "Como Passar em Concursos CESPE", "type": "livro", "author": "William Douglas" }
+    ],
+    "strategy": "Resolva provas anteriores de cada banca no tempo real e analise o estilo das questões. Para CESPE, treine a identificação de assertivas com advérbios absolutos (sempre, nunca, apenas) que costumam indicar erro."
+  },
+  "extras-esfcex": {
+    "quickReview": "O EsFCEx (Escola de Formação Complementar do Exército) avalia candidatos para o Serviço de Saúde do Exército, com provas de conhecimentos específicos da área de saúde e ciências biomédicas, além das disciplinas gerais.",
+    "keyTopics": [
+      "Anatomia e fisiologia humana: sistemas do corpo humano",
+      "Bioquímica básica: metabolismo, enzimas e biomoléculas",
+      "Microbiologia e imunologia fundamentais",
+      "Saúde pública e epidemiologia",
+      "Legislação militar: Estatuto dos Militares e normas do Exército",
+      "Ética profissional e deontologia na área de saúde"
+    ],
+    "references": [
+      { "title": "Anatomia Humana", "type": "livro", "author": "Sobotta" },
+      { "title": "Estatuto dos Militares - Lei 6.880/1980", "type": "lei", "author": "Brasil" },
+      { "title": "Bioquímica", "type": "livro", "author": "Lehninger" },
+      { "title": "Apostila EsFCEx - Conhecimentos Específicos", "type": "apostila", "author": "Gran Cursos Online" }
+    ],
+    "strategy": "Combine o estudo das disciplinas específicas da área de saúde com as matérias gerais militares. A legislação do Exército e o Estatuto dos Militares são leitura obrigatória e muito cobrada."
+  }
+}

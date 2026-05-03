@@ -53,6 +53,10 @@ export const users = sqliteTable(
     birthday: text('birthday'), // YYYY-MM-DD
     location: text('location'),
     avatar_id: integer('avatar_id').default(1),
+    xp: integer('xp').default(0),
+    level: integer('level').default(1),
+    referral_code: text('referral_code').unique(),
+    referred_by_code: text('referred_by_code'),
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
@@ -181,6 +185,8 @@ export const user_responses = sqliteTable(
     resposta_dada: text('resposta_dada').notNull(),
     acertou: integer('acertou').notNull(), // 0 = errado, 1 = correto
     tempo_resposta_ms: integer('tempo_resposta_ms'), // Em milissegundos
+    disciplina: text('disciplina'),
+    capitulo: text('capitulo'),
     respondida_em: text('respondida_em').default(new Date().toISOString()).notNull(),
   },
   (table) => [
@@ -209,6 +215,28 @@ export const study_sessions = sqliteTable(
     index('idx_study_sessions_user_id').on(table.user_id),
     index('idx_study_sessions_date').on(table.session_date),
     index('idx_study_sessions_user_date').on(table.user_id, table.session_date),
+  ]
+);
+
+// Tabela de Indicações (Referral)
+export const referrals = sqliteTable(
+  'referrals',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    referrer_id: text('referrer_id').notNull().references(() => users.id),
+    referred_id: text('referred_id').references(() => users.id),
+    referral_code: text('referral_code').notNull(),
+    referred_email: text('referred_email'),
+    status: text('status').notNull().default('registered'), // registered | subscribed | rewarded
+    reward_granted_at: text('reward_granted_at'),
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  },
+  (table) => [
+    index('idx_referrals_referrer_id').on(table.referrer_id),
+    index('idx_referrals_referred_id').on(table.referred_id),
+    index('idx_referrals_code').on(table.referral_code),
+    index('idx_referrals_status').on(table.status),
   ]
 );
 
@@ -344,6 +372,11 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
     fields: [friendships.receiver_id],
     references: [users.id],
   }),
+}));
+
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  referrer: one(users, { fields: [referrals.referrer_id], references: [users.id] }),
+  referred: one(users, { fields: [referrals.referred_id], references: [users.id] }),
 }));
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({

@@ -5,7 +5,10 @@ import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-const FREE_TRIAL_DAYS = 3;
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? 'matheus@gmail.com')
+  .split(',')
+  .map(e => e.trim().toLowerCase())
+  .filter(Boolean);
 
 export async function GET() {
   try {
@@ -13,6 +16,19 @@ export async function GET() {
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+
+    // Admin bypass — unlimited access without subscription
+    if (ADMIN_EMAILS.includes(session.user.email.toLowerCase())) {
+      return NextResponse.json({
+        status: 'active',
+        hasAccess: true,
+        isPaid: true,
+        isTrial: false,
+        trialDaysRemaining: 0,
+        expiresAt: null,
+        isAdmin: true,
+      });
     }
 
     const user = await db.query.users.findFirst({
@@ -24,27 +40,17 @@ export async function GET() {
     }
 
     const now = new Date();
-    const criadoEm = new Date(user.criado_em);
-    const daysSinceCreation = Math.floor(
-      (now.getTime() - criadoEm.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    const isTrial = user.subscription_status === 'free' && daysSinceCreation < FREE_TRIAL_DAYS;
-    const trialDaysRemaining = isTrial ? FREE_TRIAL_DAYS - daysSinceCreation : 0;
-
     let isPaid = user.subscription_status === 'active';
     if (isPaid && user.subscription_expires_at) {
       isPaid = new Date(user.subscription_expires_at) > now;
     }
 
-    const hasAccess = isTrial || isPaid;
-
     return NextResponse.json({
       status: user.subscription_status,
-      hasAccess,
-      isTrial,
+      hasAccess: isPaid,
       isPaid,
-      trialDaysRemaining,
+      isTrial: false,
+      trialDaysRemaining: 0,
       expiresAt: user.subscription_expires_at,
     });
   } catch (error) {
