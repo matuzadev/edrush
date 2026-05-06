@@ -263,6 +263,9 @@ export async function initializeDatabase() {
     const newResponseColumns = [
       `ALTER TABLE user_responses ADD COLUMN disciplina TEXT`,
       `ALTER TABLE user_responses ADD COLUMN capitulo TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN external_id TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN subject TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN origem TEXT`,
     ];
 
     for (const sql of newResponseColumns) {
@@ -272,6 +275,49 @@ export async function initializeDatabase() {
         // Coluna já existe — ignorar
       }
     }
+
+    // Tabela de preferências do usuário (settings)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_settings (
+          user_id TEXT PRIMARY KEY,
+          display_name TEXT,
+          notif_email INTEGER NOT NULL DEFAULT 1,
+          notif_milestones INTEGER NOT NULL DEFAULT 1,
+          notif_weekly INTEGER NOT NULL DEFAULT 1,
+          pref_theme TEXT NOT NULL DEFAULT 'dark',
+          pref_language TEXT NOT NULL DEFAULT 'pt',
+          pref_daily_goal INTEGER NOT NULL DEFAULT 20,
+          sound_enabled INTEGER NOT NULL DEFAULT 1,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+    } catch { /* já existe */ }
+
+    // Tabela de tentativas de simulado
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS simulado_attempts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          discipline TEXT NOT NULL,
+          total_questions INTEGER NOT NULL,
+          correct_answers INTEGER NOT NULL,
+          skipped INTEGER NOT NULL DEFAULT 0,
+          accuracy INTEGER NOT NULL DEFAULT 0,
+          duration_ms INTEGER,
+          started_at TEXT NOT NULL,
+          finished_at TEXT NOT NULL,
+          criado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_simulado_attempts_user ON simulado_attempts(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_simulado_attempts_discipline ON simulado_attempts(discipline)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_simulado_attempts_finished ON simulado_attempts(finished_at)`);
+    } catch { /* já existe */ }
 
     // Criar tabela de Capítulos/Blocos
     try {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
@@ -63,15 +63,70 @@ export default function SimuladoPlayPage() {
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const startedAtRef = useRef<string>(new Date().toISOString());
+  const startedTsRef = useRef<number>(Date.now());
+  const questionStartRef = useRef<number>(Date.now());
+  const finishedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const disciplineQuestions = QUESTIONS_BY_DISCIPLINE[disciplineId] || QUESTIONS_BY_DISCIPLINE['portugues'];
     setQuestions(disciplineQuestions);
+    startedAtRef.current = new Date().toISOString();
+    startedTsRef.current = Date.now();
+    questionStartRef.current = Date.now();
+    finishedRef.current = false;
   }, [disciplineId]);
 
+  // Reinicia o cronômetro a cada questão
+  useEffect(() => {
+    questionStartRef.current = Date.now();
+  }, [currentIndex]);
+
+  const persistAnswer = (questionIndex: number, optionIndex: number) => {
+    const q = questions[questionIndex];
+    if (!q) return;
+    const correct = optionIndex === q.correctAnswer;
+    const skipped = optionIndex === -1;
+    const tempo_resposta_ms = Date.now() - questionStartRef.current;
+    fetch('/api/questions/answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionId: q.id,
+        resposta_dada: skipped ? '__skipped__' : (q.options[optionIndex] ?? ''),
+        acertou: correct,
+        tempo_resposta_ms,
+        disciplina: disciplineId,
+        subject: disciplineId,
+        origem: 'simulado',
+      }),
+    }).catch(err => console.error('Falha ao salvar resposta do simulado:', err));
+  };
+
+  const finishSimulado = (allAnswers: number[]) => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    const correct = allAnswers.filter((ans, idx) => ans === questions[idx]?.correctAnswer).length;
+    const skipped = allAnswers.filter(a => a === -1).length;
+    fetch('/api/simulado/finish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        discipline: disciplineId,
+        totalQuestions: questions.length,
+        correctAnswers: correct,
+        skipped,
+        durationMs: Date.now() - startedTsRef.current,
+        startedAt: startedAtRef.current,
+      }),
+    }).catch(err => console.error('Falha ao salvar simulado:', err));
+  };
+
   const handleAnswer = (optionIndex: number) => {
-    setUserAnswers([...userAnswers, optionIndex]);
+    const newAnswers = [...userAnswers, optionIndex];
+    setUserAnswers(newAnswers);
     setShowResult(true);
+    persistAnswer(currentIndex, optionIndex);
   };
 
   const handleNext = () => {
@@ -79,13 +134,22 @@ export default function SimuladoPlayPage() {
       setCurrentIndex(currentIndex + 1);
       setShowResult(false);
     } else {
+      finishSimulado(userAnswers);
       setIsFinished(true);
     }
   };
 
   const handleSkip = () => {
-    setUserAnswers([...userAnswers, -1]);
-    handleNext();
+    const newAnswers = [...userAnswers, -1];
+    setUserAnswers(newAnswers);
+    persistAnswer(currentIndex, -1);
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setShowResult(false);
+    } else {
+      finishSimulado(newAnswers);
+      setIsFinished(true);
+    }
   };
 
   if (questions.length === 0) {
