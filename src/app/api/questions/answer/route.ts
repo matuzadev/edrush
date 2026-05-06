@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
     tempo_resposta_ms?: number;
     disciplina?: string;
     capitulo?: string;
+    subject?: string;
+    origem?: string;
   };
 
   try {
@@ -27,24 +29,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Body inválido' }, { status: 400 });
   }
 
-  const questionId = parseInt(String(body.questionId), 10);
-  if (isNaN(questionId) || questionId <= 0) {
-    return NextResponse.json({ ok: true, skipped: true });
-  }
-
   if (typeof body.resposta_dada !== 'string' || typeof body.acertou !== 'boolean') {
     return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
   }
 
+  const rawId = String(body.questionId ?? '');
+  const numericId = parseInt(rawId, 10);
+  const isNumeric = !isNaN(numericId) && numericId > 0 && String(numericId) === rawId;
+
+  // FK em question_id existe no schema mas o libsql não enforça FOREIGN_KEYS por padrão.
+  // Quando id é não-numérico (questão local/mock), gravamos 0 em question_id e o id real em external_id.
+  const questionIdToStore = isNumeric ? numericId : 0;
+  const externalIdToStore = isNumeric ? null : (rawId || null);
+
   try {
     await db.insert(user_responses).values({
       user_id: userId,
-      question_id: questionId,
+      question_id: questionIdToStore,
+      external_id: externalIdToStore,
       resposta_dada: body.resposta_dada,
       acertou: body.acertou ? 1 : 0,
       tempo_resposta_ms: body.tempo_resposta_ms ?? null,
       disciplina: body.disciplina ?? null,
       capitulo: body.capitulo ?? null,
+      subject: body.subject ?? null,
+      origem: body.origem ?? null,
       respondida_em: new Date().toISOString(),
     });
 

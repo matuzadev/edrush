@@ -181,12 +181,15 @@ export const user_responses = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     user_id: text('user_id').notNull().references(() => users.id),
-    question_id: integer('question_id').notNull().references(() => questions.id),
+    question_id: integer('question_id').notNull(), // 0 quando externo (questão local/mock)
+    external_id: text('external_id'), // id da questão quando vier de fonte externa (localStorage/mock)
     resposta_dada: text('resposta_dada').notNull(),
     acertou: integer('acertou').notNull(), // 0 = errado, 1 = correto
     tempo_resposta_ms: integer('tempo_resposta_ms'), // Em milissegundos
     disciplina: text('disciplina'),
     capitulo: text('capitulo'),
+    subject: text('subject'), // slug da matéria (ex.: "portugues")
+    origem: text('origem'), // 'study' | 'simulado'
     respondida_em: text('respondida_em').default(new Date().toISOString()).notNull(),
   },
   (table) => [
@@ -255,6 +258,47 @@ export const friendships = sqliteTable(
     index('idx_friendships_requester').on(table.requester_id),
     index('idx_friendships_receiver').on(table.receiver_id),
     index('idx_friendships_status').on(table.status),
+  ]
+);
+
+// Tabela de Preferências do Usuário
+export const user_settings = sqliteTable(
+  'user_settings',
+  {
+    user_id: text('user_id').primaryKey().references(() => users.id),
+    display_name: text('display_name'),
+    notif_email: integer('notif_email').notNull().default(1),
+    notif_milestones: integer('notif_milestones').notNull().default(1),
+    notif_weekly: integer('notif_weekly').notNull().default(1),
+    pref_theme: text('pref_theme').notNull().default('dark'), // dark | light
+    pref_language: text('pref_language').notNull().default('pt'), // pt | en
+    pref_daily_goal: integer('pref_daily_goal').notNull().default(20),
+    sound_enabled: integer('sound_enabled').notNull().default(1),
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  }
+);
+
+// Tabela de Tentativas de Simulado
+export const simulado_attempts = sqliteTable(
+  'simulado_attempts',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    discipline: text('discipline').notNull(),
+    total_questions: integer('total_questions').notNull(),
+    correct_answers: integer('correct_answers').notNull(),
+    skipped: integer('skipped').notNull().default(0),
+    accuracy: integer('accuracy').notNull().default(0), // 0-100
+    duration_ms: integer('duration_ms'),
+    started_at: text('started_at').notNull(),
+    finished_at: text('finished_at').notNull(),
+    criado_em: text('criado_em').notNull(),
+  },
+  (table) => [
+    index('idx_simulado_attempts_user').on(table.user_id),
+    index('idx_simulado_attempts_discipline').on(table.discipline),
+    index('idx_simulado_attempts_finished').on(table.finished_at),
   ]
 );
 

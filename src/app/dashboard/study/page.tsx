@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +33,12 @@ function StudyPageContent() {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const questionStartRef = useRef<number>(Date.now());
+
+  // Reset start time quando muda de questão
+  useEffect(() => {
+    questionStartRef.current = Date.now();
+  }, [currentQuestionIndex, sessionQuestions]);
 
   useEffect(() => {
     if (!isLoading && !user) router.push('/auth/login');
@@ -62,14 +68,31 @@ function StudyPageContent() {
 
   const handleQuestionSubmit = async (questionId: string, userAnswer: string, isCorrect: boolean, quality: number) => {
     setIsSubmitting(true);
-    
+
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      // Adicionar a questão acertada ao perfil
       addCorrectAnswer(questionId);
     } else {
       addIncorrectAnswer();
     }
+
+    // Persistir resposta individual no banco (fire-and-forget)
+    const tempo_resposta_ms = Date.now() - questionStartRef.current;
+    const currentQ = sessionQuestions[currentQuestionIndex];
+    fetch('/api/questions/answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionId,
+        resposta_dada: userAnswer,
+        acertou: isCorrect,
+        tempo_resposta_ms,
+        disciplina: currentQ?.subject ?? subject ?? null,
+        capitulo: currentQ?.chapter != null ? String(currentQ.chapter) : null,
+        subject: subject ?? null,
+        origem: 'study',
+      }),
+    }).catch(err => console.error('Falha ao salvar resposta:', err));
 
     setTimeout(async () => {
       if (currentQuestionIndex < sessionQuestions.length - 1) {
@@ -77,7 +100,6 @@ function StudyPageContent() {
       } else {
         completeChapter();
         setIsFinished(true);
-        // Persistir sessão no banco — fire-and-forget (não bloquear UI)
         await saveStudySession({
           questionsAnswered: sessionQuestions.length,
           correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,
