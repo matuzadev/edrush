@@ -9,13 +9,13 @@ import {
   User,
   Star,
   RefreshCw,
-  CheckCircle,
   Lock,
   PlayCircle,
-  BookOpen,
   Target,
   TrendingUp,
   Loader2,
+  Layers,
+  CheckCheck,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/NotificationBell';
 import subjects from '@/data/subjects.json';
@@ -32,6 +32,8 @@ interface ProgressStats {
   totalAnswered: number;
   totalCorrect: number;
   accuracy: number;
+  subjectsDone: number;
+  loaded: boolean;
 }
 
 export default function PersonalizedDashboardPage() {
@@ -42,7 +44,13 @@ export default function PersonalizedDashboardPage() {
 
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [activeSubject, setActiveSubject] = useState<string>('');
-  const [stats, setStats] = useState<ProgressStats>({ totalAnswered: 0, totalCorrect: 0, accuracy: 0 });
+  const [stats, setStats] = useState<ProgressStats>({
+    totalAnswered: 0,
+    totalCorrect: 0,
+    accuracy: 0,
+    subjectsDone: 0,
+    loaded: false,
+  });
   const [isResetting, setIsResetting] = useState(false);
 
   const user = session?.user as UserSession | undefined;
@@ -65,25 +73,39 @@ export default function PersonalizedDashboardPage() {
 
   async function loadUserData() {
     try {
-      // Carregar áreas selecionadas do perfil via session (já armazenadas no DB)
-      // e buscar progresso
-      const [profileRes, subRes] = await Promise.all([
+      const [profileRes, statsRes] = await Promise.all([
         fetch('/api/user/profile'),
-        fetch('/api/user/subscription'),
+        fetch('/api/user/stats'),
       ]);
 
+      let areas: string[] = [];
       if (profileRes.ok) {
         const profile = await profileRes.json();
-        const areas: string[] = profile.selectedAreas ?? [];
+        areas = profile.selectedAreas ?? [];
         setSelectedAreas(areas);
         if (areas.length > 0) setActiveSubject(areas[0]);
         else setActiveSubject(Object.keys(subjects)[0]);
       }
+
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        const totalAnswered = Number(data.totalQuestionsAnswered ?? 0);
+        const totalCorrect = Number(data.totalQuestionsCorrect ?? 0);
+        const accuracy = Number(data.accuracy ?? 0);
+
+        // "Matérias feitas" = disciplinas distintas em que o usuário já respondeu pelo menos 1 questão
+        const byDisciplina: { disciplina: string; answered: number }[] = data.byDisciplina ?? [];
+        const subjectsDone = byDisciplina.filter((d) => d.answered > 0).length;
+
+        setStats({ totalAnswered, totalCorrect, accuracy, subjectsDone, loaded: true });
+      } else {
+        setStats((prev) => ({ ...prev, loaded: true }));
+      }
     } catch {
-      // fallback: usar todas as matérias do subjects.json
       const allSlugs = Object.keys(subjects);
       setSelectedAreas(allSlugs);
       setActiveSubject(allSlugs[0]);
+      setStats((prev) => ({ ...prev, loaded: true }));
     }
   }
 
@@ -203,35 +225,122 @@ export default function PersonalizedDashboardPage() {
         </div>
 
         {/* Cards de métricas */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            { icon: BookOpen, label: 'Matérias', value: displaySubjects.length, color: 'emerald', accent: '#10b981' },
-            { icon: TrendingUp, label: 'Respondidas', value: stats.totalAnswered, color: 'blue', accent: '#3b82f6' },
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+          {([
+            {
+              icon: Layers,
+              label: 'Matérias Totais',
+              hint: 'no seu plano de estudos',
+              value: displaySubjects.length,
+              accent: '#10b981',
+              iconBg: 'bg-emerald-500/10',
+              iconColor: 'text-emerald-400',
+              ringFrom: 'from-emerald-500/30',
+              ringTo: 'to-emerald-500/0',
+            },
+            {
+              icon: CheckCheck,
+              label: 'Matérias feitas',
+              hint:
+                displaySubjects.length > 0
+                  ? `${Math.round((stats.subjectsDone / displaySubjects.length) * 100)}% do plano`
+                  : '—',
+              value: stats.loaded ? `${stats.subjectsDone}/${displaySubjects.length}` : '...',
+              accent: '#22c55e',
+              iconBg: 'bg-green-500/10',
+              iconColor: 'text-green-400',
+              ringFrom: 'from-green-500/30',
+              ringTo: 'to-green-500/0',
+              progress:
+                displaySubjects.length > 0
+                  ? Math.min(100, Math.round((stats.subjectsDone / displaySubjects.length) * 100))
+                  : 0,
+            },
+            {
+              icon: TrendingUp,
+              label: 'Respondidas',
+              hint: stats.totalAnswered > 0 ? `${stats.totalCorrect} corretas` : 'comece agora',
+              value: stats.loaded ? stats.totalAnswered.toLocaleString('pt-BR') : '...',
+              accent: '#3b82f6',
+              iconBg: 'bg-blue-500/10',
+              iconColor: 'text-blue-400',
+              ringFrom: 'from-blue-500/30',
+              ringTo: 'to-blue-500/0',
+            },
             {
               icon: Target,
-              label: 'Acertos',
-              value: stats.totalAnswered > 0 ? `${stats.accuracy}%` : '-',
-              color: 'violet',
+              label: 'Taxa de Acertos',
+              hint:
+                stats.totalAnswered > 0
+                  ? stats.accuracy >= 70
+                    ? 'Excelente desempenho'
+                    : stats.accuracy >= 50
+                      ? 'Continue praticando'
+                      : 'Foco nas revisões'
+                  : 'sem dados ainda',
+              value: stats.loaded
+                ? stats.totalAnswered > 0
+                  ? `${stats.accuracy}%`
+                  : '—'
+                : '...',
               accent: '#8b5cf6',
+              iconBg: 'bg-violet-500/10',
+              iconColor: 'text-violet-400',
+              ringFrom: 'from-violet-500/30',
+              ringTo: 'to-violet-500/0',
+              progress: stats.totalAnswered > 0 ? stats.accuracy : 0,
             },
-          ].map((metric) => {
+          ] as const).map((metric) => {
             const Icon = metric.icon;
             return (
               <div
                 key={metric.label}
-                className="relative overflow-hidden bg-slate-900/60 border border-white/8 rounded-2xl p-4 text-center group transition-all hover:border-white/15 hover:-translate-y-0.5"
+                className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5 group transition-all hover:border-white/20 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
               >
+                {/* glow superior */}
                 <div
-                  className="absolute top-0 left-0 right-0 h-px opacity-70"
+                  className="absolute -top-12 -right-12 w-32 h-32 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"
+                  style={{ background: metric.accent }}
+                />
+                {/* linha de topo */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-px"
                   style={{ background: `linear-gradient(90deg, transparent, ${metric.accent}, transparent)` }}
                 />
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-${metric.color}-500/10 group-hover:bg-${metric.color}-500/15 transition-colors`}
-                >
-                  <Icon size={18} className={`text-${metric.color}-400`} />
+
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${metric.iconBg} ring-1 ring-white/5`}
+                    >
+                      <Icon size={18} className={metric.iconColor} />
+                    </div>
+                    <div
+                      className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-gradient-to-r ${metric.ringFrom} ${metric.ringTo} text-white/80`}
+                    >
+                      Live
+                    </div>
+                  </div>
+
+                  <div className="text-3xl font-black text-white leading-none mb-1 tabular-nums">
+                    {metric.value}
+                  </div>
+                  <div className="text-xs font-semibold text-slate-300 mb-0.5">{metric.label}</div>
+                  <div className="text-[11px] text-slate-500">{metric.hint}</div>
+
+                  {'progress' in metric && metric.progress !== undefined && (
+                    <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-700"
+                        style={{
+                          width: `${metric.progress}%`,
+                          background: `linear-gradient(90deg, ${metric.accent}, ${metric.accent}cc)`,
+                          boxShadow: `0 0 12px ${metric.accent}55`,
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
-                <div className="text-2xl font-black text-white leading-none mb-1">{metric.value}</div>
-                <div className="text-xs text-slate-500">{metric.label}</div>
               </div>
             );
           })}
