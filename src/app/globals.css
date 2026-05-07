@@ -5,6 +5,27 @@
    Tailwind can process them correctly in all environments.
 ========================================================= */
 
+/* ── CSS Theme Variables ───────────────────────────────── */
+:root {
+  --bg: #020617;
+  --fg: #f8fafc;
+  --card: #0f172a;
+  --border: rgba(255,255,255,0.05);
+}
+
+html.light {
+  --bg: #f1f5f9;
+  --fg: #0f172a;
+  --card: #ffffff;
+  --border: rgba(0,0,0,0.08);
+}
+
+/* Light mode overrides (apenas dashboard, settings, profile) */
+html.light .dashboard-shell {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
 @layer base {
   *,
   *::before,
