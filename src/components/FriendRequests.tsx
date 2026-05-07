@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { UserCheck, UserX, Users, Loader } from 'lucide-react';
+import { UserCheck, UserX, Loader } from 'lucide-react';
+import { getAvatar } from '@/data/avatars';
 
 interface FriendEntry {
   friendshipId: number;
@@ -12,15 +13,11 @@ interface FriendEntry {
   since: string;
 }
 
-function getAvatarLabel(avatarId: number): string {
-  const avatars: Record<number, string> = {
-    1: '🧑', 2: '👩', 3: '👨‍💼', 4: '👩‍🎓', 5: '🧒',
-    6: '👴', 7: '👩‍🏫', 8: '🦸', 9: '🧙', 10: '🥷',
-  };
-  return avatars[avatarId] ?? '🧑';
+interface FriendRequestsProps {
+  onViewProfile?: (username: string) => void;
 }
 
-export function FriendRequests() {
+export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
   const [friends, setFriends] = useState<FriendEntry[]>([]);
   const [pendingReceived, setPendingReceived] = useState<FriendEntry[]>([]);
   const [pendingSent, setPendingSent] = useState<FriendEntry[]>([]);
@@ -104,20 +101,35 @@ export function FriendRequests() {
     );
   }
 
-  function UserCard({ entry, actions }: { entry: FriendEntry; actions?: React.ReactNode }) {
+  function UserCard({ entry, actions, clickable }: { entry: FriendEntry; actions?: React.ReactNode; clickable?: boolean }) {
+    const avatar = getAvatar(entry.avatar_id);
+    const displayName = entry.username ?? entry.nome ?? 'Concurseiro';
+    const canClick = clickable && onViewProfile && entry.username;
+
     return (
-      <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-white/5 rounded-lg">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-base">
-            {getAvatarLabel(entry.avatar_id)}
-          </div>
-          <div>
-            <p className="text-white font-medium text-sm">
-              {entry.username ?? entry.nome ?? 'Concurseiro'}
-            </p>
+      <div
+        onClick={canClick ? () => onViewProfile!(entry.username!) : undefined}
+        className={`flex items-center justify-between p-3 bg-slate-800/50 border border-white/5 rounded-lg ${
+          canClick ? 'cursor-pointer hover:bg-slate-800/80 hover:border-emerald-500/30 transition' : ''
+        }`}
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${avatar.colors.primary}33, ${avatar.colors.accent}11)`,
+              border: `1.5px solid ${avatar.colors.primary}55`,
+            }}
+            dangerouslySetInnerHTML={{ __html: avatar.svg }}
+          />
+          <div className="min-w-0">
+            <p className="text-white font-medium text-sm truncate">{displayName}</p>
+            {canClick && (
+              <p className="text-[10px] text-slate-500">Toque para ver perfil</p>
+            )}
           </div>
         </div>
-        {actions}
+        {actions && <div onClick={(e) => e.stopPropagation()}>{actions}</div>}
       </div>
     );
   }
