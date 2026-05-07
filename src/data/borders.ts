@@ -379,6 +379,7 @@ export const TIER_COLOR: Record<BorderTier, { color: string; bg: string; border:
   gold:     { color: '#fde047', bg: 'rgba(253,224,71,0.10)',  border: 'rgba(253,224,71,0.30)',  label: 'Ouro' },
   platinum: { color: '#c084fc', bg: 'rgba(192,132,252,0.10)', border: 'rgba(192,132,252,0.35)', label: 'Platina' },
   diamond:  { color: '#67e8f9', bg: 'rgba(103,232,249,0.10)', border: 'rgba(103,232,249,0.40)', label: 'Diamante' },
+  mythic:   { color: '#fde047', bg: 'rgba(253,224,71,0.12)',  border: 'rgba(253,224,71,0.50)',  label: 'Mítica' },
 };
 
 export interface UserBorderStats {
