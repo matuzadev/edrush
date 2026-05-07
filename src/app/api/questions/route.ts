@@ -65,9 +65,28 @@ export async function GET(request: NextRequest) {
       args.push(`%${search}%`);
     }
 
-    // Anti-farm: exclui questões já acertadas por esse usuário (qualquer resposta sua com acertou=1)
+    // Modo revisão: se a (disciplina, capítulo) já está marcado como completo
+    // para este usuário, libera todas as questões — inclusive já acertadas.
+    let chapterCompleted = false;
+    if (userId && disciplina && capitulo) {
+      try {
+        const completedRs = await rawClient.execute({
+          sql: `SELECT 1 FROM chapters c
+                JOIN user_chapter_progress p ON p.chapter_id = c.id
+                WHERE c.disciplina = ? AND c.titulo = ?
+                  AND p.user_id = ? AND p.is_completed = 1
+                LIMIT 1`,
+          args: [disciplina, capitulo, userId],
+        });
+        chapterCompleted = completedRs.rows.length > 0;
+      } catch { /* sem registros / sem tabela ainda — segue normal */ }
+    }
+
+    // Anti-farm: exclui questões já acertadas por esse usuário (qualquer resposta sua com acertou=1).
+    // Desativado quando o capítulo está em modo revisão (completado) ou via ?includeAnswered=1.
     let excludedCount = 0;
-    if (userId && !includeAnswered) {
+    const skipAntiFarm = includeAnswered || chapterCompleted;
+    if (userId && !skipAntiFarm) {
       conditions.push(`id NOT IN (
         SELECT DISTINCT question_id FROM user_responses
         WHERE user_id = ? AND acertou = 1 AND question_id > 0
@@ -145,6 +164,7 @@ export async function GET(request: NextRequest) {
       questions: transformedQuestions,
       count: transformedQuestions.length,
       excludedAlreadyCorrect: excludedCount, // questões filtradas por anti-farm
+      reviewMode: chapterCompleted,          // capítulo já completado: tudo liberado
     });
   } catch (error) {
     console.error('Erro ao buscar questões:', error);

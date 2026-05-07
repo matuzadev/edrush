@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
-import { study_sessions, users, notifications } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import {
+  study_sessions, users, notifications,
+  chapters, user_chapter_progress, chapter_unlocks,
+} from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { xpForSession, computeLevel } from '@/lib/levels';
 import { checkAndUnlockBorders } from '@/lib/borders';
 
