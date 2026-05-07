@@ -306,7 +306,7 @@ export default function ChapterPage({
     } catch {
       // fire-and-forget se falhar
     }
-  }, [subject, chapterTitle]);
+  }, [subject, chapterTitle, id]);
 
   const handleNext = () => {
     if (lives <= 0 && !isCorrect) {
