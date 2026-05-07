@@ -62,6 +62,7 @@ export default function ProfilePage() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddFriendsOpen, setIsAddFriendsOpen] = useState(false);
+  const [viewingFriend, setViewingFriend] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
@@ -692,7 +693,7 @@ export default function ProfilePage() {
                   + Adicionar
                 </button>
               </div>
-              <FriendRequests />
+              <FriendRequests onViewProfile={(username) => setViewingFriend(username)} />
             </div>
 
           </div>
@@ -714,6 +715,10 @@ export default function ProfilePage() {
       <AddFriendsModal
         isOpen={isAddFriendsOpen}
         onClose={() => setIsAddFriendsOpen(false)}
+      />
+      <FriendProfileModal
+        username={viewingFriend}
+        onClose={() => setViewingFriend(null)}
       />
     </div>
   );
