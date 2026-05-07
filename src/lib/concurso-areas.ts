@@ -12,20 +12,31 @@ export interface ConcursoAreaMap {
 export const CONCURSO_AREAS: ConcursoAreaMap[] = [
   // ─── POLÍCIA FEDERAL ───────────────────────────────────────────────────────
   {
-    // Baseado na Planilha PF & EsFCEX.xlsx — aba "Concurso PF"
+    // Baseado no edital Ed_1_PF_25_Abertura (CEBRASPE) para Perito Criminal Federal
+    // — Área 3: Informática Forense. Currículo confere com o conteúdo programático
+    // dos cargos da PF (Conhecimentos Básicos + Específicos da especialidade).
     match: ['perito criminal federal', 'perito digital'],
     areas: [
-      // Conhecimentos Básicos
-      'lingua-portuguesa',
-      'informatica-basica',
-      'direito-penal',
-      'criminalistica',
-      // Conhecimentos Específicos
-      'fundamentos-computacao',
-      'bancos-de-dados',
-      'engenharia-reversa-malware',
-      'linguagens-programacao',
-      'estrutura-dados-algoritmos',
+      // ── Conhecimentos Básicos ────────────────────────────────────────────
+      'portugues',                  // Língua Portuguesa (capítulos seedados)
+      'informatica-basica',         // Noções gerais de informática
+      'direito-constitucional',     // Noções de Direito Constitucional
+      'direito-administrativo',     // Noções de Direito Administrativo
+      'direito-penal',              // Direito Penal e Processual Penal
+      'criminalistica',             // Criminalística
+      // ── Conhecimentos Específicos — Informática Forense ─────────────────
+      'fundamentos-computacao',     // Arquitetura, SOs, virtualização, RAID
+      'redes-de-computadores',      // Modelos OSI/TCP/IP, protocolos, VPN
+      'seguranca-informacao',       // Conceitos de segurança, malware, defesas
+      'computacao-nuvem',           // Cloud, virtualização, containers
+      'bancos-de-dados',            // SGBDs, SQL, modelagem, NoSQL
+      'engenharia-reversa-malware', // Análise de malware, debuggers, sandbox
+      'linguagens-programacao',     // C, Java, Python, JS, web
+      'estrutura-dados-algoritmos', // Listas, árvores, busca, ordenação
+      'sistemas-informacao',        // Ciclo de vida, requisitos, testes
+      'teoria-sistemas',            // Sistemas abertos/fechados, integração
+      'extras-esfcex',              // Criptografia, LGPD, forense digital, Git
+      // ── Produção textual e estratégia de prova ──────────────────────────
       'prova-discursiva',
       'banca-analise',
     ],

@@ -98,32 +98,9 @@ const PF_2025_BASE: Omit<SeedConcurso, 'cargo' | 'area_especialidade' | 'vagas_c
 };
 
 export const SEED_CONCURSOS: SeedConcurso[] = [
-  // ── PF 2025: Perito Criminal Federal — visão geral do cargo ──────────────
-  // Entrada principal que representa o cargo como um todo no seletor de concurso.
-  {
-    ...PF_2025_BASE,
-    slug: 'pf-perito-criminal-2025',
-    titulo: 'Polícia Federal 2025 — Perito Criminal Federal',
-    descricao:
-      'Concurso para Perito Criminal Federal da Polícia Federal, com 69 vagas distribuídas ' +
-      'em 13 especialidades (Informática Forense, Contábil-Financeira, Meio Ambiente e outras). ' +
-      'Banca CEBRASPE. Provas realizadas em 27/07/2025. Remuneração inicial: R$ 26.800,00.',
-    cargo: 'Perito Criminal Federal',
-    area_especialidade: null, // representa o cargo completo, não uma área específica
-    vagas_cargo: 69,
-    requisitos: JSON.stringify([
-      'Diploma de graduação em curso superior específico à área de especialidade',
-      'Registro no conselho de classe profissional pertinente (quando aplicável)',
-      'Carteira Nacional de Habilitação — categoria B (mínimo)',
-      'Aptidão em exame médico, psicológico e avaliação física',
-      'Idoneidade moral comprovada por investigação social',
-      'Nacionalidade brasileira',
-      'Estar em dia com obrigações eleitorais e militares',
-    ]),
-  },
-
   // ── PF 2025: Perito Criminal Federal — Área 3: Informática Forense ───────
-  // Maior área em vagas (24). Entrada dedicada para estudantes de TI/Segurança.
+  // Único concurso ativo no catálogo. Para adicionar mais, basta inserir
+  // novas entradas neste array.
   {
     ...PF_2025_BASE,
     slug: 'pf-perito-criminal-informatica-forense-2025',
@@ -145,47 +122,12 @@ export const SEED_CONCURSOS: SeedConcurso[] = [
       'Estar em dia com obrigações eleitorais e militares',
     ]),
   },
+];
 
-  // ── EXEMPLO NÃO VERIFICADO: PRF ──────────────────────────────────────────
-  // AVISO: Dados abaixo são baseados em informações públicas gerais sobre a PRF,
-  // mas NÃO refletem um edital específico publicado. Não use como fonte oficial.
-  // Marque como 'previsto' para indicar que ainda não há edital confirmado.
-  {
-    slug: 'prf-policial-rodoviario-federal-2026',
-    titulo: 'Polícia Rodoviária Federal 2026 — Policial Rodoviário Federal',
-    organizador: 'Polícia Rodoviária Federal',
-    orgao: 'Ministério da Justiça e Segurança Pública',
-    descricao:
-      'EXEMPLO (dados não verificados por edital publicado). ' +
-      'Próximo concurso da PRF previsto para 2026. Última remuneração conhecida: ' +
-      'R$ 11.670,33 (2025). Pedido de 263 vagas encaminhado ao MJSP em 2025.',
-    cargo: 'Policial Rodoviário Federal',
-    area_especialidade: null,
-    vagas_total: null,
-    vagas_por_funcao: null,
-    vagas_cargo: null,
-    status: 'previsto',
-    data_publicacao_edital: null,
-    data_abertura_inscricoes: null,
-    data_fechamento_inscricoes: null,
-    data_prova_objetiva: null,
-    data_prova_discursiva: null,
-    data_resultado_final: null,
-    url_edital: null,
-    url_site_oficial: 'https://www.prf.gov.br',
-    banca: null,
-    remuneracao_inicial: 11670.33,
-    nivel_escolaridade: 'Superior Completo',
-    fonte_scrape: null,
-    logo_url: '/imagens/logos/prf.png',
-    edital_numero: null,
-    edital_ano: null,
-    url_inscricao: null,
-    requisitos: JSON.stringify([
-      'Diploma de graduação em curso superior de qualquer área',
-      'Carteira Nacional de Habilitação — categoria B (mínimo)',
-      'Aptidão em exame médico, psicológico e avaliação física',
-    ]),
-    destaque: 0,
-  },
+// Slugs descontinuados — limpos no boot por seedConcursosBank() em src/lib/db.ts.
+// Ao remover uma entrada de SEED_CONCURSOS, adicione o slug aqui se quiser que
+// linhas antigas no banco sejam removidas no próximo boot.
+export const DEPRECATED_CONCURSO_SLUGS: string[] = [
+  'pf-perito-criminal-2025',                  // visão geral substituída pela área de Informática Forense
+  'prf-policial-rodoviario-federal-2026',     // placeholder não verificado
 ];
