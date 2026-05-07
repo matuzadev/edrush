@@ -140,6 +140,7 @@ export function EditProfileModal({
           {([
             { key: 'identity', label: 'Identidade', icon: User },
             { key: 'avatar',   label: 'Avatar',     icon: Smile },
+            { key: 'borders',  label: 'Bordas',     icon: Sparkles },
           ] as const).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
