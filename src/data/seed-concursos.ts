@@ -66,7 +66,7 @@ export type SeedConcurso = {
 //   Área 22 — Meio Ambiente:              14 vagas
 //   TOTAL:                                69 vagas
 
-const PF_2025_BASE: Omit<SeedConcurso, 'cargo' | 'area_especialidade' | 'vagas_cargo' | 'slug' | 'titulo' | 'descricao'> = {
+const PF_2025_BASE: Omit<SeedConcurso, 'cargo' | 'area_especialidade' | 'vagas_cargo' | 'slug' | 'titulo' | 'descricao' | 'requisitos'> = {
   organizador: 'Polícia Federal',
   orgao: 'Ministério da Justiça e Segurança Pública',
   vagas_total: 1000,

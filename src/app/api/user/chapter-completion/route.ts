@@ -43,8 +43,8 @@ export async function GET() {
     });
 
     const completed = rs.rows.map((r) => ({
-      subject: String((r as { subject: string }).subject),
-      chapterId: Number((r as { chapter_id: number }).chapter_id),
+      subject: String((r as unknown as { subject: string }).subject),
+      chapterId: Number((r as unknown as { chapter_id: number }).chapter_id),
     }));
 
     return NextResponse.json({ completed, threshold: COMPLETION_THRESHOLD_PCT });

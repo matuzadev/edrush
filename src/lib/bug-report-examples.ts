@@ -1,8 +1,10 @@
+// @ts-nocheck
 /**
  * Exemplos de Uso do Sistema de Bug Report
- * 
- * Use estes exemplos em seus componentes/páginas para criar fluxos
- * customizados de reportagem de bugs
+ *
+ * Arquivo apenas referência — contém snippets JSX em .ts e imports duplicados
+ * propositalmente (cada bloco é um exemplo isolado). Não é importado em
+ * runtime; o type-check é desativado para o arquivo todo.
  */
 
 // ============================================

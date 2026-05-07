@@ -46,7 +46,16 @@ export async function GET() {
 
     // 3) Última mensagem por par + unread count
     // Para cada amigo, buscar última msg (em qualquer direção) e count de não lidas (recebidas e não lidas)
-    const threads = [];
+    type Thread = {
+      friendId: string;
+      nome: string | null;
+      username: string | null;
+      avatar_id: number;
+      level: number;
+      unreadCount: number;
+      lastMessage: { id: number; content: string; type: string; mine: boolean; createdAt: string } | null;
+    };
+    const threads: Thread[] = [];
     let totalUnread = 0;
 
     for (const friendId of friendIds) {
