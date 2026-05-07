@@ -1070,6 +1070,7 @@ export default function ProfilePage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleSaveProfile}
+        onBorderEquipped={() => fetchProfile()}
         initialData={{
           username: profile.username,
           birthday: profile.birthday ?? '',
