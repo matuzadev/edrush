@@ -247,7 +247,7 @@ export default function ProfilePage() {
                 {/* Avatar + ações */}
                 <div className="flex items-end justify-between mb-5">
                   <div className="relative">
-                    <AvatarBorder slug={profile.equippedBorder} size={80}>
+                    <AvatarBorder slug={profile.equippedBorder} size={96}>
                       <AvatarSelector selectedId={profile.avatar_id} size="lg" />
                     </AvatarBorder>
                     {/* Badge de nível */}
