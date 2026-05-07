@@ -209,4 +209,5 @@ export const SEED_CONCURSOS: SeedConcurso[] = [
 export const DEPRECATED_CONCURSO_SLUGS: string[] = [
   'pf-perito-criminal-2025',                  // visão geral substituída pela área de Informática Forense
   'prf-policial-rodoviario-federal-2026',     // placeholder não verificado
+  'perito-criminal-federal',                   // legado sem banca/vagas/datas — substituído por pf-perito-criminal-informatica-forense-2025
 ];
