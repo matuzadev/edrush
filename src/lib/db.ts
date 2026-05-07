@@ -238,6 +238,27 @@ export async function initializeDatabase() {
       try { await client.execute(sql); } catch { /* já existe */ }
     }
 
+    // Tabela de estado do Foco Sentinela
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_sentinela (
+          user_id TEXT PRIMARY KEY,
+          last_mood TEXT NOT NULL DEFAULT 'awake',
+          last_message_id TEXT,
+          last_seen_at TEXT,
+          last_visit_at TEXT,
+          total_interactions INTEGER NOT NULL DEFAULT 0,
+          muted INTEGER NOT NULL DEFAULT 0,
+          hidden INTEGER NOT NULL DEFAULT 0,
+          shown_messages TEXT NOT NULL DEFAULT '[]',
+          preferences TEXT NOT NULL DEFAULT '{}',
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+    } catch { /* já existe */ }
+
     // Tabela de bordas desbloqueadas
     try {
       await client.execute(`
