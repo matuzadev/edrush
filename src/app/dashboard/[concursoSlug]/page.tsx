@@ -5,8 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
-  LogOut,
-  User,
   Star,
   RefreshCw,
   Lock,
@@ -18,6 +16,7 @@ import {
   CheckCheck,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/NotificationBell';
+import { UserMenu } from '@/components/UserMenu';
 import subjects from '@/data/subjects.json';
 
 interface UserSession {
@@ -173,9 +172,7 @@ export default function PersonalizedDashboardPage() {
         
         <div className="flex items-center gap-3">
           <NotificationBell />
-          <Link href="/dashboard/profile" className="text-slate-400 hover:text-emerald-400 transition">
-            <User className="w-5 h-5" />
-          </Link>
+          <UserMenu onLogout={handleLogout} />
           <div className="hidden md:flex bg-slate-900 rounded-full px-3 py-1 border border-white/5 items-center gap-1.5">
             <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
             <span className="text-xs font-bold text-white">USUÁRIO PRO</span>
