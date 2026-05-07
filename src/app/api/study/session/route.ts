@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
-import { study_sessions, users } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { study_sessions, users, notifications } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import { xpForSession, computeLevel } from '@/lib/levels';
 
 export async function POST(req: NextRequest) {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   const earned = xpForSession(correctAnswers, questionsAnswered);
 
   try {
-    // Insert session + update user XP atomically
+    // Insert session
     await db.insert(study_sessions).values({
       user_id: userId,
       session_date: sessionDate,
@@ -49,23 +49,62 @@ export async function POST(req: NextRequest) {
       criado_em: now.toISOString(),
     });
 
+    let leveledUp = false;
+    let newLevel = 1;
+    let levelInfo: { name: string; color: string; bg: string; border: string } | null = null;
+
     if (earned > 0) {
-      // Fetch current xp to compute new level
+      // Fetch current level and XP before update
       const userRow = await db.query.users.findFirst({
         where: eq(users.id, userId),
-        columns: { xp: true },
+        columns: { xp: true, level: true },
       });
       const currentXp = userRow?.xp ?? 0;
+      const oldLevel = userRow?.level ?? 1;
       const newXp = currentXp + earned;
-      const newLevel = computeLevel(newXp).level;
+      const newLevelInfo = computeLevel(newXp);
+      newLevel = newLevelInfo.level;
+      leveledUp = newLevel > oldLevel;
 
       await db
         .update(users)
         .set({ xp: newXp, level: newLevel, atualizado_em: now.toISOString() })
         .where(eq(users.id, userId));
+
+      levelInfo = {
+        name: newLevelInfo.name,
+        color: newLevelInfo.color,
+        bg: newLevelInfo.bg,
+        border: newLevelInfo.border,
+      };
+
+      // Se subiu de nível, criar notificação e dar +50 XP de bônus
+      if (leveledUp) {
+        await db.insert(notifications).values({
+          user_id: userId,
+          type: 'achievement',
+          title: `Nível ${newLevel} alcançado!`,
+          body: `Parabéns! Você atingiu o nível ${newLevel} — ${newLevelInfo.name}. Continue assim!`,
+          read: 0,
+          related_id: String(newLevel),
+          criado_em: now.toISOString(),
+        });
+
+        // Bônus de +50 XP ao subir de nível
+        await db
+          .update(users)
+          .set({ xp: newXp + 50, atualizado_em: now.toISOString() })
+          .where(eq(users.id, userId));
+      }
     }
 
-    return NextResponse.json({ ok: true, xpEarned: earned });
+    return NextResponse.json({
+      ok: true,
+      xpEarned: earned,
+      newLevel,
+      leveledUp,
+      levelInfo,
+    });
   } catch (error) {
     console.error('Erro ao salvar sessão de estudo:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

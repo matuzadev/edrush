@@ -177,7 +177,7 @@ function StudyPageContent() {
                 <p className="text-slate-500 text-xs uppercase font-bold">Precisão</p>
               </div>
               <div className="bg-slate-900 p-6 rounded-2xl border border-white/5">
-                <p className="text-blue-400 text-3xl font-black">+{sessionQuestions.length * 10}</p>
+                <p className="text-blue-400 text-3xl font-black">+{sessionQuestions.length * 20}</p>
                 <p className="text-slate-500 text-xs uppercase font-bold">XP Ganho</p>
               </div>
             </div>
