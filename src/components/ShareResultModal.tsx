@@ -218,11 +218,20 @@ export function ShareResultModal({ isOpen, onClose, result, defaultMessage }: Sh
             }}
           >
             {sentTo ? (
-              <><Check className="w-4 h-4" /> Enviado para {sentTo}</>
+              <span className="inline-flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                <span>Enviado para {sentTo}</span>
+              </span>
             ) : isSending ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Enviando…</>
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Enviando…</span>
+              </span>
             ) : (
-              <><Send className="w-4 h-4" /> Enviar resultado</>
+              <span className="inline-flex items-center gap-2">
+                <Send className="w-4 h-4" />
+                <span>Enviar resultado</span>
+              </span>
             )}
           </button>
         </div>
