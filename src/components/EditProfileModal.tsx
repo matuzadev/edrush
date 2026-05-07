@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Loader2, User, MapPin, Calendar, FileText, Smile } from 'lucide-react';
+import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
+import { BordersGallery } from './BordersGallery';
 import { getAvatar } from '@/data/avatars';
 
 const BIO_MAX = 160;
