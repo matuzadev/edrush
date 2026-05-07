@@ -472,6 +472,73 @@ export default function ProfilePage() {
               </div>
             </Link>
 
+            {/* ── Amigos (alto na página, agrupado com identidade social) ── */}
+            <div
+              className="relative overflow-hidden rounded-2xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(8,47,73,0.45) 0%, rgba(15,23,42,0.85) 50%, rgba(30,27,75,0.40) 100%)',
+                border: '1px solid rgba(34,211,238,0.20)',
+                boxShadow: '0 12px 36px -16px rgba(34,211,238,0.20)',
+              }}
+            >
+              {/* Linha gradient no topo */}
+              <div
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+                style={{ background: 'linear-gradient(90deg, transparent, #22d3ee, #3b82f6, #8b5cf6, transparent)' }}
+              />
+
+              {/* Glow blobs */}
+              <div
+                className="absolute -top-16 -left-16 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-30"
+                style={{ background: 'radial-gradient(circle, #22d3ee 0%, transparent 70%)' }}
+              />
+              <div
+                className="absolute -bottom-16 -right-16 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-25"
+                style={{ background: 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)' }}
+              />
+
+              {/* Header */}
+              <div className="relative flex items-center justify-between gap-3 px-5 pt-5 pb-4 border-b border-white/5">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(34,211,238,0.25), rgba(59,130,246,0.10))',
+                      border: '1px solid rgba(34,211,238,0.35)',
+                      boxShadow: '0 0 16px -2px rgba(34,211,238,0.40)',
+                    }}
+                  >
+                    <Users size={18} className="text-cyan-300" strokeWidth={2.2} />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-black text-white text-base leading-tight">Amigos & rede</h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      Conecte-se com outros concurseiros
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsAddFriendsOpen(true)}
+                  className="shrink-0 group/add flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-black text-xs transition-all hover:gap-2.5"
+                  style={{
+                    background: 'linear-gradient(135deg, #22d3ee, #3b82f6)',
+                    color: '#020617',
+                    boxShadow: '0 4px 16px -4px rgba(34,211,238,0.50)',
+                  }}
+                >
+                  <span className="text-base leading-none font-black">+</span>
+                  <span className="hidden sm:inline">Adicionar</span>
+                  <span className="sm:hidden">Add</span>
+                </button>
+              </div>
+
+              {/* Lista (componente existente) */}
+              <div className="relative px-5 py-4">
+                <FriendRequests onViewProfile={(username) => setViewingFriend(username)} />
+              </div>
+            </div>
+
             {/* ── Info pessoal ── */}
             <div className="grid grid-cols-3 gap-3">
               {[
