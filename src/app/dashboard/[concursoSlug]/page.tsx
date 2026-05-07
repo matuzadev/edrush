@@ -190,12 +190,6 @@ export default function PersonalizedDashboardPage() {
             )}
             <span>Trocar concurso</span>
           </button>
-          <button
-            onClick={handleLogout}
-            className="text-slate-400 hover:text-red-400 transition"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
         </div>
       </nav>
 
