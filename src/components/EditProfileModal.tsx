@@ -303,8 +303,8 @@ export function EditProfileModal({
           </button>
           <button
             onClick={handleSave}
-            disabled={isSaving}
-            className="flex-1 py-3 rounded-xl text-sm font-black text-slate-950 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+            disabled={isSaving || !!usernameError}
+            className="flex-1 py-3 rounded-xl text-sm font-black text-slate-950 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               background: 'linear-gradient(135deg, #10b981, #06b6d4)',
               boxShadow: '0 0 20px rgba(16,185,129,0.3)',
