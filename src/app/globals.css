@@ -138,8 +138,8 @@ html.light {
 
   body {
     min-height: 100vh;
-    background-color: theme("colors.slate.900");
-    color: theme("colors.slate.50");
+    background-color: var(--bg);
+    color: var(--fg);
     font-family: theme("fontFamily.sans");
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
