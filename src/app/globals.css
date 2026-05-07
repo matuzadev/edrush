@@ -14,16 +14,115 @@
 }
 
 html.light {
-  --bg: #f1f5f9;
+  --bg: #f8fafc;
   --fg: #0f172a;
   --card: #ffffff;
-  --border: rgba(0,0,0,0.08);
+  --border: rgba(15,23,42,0.08);
 }
 
-/* Light mode overrides (apenas dashboard, settings, profile) */
-html.light .dashboard-shell {
-  background-color: var(--bg);
-  color: var(--fg);
+/* Transição suave ao alternar tema */
+html, body {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* =========================================================
+   LIGHT MODE — overrides globais
+   Cobre as classes Tailwind hardcoded mais usadas no app
+   sem precisar tocar 133 lugares página a página.
+   Accents (emerald/blue/cyan/yellow/violet) ficam intocados.
+========================================================= */
+html.light {
+  /* === BACKGROUNDS ESCUROS → CLAROS === */
+
+  /* Background principal (page shell) */
+  .bg-\[\#020617\]    { background-color: #f8fafc !important; }
+  .bg-\[\#020617\]\/95 { background-color: rgba(248,250,252,0.95) !important; }
+  .bg-\[\#020617\]\/80 { background-color: rgba(248,250,252,0.85) !important; }
+  .bg-slate-950        { background-color: #f8fafc !important; }
+
+  /* Cards / superfícies elevadas */
+  .bg-\[\#0f172a\]     { background-color: #ffffff !important; }
+  .bg-\[\#0f172a\]\/80 { background-color: rgba(255,255,255,0.85) !important; }
+  .bg-\[\#0f172a\]\/95 { background-color: rgba(255,255,255,0.95) !important; }
+  .bg-\[\#030712\]     { background-color: #f1f5f9 !important; }
+
+  /* Slates escuras → cinzas claras (preservando hierarquia) */
+  .bg-slate-900        { background-color: #ffffff !important; }
+  .bg-slate-900\/95    { background-color: rgba(255,255,255,0.95) !important; }
+  .bg-slate-900\/90    { background-color: rgba(255,255,255,0.9) !important; }
+  .bg-slate-900\/80    { background-color: rgba(255,255,255,0.85) !important; }
+  .bg-slate-900\/70    { background-color: rgba(255,255,255,0.8) !important; }
+  .bg-slate-900\/60    { background-color: rgba(255,255,255,0.75) !important; }
+  .bg-slate-900\/50    { background-color: rgba(255,255,255,0.7) !important; }
+  .bg-slate-900\/40    { background-color: rgba(241,245,249,0.7) !important; }
+  .bg-slate-900\/30    { background-color: rgba(241,245,249,0.5) !important; }
+
+  .bg-slate-800        { background-color: #f1f5f9 !important; }
+  .bg-slate-800\/80    { background-color: rgba(241,245,249,0.85) !important; }
+  .bg-slate-800\/60    { background-color: rgba(241,245,249,0.7) !important; }
+  .bg-slate-800\/40    { background-color: rgba(241,245,249,0.55) !important; }
+
+  /* Whites com alpha (camadas) → cinzas escuros com alpha */
+  .bg-white\/5         { background-color: rgba(15,23,42,0.04) !important; }
+  .bg-white\/8         { background-color: rgba(15,23,42,0.06) !important; }
+  .bg-white\/10        { background-color: rgba(15,23,42,0.08) !important; }
+  .bg-white\/15        { background-color: rgba(15,23,42,0.10) !important; }
+  .bg-white\/20        { background-color: rgba(15,23,42,0.12) !important; }
+
+  /* === TEXTOS === */
+  .text-white          { color: #0f172a !important; }
+  .text-slate-100      { color: #1e293b !important; }
+  .text-slate-200      { color: #1e293b !important; }
+  .text-slate-300      { color: #334155 !important; }
+  .text-slate-400      { color: #475569 !important; }
+  .text-slate-500      { color: #64748b !important; }
+  .text-slate-600      { color: #94a3b8 !important; }
+  .text-slate-950      { color: #0f172a !important; }
+
+  /* === BORDAS === */
+  .border-white\/5     { border-color: rgba(15,23,42,0.06) !important; }
+  .border-white\/6     { border-color: rgba(15,23,42,0.07) !important; }
+  .border-white\/8     { border-color: rgba(15,23,42,0.08) !important; }
+  .border-white\/10    { border-color: rgba(15,23,42,0.09) !important; }
+  .border-white\/15    { border-color: rgba(15,23,42,0.11) !important; }
+  .border-white\/20    { border-color: rgba(15,23,42,0.13) !important; }
+  .border-white\/30    { border-color: rgba(15,23,42,0.18) !important; }
+  .border-white\/40    { border-color: rgba(15,23,42,0.22) !important; }
+  .border-slate-700    { border-color: #cbd5e1 !important; }
+  .border-slate-700\/50 { border-color: rgba(203,213,225,0.5) !important; }
+  .border-slate-800    { border-color: #e2e8f0 !important; }
+  .border-slate-900    { border-color: #cbd5e1 !important; }
+
+  /* === HOVERS específicos === */
+  .hover\:bg-white\/5:hover  { background-color: rgba(15,23,42,0.05) !important; }
+  .hover\:bg-white\/10:hover { background-color: rgba(15,23,42,0.08) !important; }
+  .hover\:bg-slate-800:hover { background-color: #e2e8f0 !important; }
+  .hover\:bg-slate-800\/80:hover { background-color: rgba(226,232,240,0.85) !important; }
+  .hover\:text-white:hover   { color: #0f172a !important; }
+
+  /* === RING offsets / focus rings === */
+  .ring-offset-slate-900 { --tw-ring-offset-color: #ffffff !important; }
+  .ring-white\/5        { --tw-ring-color: rgba(15,23,42,0.05) !important; }
+
+  /* === Placeholder === */
+  ::placeholder         { color: #94a3b8 !important; opacity: 1; }
+  .placeholder-slate-500::placeholder { color: #94a3b8 !important; }
+  .placeholder-slate-600::placeholder { color: #94a3b8 !important; }
+
+  /* === Inputs com background custom === */
+  input, textarea, select {
+    color-scheme: light;
+  }
+
+  /* === Scrollbar dark → light === */
+  ::-webkit-scrollbar-thumb       { background-color: #cbd5e1 !important; }
+  ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8 !important; }
+  ::-webkit-scrollbar-track       { background-color: #f1f5f9 !important; }
+
+  /* === Sombras gigantes (drop-shadow do dark) ficam suaves === */
+  .shadow-2xl, .shadow-xl {
+    --tw-shadow-color: rgba(15,23,42,0.10) !important;
+  }
 }
 
 @layer base {
