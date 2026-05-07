@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@libsql/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 import path from 'path';
 
 const dbUrl = process.env.TURSO_DATABASE_URL ?? `file:${path.resolve(process.cwd(), 'data/foco-federal.db')}`;
@@ -17,6 +19,12 @@ export async function GET(request: NextRequest) {
     const concursoId = searchParams.get('concurso_id');
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') ?? '100');
+    // Anti-farm: por padrão, exclui questões que o usuário já acertou.
+    // Pode ser desligado via ?includeAnswered=1 (preview, admin, manage-questions).
+    const includeAnswered = searchParams.get('includeAnswered') === '1';
+
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
     // Build raw SQL query to ensure new material columns are fetched
     const conditions: string[] = [];
