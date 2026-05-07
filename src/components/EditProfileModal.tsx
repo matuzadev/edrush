@@ -173,14 +173,26 @@ export function EditProfileModal({
                   value={formData.username}
                   onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
                   placeholder="como quer ser chamado?"
+                  maxLength={30}
                   className="w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 text-sm transition-all outline-none"
                   style={{
                     background: 'rgba(30,41,59,0.6)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: usernameError ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.08)',
                   }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = '#10b981'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(16,185,129,0.15)'; }}
-                  onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = usernameError ? '#f87171' : '#10b981';
+                    e.currentTarget.style.boxShadow = usernameError
+                      ? '0 0 0 2px rgba(248,113,113,0.15)'
+                      : '0 0 0 2px rgba(16,185,129,0.15)';
+                  }}
+                  onBlur={(e)  => {
+                    e.currentTarget.style.borderColor = usernameError ? '#f87171' : 'rgba(255,255,255,0.08)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
+                {usernameError && (
+                  <p className="text-xs text-red-400 mt-1.5">{usernameError}</p>
+                )}
               </div>
 
               {/* Bio */}
