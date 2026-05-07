@@ -715,7 +715,11 @@ export default function SelectConcursoPage() {
 
   async function fetchConcursos() {
     try {
-      const res = await fetch('/api/concursos?status=ativo');
+      // Sem filtro de status na URL: a API retorna todos os concursos
+      // (incluindo "finalizado") para o usuário poder estudar usando edital
+      // recente como referência. O filtro por status é feito client-side via
+      // os chips de filtro abaixo.
+      const res = await fetch('/api/concursos');
       if (res.ok) {
         const data = await res.json();
         setConcursos(data as ConcursoFull[]);
