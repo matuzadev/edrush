@@ -267,6 +267,28 @@ export const friendships = sqliteTable(
   ]
 );
 
+// Tabela de Mensagens (chat entre amigos)
+export const messages = sqliteTable(
+  'messages',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    sender_id: text('sender_id').notNull().references(() => users.id),
+    receiver_id: text('receiver_id').notNull().references(() => users.id),
+    type: text('type').notNull().default('text'), // 'text' | 'result'
+    content: text('content').notNull(),
+    payload: text('payload'), // JSON: { accuracy, total, correct, subject, ... } quando type='result'
+    read: integer('read').notNull().default(0),
+    criado_em: text('criado_em').notNull(),
+  },
+  (table) => [
+    index('idx_messages_sender').on(table.sender_id),
+    index('idx_messages_receiver').on(table.receiver_id),
+    index('idx_messages_pair').on(table.sender_id, table.receiver_id),
+    index('idx_messages_read').on(table.read),
+    index('idx_messages_criado').on(table.criado_em),
+  ]
+);
+
 // Tabela de Preferências do Usuário
 export const user_settings = sqliteTable(
   'user_settings',

@@ -104,11 +104,12 @@ export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
   function UserCard({ entry, actions, clickable }: { entry: FriendEntry; actions?: React.ReactNode; clickable?: boolean }) {
     const avatar = getAvatar(entry.avatar_id);
     const displayName = entry.username ?? entry.nome ?? 'Concurseiro';
-    const canClick = clickable && onViewProfile && entry.username;
+    const profileId = entry.username ?? entry.nome;
+    const canClick = clickable && onViewProfile && !!profileId;
 
     return (
       <div
-        onClick={canClick ? () => onViewProfile!(entry.username!) : undefined}
+        onClick={canClick ? () => onViewProfile!(profileId!) : undefined}
         className={`flex items-center justify-between p-3 bg-slate-800/50 border border-white/5 rounded-lg ${
           canClick ? 'cursor-pointer hover:bg-slate-800/80 hover:border-emerald-500/30 transition' : ''
         }`}
