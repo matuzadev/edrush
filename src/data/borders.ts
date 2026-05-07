@@ -1,7 +1,7 @@
 // Catálogo de bordas. Cada borda é única em estilo, gradient e animação.
 // Renderização via CSS puro em src/components/AvatarBorder.tsx.
 
-export type BorderTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+export type BorderTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'mythic';
 
 export type BorderCriteriaType =
   | 'level' | 'streak' | 'questions' | 'accuracy' | 'sessions' | 'medals' | 'special';
@@ -31,7 +31,13 @@ export interface BorderDef {
   tier: BorderTier;
   criteria: { type: BorderCriteriaType; value: number; minQuestions?: number };
   style: BorderStyle;
+  exclusive?: boolean; // se true, só os e-mails em EXCLUSIVE_OWNERS podem ver/equipar
 }
+
+// Bordas exclusivas — slug → e-mails autorizados (lowercased)
+export const EXCLUSIVE_OWNERS: Record<string, string[]> = {
+  'foco-ceo': ['matheus@gmail.com'],
+};
 
 export const BORDERS: BorderDef[] = [
   // ─────────────────────── BRONZE — primeiros passos ───────────────────────
@@ -328,6 +334,32 @@ export const BORDERS: BorderDef[] = [
       shimmer: true,
       pulseFast: true,
       rays: true,
+    },
+  },
+
+  // ─────────────────────── MÍTICA — exclusiva CEO ───────────────────────
+  {
+    slug: 'foco-ceo',
+    name: 'Fundador',
+    description: 'Borda mítica do criador do Foco Federal. Única e intransferível.',
+    tier: 'mythic',
+    criteria: { type: 'special', value: 0 },
+    exclusive: true,
+    style: {
+      // Gradient holográfico inédito — branco-dourado-rosa-violeta-cyan-esmeralda
+      ring: 'conic-gradient(from 0deg, #ffffff 0%, #fde047 12%, #f97316 24%, #ec4899 38%, #a855f7 52%, #06b6d4 66%, #10b981 80%, #fde047 92%, #ffffff 100%)',
+      glow: 'rgba(253,224,71,1)',
+      glowSize: 44,
+      width: 6,
+      rotate: true,
+      rotateSpeed: 3,
+      // Anel duplo gira em sentido oposto, criando efeito de "vortex"
+      dualRing: 'conic-gradient(from 90deg, #ffffff, #ec4899 25%, #ffffff 50%, #06b6d4 75%, #ffffff)',
+      sparkle: true,
+      shimmer: true,
+      pulseFast: true,
+      rays: true,
+      breathe: true,
     },
   },
 ];

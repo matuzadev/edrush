@@ -18,6 +18,7 @@ interface EditProfileModalProps {
     bio: string;
     avatar: number;
   }) => void;
+  onBorderEquipped?: () => void;
   initialData: {
     username: string;
     birthday?: string;
@@ -33,6 +34,7 @@ export function EditProfileModal({
   isOpen,
   onClose,
   onSave,
+  onBorderEquipped,
   initialData,
 }: EditProfileModalProps) {
   const [formData, setFormData] = useState(initialData);
@@ -282,6 +284,16 @@ export function EditProfileModal({
               onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
               size="lg"
             />
+          )}
+
+          {activeTab === 'borders' && (
+            <div>
+              <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você
+                e seus amigos no chat e nos perfis.
+              </p>
+              <BordersGallery avatarId={formData.avatar} onEquipped={onBorderEquipped} />
+            </div>
           )}
         </div>
 
