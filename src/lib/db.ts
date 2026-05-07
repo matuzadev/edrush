@@ -308,6 +308,17 @@ export async function initializeDatabase() {
       `);
     } catch { /* já existe */ }
 
+    // Adicionar novas colunas de settings (idempotente)
+    const newSettingsColumns = [
+      `ALTER TABLE user_settings ADD COLUMN auto_play INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE user_settings ADD COLUMN show_timer INTEGER NOT NULL DEFAULT 1`,
+      `ALTER TABLE user_settings ADD COLUMN hard_mode INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE user_settings ADD COLUMN compact_ui INTEGER NOT NULL DEFAULT 0`,
+    ];
+    for (const sql of newSettingsColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
     // Tabela de tentativas de simulado
     try {
       await client.execute(`
