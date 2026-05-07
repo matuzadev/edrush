@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
           WHERE user_id = ? AND acertou = 1 AND question_id > 0
         )`;
         const countRs = await rawClient.execute({ sql: countSql, args: [...baseArgs, userId] });
-        excludedCount = Number((countRs.rows[0] as { n: number })?.n ?? 0);
+        excludedCount = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
       } catch { /* não bloqueia se falhar */ }
     }
 

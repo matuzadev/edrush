@@ -563,7 +563,7 @@ async function seedQuestionsBank() {
         sql: 'SELECT COUNT(*) AS n FROM questions WHERE disciplina = ? AND capitulo = ?',
         args: [disciplina, capitulo],
       });
-      const existingCount = Number((countRs.rows[0] as { n: number })?.n ?? 0);
+      const existingCount = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
       if (existingCount > 0) continue; // já populado, não duplica
 
       const now = new Date().toISOString();
