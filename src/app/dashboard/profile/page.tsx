@@ -95,6 +95,19 @@ export default function ProfilePage() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddFriendsOpen, setIsAddFriendsOpen] = useState(false);
+  const [isFriendsPopupOpen, setIsFriendsPopupOpen] = useState(false);
+  const [friendsCount, setFriendsCount] = useState<number | null>(null);
+
+  // Carrega só a contagem de amigos para o badge (leve, ~1 request)
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/friends')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d) setFriendsCount(((d.friends as unknown[])?.length ?? 0));
+      })
+      .catch(() => {});
+  }, [user]);
   const [viewingFriend, setViewingFriend] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
