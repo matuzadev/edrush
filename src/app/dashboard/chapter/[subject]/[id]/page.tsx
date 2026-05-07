@@ -594,6 +594,7 @@ export default function ChapterPage({
         .animate-pop{animation:popIn 0.3s ease-out forwards;}
         @keyframes comboPop{0%{opacity:0;transform:scale(0.5) translateY(20px)}50%{opacity:1;transform:scale(1.3) translateY(-8px)}100%{opacity:0;transform:scale(1) translateY(-24px)}}
         .animate-combo-flair{animation:comboPop 1.1s ease-out forwards;}
+        @keyframes xpBump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
       `}</style>
 
       {/* Header */}
@@ -642,7 +643,11 @@ export default function ChapterPage({
                   🔥 ×{combo}
                 </span>
               )}
-              <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2.5 py-0.5 rounded-full">
+              <span
+                key={xp}
+                className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2.5 py-0.5 rounded-full"
+                style={{ animation: xp > 0 ? 'xpBump 0.4s ease-out' : undefined }}
+              >
                 ⚡ {xp} XP
               </span>
             </div>
