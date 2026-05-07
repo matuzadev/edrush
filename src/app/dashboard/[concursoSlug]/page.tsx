@@ -51,6 +51,10 @@ export default function PersonalizedDashboardPage() {
     loaded: false,
   });
   const [isResetting, setIsResetting] = useState(false);
+  // Capítulos completados: chave "subject:chapterId" → true.
+  // Alimentado por /api/user/chapter-completion. Usado para liberar o próximo
+  // capítulo na trilha (estilo Duolingo).
+  const [completedSet, setCompletedSet] = useState<Set<string>>(new Set());
 
   const user = session?.user as UserSession | undefined;
 
