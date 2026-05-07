@@ -93,7 +93,7 @@ interface StatusConfig {
   dotClass?: string;
 }
 
-function getStatusConfig(status: ConcursoFull['status']): StatusConfig {
+function getStatusConfig(status: ConcursoFull['status'] | string | null | undefined): StatusConfig {
   switch (status) {
     case 'previsto':
       return { label: 'Previsto', className: 'bg-slate-700/60 text-slate-300 border border-slate-600/40' };
@@ -109,6 +109,15 @@ function getStatusConfig(status: ConcursoFull['status']): StatusConfig {
       return { label: 'Aguardando Prova', className: 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/25' };
     case 'finalizado':
       return { label: 'Finalizado', className: 'bg-slate-800/80 text-slate-500 border border-slate-700/40' };
+    case 'ativo':
+      // Compat com registros legados anteriores ao novo enum de status.
+      return {
+        label: 'Ativo',
+        className: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30',
+        dotClass: 'bg-emerald-400 animate-pulse',
+      };
+    default:
+      return { label: 'Indefinido', className: 'bg-slate-800/80 text-slate-500 border border-slate-700/40' };
   }
 }
 
