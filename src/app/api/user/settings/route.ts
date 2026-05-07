@@ -14,9 +14,13 @@ const DEFAULTS = {
   pref_language: 'pt' as 'pt' | 'en',
   pref_daily_goal: 20,
   sound_enabled: 1,
+  auto_play: 0,
+  show_timer: 1,
+  hard_mode: 0,
+  compact_ui: 0,
 };
 
-function rowToJson(row: any) {
+function rowToJson(row: Record<string, unknown>) {
   return {
     displayName: row.display_name ?? null,
     notifications: {
@@ -30,6 +34,10 @@ function rowToJson(row: any) {
       dailyGoal: row.pref_daily_goal ?? 20,
     },
     soundEnabled: (row.sound_enabled ?? 1) === 1,
+    autoPlay: (row.auto_play ?? 0) === 1,
+    showTimer: (row.show_timer ?? 1) === 1,
+    hardMode: (row.hard_mode ?? 0) === 1,
+    compactUi: (row.compact_ui ?? 0) === 1,
   };
 }
 
@@ -45,7 +53,7 @@ export async function GET() {
       where: eq(user_settings.user_id, userId),
     });
 
-    if (existing) return NextResponse.json(rowToJson(existing));
+    if (existing) return NextResponse.json(rowToJson(existing as Record<string, unknown>));
 
     // Cria com defaults na primeira vez
     const now = new Date().toISOString();
@@ -74,6 +82,10 @@ export async function PATCH(req: NextRequest) {
     notifications?: { email?: boolean; milestones?: boolean; weekly?: boolean };
     preferences?: { theme?: 'dark' | 'light'; language?: 'pt' | 'en'; dailyGoal?: number };
     soundEnabled?: boolean;
+    autoPlay?: boolean;
+    showTimer?: boolean;
+    hardMode?: boolean;
+    compactUi?: boolean;
   };
 
   try {
@@ -97,9 +109,12 @@ export async function PATCH(req: NextRequest) {
     updates.pref_daily_goal = n;
   }
   if (body.soundEnabled !== undefined) updates.sound_enabled = body.soundEnabled ? 1 : 0;
+  if (body.autoPlay !== undefined) updates.auto_play = body.autoPlay ? 1 : 0;
+  if (body.showTimer !== undefined) updates.show_timer = body.showTimer ? 1 : 0;
+  if (body.hardMode !== undefined) updates.hard_mode = body.hardMode ? 1 : 0;
+  if (body.compactUi !== undefined) updates.compact_ui = body.compactUi ? 1 : 0;
 
   try {
-    // Upsert manual: tenta UPDATE; se 0 linhas, INSERT
     const existing = await db.query.user_settings.findFirst({
       where: eq(user_settings.user_id, userId),
     });
@@ -111,7 +126,7 @@ export async function PATCH(req: NextRequest) {
       await db.insert(user_settings).values({
         user_id: userId,
         ...DEFAULTS,
-        ...(updates as any),
+        ...(updates as typeof DEFAULTS & { atualizado_em: string }),
         criado_em: now,
       });
     }
