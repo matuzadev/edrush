@@ -79,7 +79,7 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
 
   // Agrupar por tier para a vista 'all'
   const grouped: Record<BorderTier, BorderItem[]> = {
-    bronze: [], silver: [], gold: [], platinum: [], diamond: [],
+    bronze: [], silver: [], gold: [], platinum: [], diamond: [], mythic: [],
   };
   for (const b of filtered) grouped[b.tier].push(b);
 
@@ -226,6 +226,19 @@ function BorderCard({
           style={{ background: tier.bg, color: tier.color, border: `1px solid ${tier.border}` }}
         >
           <Sparkles size={9} /> Raro
+        </div>
+      )}
+
+      {!item.equipped && item.tier === 'mythic' && (
+        <div
+          className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest flex items-center gap-1"
+          style={{
+            background: 'linear-gradient(90deg, #fde047, #fb923c, #ec4899)',
+            color: '#020617',
+            boxShadow: '0 0 10px rgba(253,224,71,0.50)',
+          }}
+        >
+          <Sparkles size={9} strokeWidth={3} /> Exclusiva
         </div>
       )}
 
