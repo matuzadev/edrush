@@ -15,7 +15,7 @@ import { BugReport } from './bug-report';
  */
 export async function saveBugReportToDatabase(report: BugReport): Promise<void> {
   try {
-    await db.execute({
+    await db.$client.execute({
       sql: `
         INSERT INTO bug_reports (
           id, 
@@ -86,7 +86,7 @@ export async function getBugReports(filters?: {
       args.push(filters.offset);
     }
 
-    const result = await db.execute({
+    const result = await db.$client.execute({
       sql,
       args,
     });
@@ -103,12 +103,12 @@ export async function getBugReports(filters?: {
  */
 export async function getBugReportById(id: string): Promise<BugReport | null> {
   try {
-    const result = await db.execute({
+    const result = await db.$client.execute({
       sql: 'SELECT * FROM bug_reports WHERE id = ?',
       args: [id],
     });
 
-    return (result.rows?.[0] as BugReport) || null;
+    return (result.rows?.[0] as unknown as BugReport) || null;
   } catch (error) {
     console.error('❌ Erro ao buscar bug report:', error);
     throw error;
@@ -123,7 +123,7 @@ export async function updateBugReportStatus(
   status: 'novo' | 'em-analise' | 'resolvido' | 'rejeitado'
 ): Promise<void> {
   try {
-    await db.execute({
+    await db.$client.execute({
       sql: 'UPDATE bug_reports SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
       args: [status, id],
     });
@@ -140,7 +140,7 @@ export async function updateBugReportStatus(
  */
 export async function deleteBugReport(id: string): Promise<void> {
   try {
-    await db.execute({
+    await db.$client.execute({
       sql: 'DELETE FROM bug_reports WHERE id = ?',
       args: [id],
     });
@@ -157,7 +157,7 @@ export async function deleteBugReport(id: string): Promise<void> {
  */
 export async function getBugReportsStats() {
   try {
-    const result = await db.execute({
+    const result = await db.$client.execute({
       sql: `
         SELECT 
           COUNT(*) as total,
@@ -185,7 +185,7 @@ export async function getBugReportsStats() {
  */
 export async function getTopBugs(limit: number = 10) {
   try {
-    const result = await db.execute({
+    const result = await db.$client.execute({
       sql: `
         SELECT 
           title,
