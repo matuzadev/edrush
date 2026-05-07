@@ -22,7 +22,7 @@ export async function GET() {
       WHERE status = 'accepted'
         AND (requester_id = ${userId} OR receiver_id = ${userId})
     `);
-    const friendIds = (friendsRaw.rows as { friend_id: string }[]).map(r => r.friend_id);
+    const friendIds = (friendsRaw.rows as unknown as { friend_id: string }[]).map(r => r.friend_id);
 
     if (friendIds.length === 0) {
       return NextResponse.json({ threads: [], totalUnread: 0 });
@@ -33,7 +33,7 @@ export async function GET() {
       `SELECT id, nome, username, avatar_id, xp, level FROM users WHERE id IN (${friendIds.map(id => `'${id.replace(/'/g, "''")}'`).join(', ')})`
     ));
     const userMap = new Map<string, { id: string; nome: string | null; username: string | null; avatar_id: number; xp: number; level: number }>();
-    for (const row of usersRaw.rows as { id: string; nome: string | null; username: string | null; avatar_id: number | null; xp: number | null; level: number | null }[]) {
+    for (const row of usersRaw.rows as unknown as { id: string; nome: string | null; username: string | null; avatar_id: number | null; xp: number | null; level: number | null }[]) {
       userMap.set(row.id, {
         id: row.id,
         nome: row.nome,

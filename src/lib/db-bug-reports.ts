@@ -91,7 +91,7 @@ export async function getBugReports(filters?: {
       args,
     });
 
-    return result.rows as BugReport[];
+    return result.rows as unknown as BugReport[];
   } catch (error) {
     console.error('❌ Erro ao buscar bug reports:', error);
     throw error;
