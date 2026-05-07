@@ -76,35 +76,43 @@ export function UserMenu({ onLogout }: UserMenuProps) {
         aria-expanded={open}
         aria-label="Menu do usuário"
       >
-        {/* Avatar container */}
-        <div
-          className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white/10 transition"
-          style={{
-            boxShadow: open ? `0 0 0 2px ${glowColor}, 0 0 10px ${avatarDef.colors.primary}44` : undefined,
-            background: `linear-gradient(135deg, ${avatarDef.colors.primary}22, ${avatarDef.colors.accent}11)`,
-          }}
-        >
-          {isLoading ? (
-            <div className="w-full h-full bg-slate-700 animate-pulse" />
-          ) : profile.foto_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.foto_url} alt={displayName} className="w-full h-full object-cover" />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
-            />
-          )}
-        </div>
+        {/* Avatar + nível em coluna */}
+        <div className="flex flex-col items-center gap-1">
+          <div
+            className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white/10 transition"
+            style={{
+              boxShadow: open
+                ? `0 0 0 2px ${glowColor}, 0 0 12px ${avatarDef.colors.primary}55`
+                : `0 0 8px ${avatarDef.colors.primary}22`,
+              background: `linear-gradient(135deg, ${avatarDef.colors.primary}22, ${avatarDef.colors.accent}11)`,
+            }}
+          >
+            {isLoading ? (
+              <div className="w-full h-full bg-slate-700 animate-pulse" />
+            ) : profile.foto_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.foto_url} alt={displayName} className="w-full h-full object-cover" />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
+              />
+            )}
+          </div>
 
-        {/* Level badge */}
-        <span
-          className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white border border-slate-950"
-          style={{ backgroundColor: badgeBg }}
-          aria-label={`Nível ${level}`}
-        >
-          {level}
-        </span>
+          {/* Badge de nível abaixo do avatar */}
+          <span
+            className="px-1.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider text-white whitespace-nowrap leading-none"
+            style={{
+              background: `linear-gradient(135deg, ${badgeBg}, ${avatarDef.colors.primary})`,
+              boxShadow: `0 2px 6px ${badgeBg}55, inset 0 0 0 1px rgba(255,255,255,0.12)`,
+              textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+            }}
+            aria-label={`Nível ${level}`}
+          >
+            Nv {level}
+          </span>
+        </div>
 
         <ChevronDown
           className={`w-3 h-3 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
