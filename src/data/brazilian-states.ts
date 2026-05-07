@@ -39,3 +39,45 @@ export function getStateBySigla(sigla: string): BrazilianState | undefined {
   const target = sigla.trim().toUpperCase();
   return BRAZILIAN_STATES.find((s) => s.sigla === target);
 }
+
+// Regiões Administrativas do Distrito Federal (as "cidades-satélite" de Brasília).
+// O IBGE retorna apenas "Brasília" para DF porque, legalmente, o DF é um único
+// município — mas para o usuário comum cada RA é tratada como uma cidade.
+// Lista oficial das 35 RAs ordenada alfabeticamente (collation pt-BR).
+export const DF_REGIOES_ADMINISTRATIVAS: string[] = [
+  'Água Quente',
+  'Águas Claras',
+  'Arapoanga',
+  'Arniqueira',
+  'Brasília (Plano Piloto)',
+  'Brazlândia',
+  'Candangolândia',
+  'Ceilândia',
+  'Cruzeiro',
+  'Fercal',
+  'Gama',
+  'Guará',
+  'Itapoã',
+  'Jardim Botânico',
+  'Lago Norte',
+  'Lago Sul',
+  'Núcleo Bandeirante',
+  'Paranoá',
+  'Park Way',
+  'Planaltina',
+  'Recanto das Emas',
+  'Riacho Fundo',
+  'Riacho Fundo II',
+  'Samambaia',
+  'Santa Maria',
+  'São Sebastião',
+  'SCIA (Estrutural)',
+  'SIA',
+  'Sobradinho',
+  'Sobradinho II',
+  'Sol Nascente / Pôr do Sol',
+  'Sudoeste / Octogonal',
+  'Taguatinga',
+  'Varjão',
+  'Vicente Pires',
+];
