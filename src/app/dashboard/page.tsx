@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { NotificationBell } from '@/components/NotificationBell';
-import { LogOut, CheckCircle, Lock, PlayCircle, Star, User } from 'lucide-react';
+import { LogOut, CheckCircle, Lock, PlayCircle, Star } from 'lucide-react';
+import { UserMenu } from '@/components/UserMenu';
 
 // Exemplo de estrutura de dados para as trilhas
 import subjectsData from '@/data/subjects.json';
@@ -60,9 +61,7 @@ export default function DashboardPage() {
         
         <div className="flex items-center gap-4">
           <NotificationBell />
-          <Link href="/dashboard/profile" className="text-slate-400 hover:text-emerald-400 transition">
-            <User className="w-5 h-5" />
-          </Link>
+          <UserMenu onLogout={handleLogout} />
           <div className="hidden md:flex bg-slate-900 rounded-full px-4 py-1 border border-white/5 items-center gap-2">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
             <span className="text-sm font-bold text-white">PRO</span>

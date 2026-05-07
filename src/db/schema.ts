@@ -280,6 +280,11 @@ export const user_settings = sqliteTable(
     pref_language: text('pref_language').notNull().default('pt'), // pt | en
     pref_daily_goal: integer('pref_daily_goal').notNull().default(20),
     sound_enabled: integer('sound_enabled').notNull().default(1),
+    // Novas preferências de UX do quiz
+    auto_play: integer('auto_play').notNull().default(0),        // avança auto após 3s de feedback
+    show_timer: integer('show_timer').notNull().default(1),      // exibe cronômetro no quiz
+    hard_mode: integer('hard_mode').notNull().default(0),        // perde 2 vidas em vez de 1
+    compact_ui: integer('compact_ui').notNull().default(0),      // UI compacta (~30% menos padding)
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   }
