@@ -218,13 +218,15 @@ export const study_sessions = sqliteTable(
     questions_answered: integer('questions_answered').notNull().default(0),
     correct_answers: integer('correct_answers').notNull().default(0),
     concurso_slug: text('concurso_slug'),
-    subject: text('subject'), // matéria/disciplina da sessão
+    subject: text('subject'), // matéria/disciplina da sessão (URL slug, ex.: "portugues")
+    chapter_id: integer('chapter_id'), // id do capítulo em subjects.json (1, 2, 3...)
     criado_em: text('criado_em').notNull(),
   },
   (table) => [
     index('idx_study_sessions_user_id').on(table.user_id),
     index('idx_study_sessions_date').on(table.session_date),
     index('idx_study_sessions_user_date').on(table.user_id, table.session_date),
+    index('idx_study_sessions_subject_chapter').on(table.subject, table.chapter_id),
   ]
 );
 
