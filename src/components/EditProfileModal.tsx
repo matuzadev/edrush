@@ -26,7 +26,7 @@ interface EditProfileModalProps {
   };
 }
 
-type ModalTab = 'identity' | 'avatar';
+type ModalTab = 'identity' | 'avatar' | 'borders';
 
 export function EditProfileModal({
   isOpen,
