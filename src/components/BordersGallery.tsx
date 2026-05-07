@@ -32,7 +32,7 @@ interface BordersGalleryProps {
   onEquipped?: (slug: string) => void;
 }
 
-const TIER_ORDER: BorderTier[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond'];
+const TIER_ORDER: BorderTier[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'mythic'];
 
 export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
   const [borders, setBorders] = useState<BorderItem[]>([]);
