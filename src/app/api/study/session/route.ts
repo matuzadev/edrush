@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
     questionsAnswered: number;
     correctAnswers: number;
     concursoSlug?: string;
-    subject?: string;
-    // Marca o capítulo como completado em user_chapter_progress quando accuracy ≥ 80%.
-    // Permite o "modo revisão" (todas as questões liberadas após terminar o capítulo).
-    disciplina?: string; // ex.: 'lingua-portuguesa'
-    chapter?: string;    // título do capítulo, ex.: 'Ortografia e Acentuação'
+    subject?: string;        // slug do subjects.json (URL), ex.: 'portugues'
+    chapterId?: number;      // id do capítulo em subjects.json (1, 2, 3...)
+    // Compat: marca o capítulo como completado em user_chapter_progress quando ≥80%.
+    disciplina?: string;     // ex.: 'lingua-portuguesa' (usado como fallback)
+    chapter?: string;        // título do capítulo
   };
   try {
     body = await req.json();
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Body inválido' }, { status: 400 });
   }
 
-  const { questionsAnswered, correctAnswers, concursoSlug, subject, disciplina, chapter } = body;
+  const { questionsAnswered, correctAnswers, concursoSlug, subject, chapterId, disciplina, chapter } = body;
 
   if (
     typeof questionsAnswered !== 'number' ||
@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       correct_answers: correctAnswers,
       concurso_slug: concursoSlug ?? null,
       subject: subject ?? null,
+      chapter_id: typeof chapterId === 'number' ? chapterId : null,
       criado_em: now.toISOString(),
     });
 
