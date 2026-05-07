@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usUserProfile } from '@/hooks/useProfile';
 import { AvatarSelector } from '@/components/AvatarSelector';
 import { AvatarBorder } from '@/components/AvatarBorder';
+import { ConcursoBadge } from '@/components/ConcursoBadge';
 import { AddFriendsModal } from '@/components/AddFriendsModal';
 import { EditProfileModal } from '@/components/EditProfileModal';
 import { FriendRequests } from '@/components/FriendRequests';
@@ -521,6 +522,9 @@ export default function ProfilePage() {
                 </div>
               </div>
             </Link>
+
+            {/* ── Concurso em estudo (estilo Duolingo) ── */}
+            <ConcursoBadge slug={profile.concursoSlug} variant="card" />
 
             {/* ── Info pessoal ── */}
             <div className="grid grid-cols-3 gap-3">
