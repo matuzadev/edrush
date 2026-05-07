@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X, Loader2, Trophy, Target, TrendingUp, Flame, BookOpen } from 'lucide-react';
 import { getAvatar } from '@/data/avatars';
+import { AvatarBorder } from './AvatarBorder';
 
 interface ActivityDay {
   date: string;
@@ -36,6 +37,7 @@ interface FriendProfile {
   username: string;
   nome: string | null;
   avatar_id: number;
+  equippedBorder?: string;
   bio: string | null;
   location: string | null;
   criado_em: string;
@@ -178,19 +180,19 @@ export function FriendProfileModal({ username, onClose }: FriendProfileModalProp
               />
 
               <div className="relative flex items-start gap-4">
-                {/* Avatar grande com badge de nível */}
+                {/* Avatar grande com borda equipada + badge de nível */}
                 <div className="relative shrink-0">
+                  <AvatarBorder slug={profile.equippedBorder} size={72}>
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{
+                        background: `linear-gradient(135deg, ${avatar.colors.primary}33, ${avatar.colors.accent}11)`,
+                      }}
+                      dangerouslySetInnerHTML={{ __html: avatar.svg }}
+                    />
+                  </AvatarBorder>
                   <div
-                    className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center"
-                    style={{
-                      background: `linear-gradient(135deg, ${avatar.colors.primary}33, ${avatar.colors.accent}11)`,
-                      border: `2px solid ${avatar.colors.primary}66`,
-                      boxShadow: `0 0 20px -4px ${avatar.colors.primary}55`,
-                    }}
-                    dangerouslySetInnerHTML={{ __html: avatar.svg }}
-                  />
-                  <div
-                    className={`absolute -bottom-1 -right-1 min-w-[26px] h-6 px-1.5 rounded-full flex items-center justify-center font-black text-[11px] ${profile.levelBg} ${profile.levelColor} ${profile.levelBorder} border-2`}
+                    className={`absolute -bottom-1 -right-1 z-10 min-w-[26px] h-6 px-1.5 rounded-full flex items-center justify-center font-black text-[11px] ${profile.levelBg} ${profile.levelColor} ${profile.levelBorder} border-2`}
                     style={{ borderColor: 'rgba(2,6,23,1)' }}
                   >
                     {profile.level}
