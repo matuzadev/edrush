@@ -4,6 +4,7 @@ import Script from "next/script";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BugReportButton } from "@/components/BugReportButton";
+import { FriendsChat } from "@/components/FriendsChat";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
@@ -36,6 +37,7 @@ export default function RootLayout({
             {children}
           </AuthProvider>
         </ThemeProvider>
+        <FriendsChat />
         <BugReportButton />
       </body>
     </html>
