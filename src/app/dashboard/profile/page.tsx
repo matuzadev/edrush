@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { usUserProfile } from '@/hooks/useProfile';
 import { AvatarSelector } from '@/components/AvatarSelector';
+import { AvatarBorder } from '@/components/AvatarBorder';
 import { AddFriendsModal } from '@/components/AddFriendsModal';
 import { EditProfileModal } from '@/components/EditProfileModal';
 import { FriendRequests } from '@/components/FriendRequests';
@@ -246,12 +247,12 @@ export default function ProfilePage() {
                 {/* Avatar + ações */}
                 <div className="flex items-end justify-between mb-5">
                   <div className="relative">
-                    <div className="ring-4 ring-[#020617] rounded-full">
+                    <AvatarBorder slug={profile.equippedBorder} size={80}>
                       <AvatarSelector selectedId={profile.avatar_id} size="lg" />
-                    </div>
+                    </AvatarBorder>
                     {/* Badge de nível */}
                     <div
-                      className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-xs font-black border"
+                      className="absolute -bottom-1 -right-1 px-2.5 py-0.5 rounded-full text-xs font-black border z-10"
                       style={{
                         backgroundColor: 'rgba(15,23,42,0.95)',
                         borderColor: 'rgba(16,185,129,0.5)',
