@@ -289,6 +289,15 @@ export async function initializeDatabase() {
       try { await client.execute(sql); } catch { /* já existe */ }
     }
 
+    // Coluna chapter_id em study_sessions — para rastreamento "Duolingo-style" de
+    // qual capítulo foi completado e desbloquear o próximo automaticamente.
+    try {
+      await client.execute(`ALTER TABLE study_sessions ADD COLUMN chapter_id INTEGER`);
+    } catch { /* já existe */ }
+    try {
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_study_sessions_subject_chapter ON study_sessions(subject, chapter_id)`);
+    } catch { /* ignora */ }
+
     // Adicionar colunas novas em user_responses (safe: try/catch por coluna)
     const newResponseColumns = [
       `ALTER TABLE user_responses ADD COLUMN disciplina TEXT`,
