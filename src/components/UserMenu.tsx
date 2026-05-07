@@ -100,13 +100,13 @@ export function UserMenu({ onLogout }: UserMenuProps) {
             )}
           </div>
 
-          {/* Badge de nível abaixo do avatar */}
+          {/* Badge de nível abaixo do avatar — neutro */}
           <span
-            className="px-1.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider text-white whitespace-nowrap leading-none"
+            className="px-1.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider whitespace-nowrap leading-none"
             style={{
-              background: `linear-gradient(135deg, ${badgeBg}, ${avatarDef.colors.primary})`,
-              boxShadow: `0 2px 6px ${badgeBg}55, inset 0 0 0 1px rgba(255,255,255,0.12)`,
-              textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+              background: 'rgba(15,23,42,0.85)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              color: '#cbd5e1',
             }}
             aria-label={`Nível ${level}`}
           >
