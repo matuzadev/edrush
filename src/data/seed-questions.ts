@@ -2,6 +2,10 @@
 // Cada (disciplina, capitulo) só é populado se ainda não houver nenhuma questão
 // cadastrada para o par. Para reaplicar/atualizar, apague as linhas no banco
 // (DELETE FROM questions WHERE disciplina=? AND capitulo=?) e reinicie o servidor.
+//
+// Bancos por concurso:
+//   - Português + matérias específicas da PF (Perito Criminal): definidos abaixo
+//   - EsFCEx (Exército — Informática): em src/data/seed-questions-esfcex.ts
 
 export type SeedDifficulty = 'fácil' | 'médio' | 'difícil';
 
@@ -19,6 +23,10 @@ export type SeedQuestion = {
   fonte?: string;
 };
 
+// Importa o banco do EsFCEx (Exército — Informática). Mantemos arquivos
+// separados para cada concurso para evitar inflar este arquivo.
+import { ESFCEX_CHAPTERS, ESFCEX_QUESTIONS } from './seed-questions-esfcex';
+
 // ─── Capítulos seed: Português para Perito Criminal Federal ────────────────
 // Currículo alinhado ao edital típico de PF/Perito Criminal. Os títulos devem
 // bater com src/data/subjects.json para o capítulo aparecer no quiz.
@@ -35,6 +43,8 @@ export const SEED_CHAPTERS: { disciplina: string; numero: number; titulo: string
   { disciplina: 'lingua-portuguesa', numero: 10, titulo: 'Semântica e Significação de Palavras',     descricao: 'Sinonímia, antonímia, polissemia, denotação e conotação, ambiguidade.' },
   { disciplina: 'lingua-portuguesa', numero: 11, titulo: 'Coesão e Coerência Textual',               descricao: 'Mecanismos coesivos, articuladores discursivos e progressão temática.' },
   { disciplina: 'lingua-portuguesa', numero: 12, titulo: 'Redação Oficial',                          descricao: 'Padrões da redação oficial conforme o Manual de Redação da Presidência da República.' },
+  // ── EsFCEx — Exército (todos os capítulos do mapeamento concurso-areas) ──
+  ...ESFCEX_CHAPTERS,
 ];
 
 // ─── Banco de questões: Português — Ortografia e Acentuação ─────────────────
@@ -4089,4 +4099,6 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
   ...PT_CAP10,
   ...PT_CAP11,
   ...PT_CAP12,
+  // ── EsFCEx — Exército Brasileiro (Informática) — 300+ questões ───────────
+  ...ESFCEX_QUESTIONS,
 ];
