@@ -58,7 +58,7 @@ export async function GET() {
         ORDER BY criado_em DESC
         LIMIT 1
       `);
-      const lastMsg = (lastMsgRaw.rows[0] ?? null) as null | {
+      const lastMsg = (lastMsgRaw.rows[0] ?? null) as unknown as null | {
         id: number; sender_id: string; receiver_id: string; type: string;
         content: string; payload: string | null; read: number; criado_em: string;
       };
