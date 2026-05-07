@@ -404,6 +404,16 @@ export function meetsCriteria(border: BorderDef, stats: UserBorderStats): boolea
   }
 }
 
+// True se o usuário (por e-mail) está autorizado a ver/equipar essa borda.
+// Bordas não-exclusivas: sempre true.
+// Bordas exclusivas: true só se o e-mail estiver em EXCLUSIVE_OWNERS[slug].
+export function canUserAccessBorder(border: BorderDef, userEmail: string | null | undefined): boolean {
+  if (!border.exclusive) return true;
+  const allowed = EXCLUSIVE_OWNERS[border.slug] ?? [];
+  if (!userEmail) return false;
+  return allowed.includes(userEmail.toLowerCase().trim());
+}
+
 export function describeCriteria(border: BorderDef): string {
   const c = border.criteria;
   switch (c.type) {
