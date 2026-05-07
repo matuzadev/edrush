@@ -1012,29 +1012,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* ── Amigos ── */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5">
-              <div
-                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent, #22d3ee, transparent)' }}
-              />
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                    <Users size={15} className="text-cyan-400" />
-                  </div>
-                  <h3 className="font-bold text-white">Amigos</h3>
-                </div>
-                <button
-                  onClick={() => setIsAddFriendsOpen(true)}
-                  className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 hover:border-cyan-400/50 rounded-lg px-2.5 py-1.5 transition"
-                >
-                  + Adicionar
-                </button>
-              </div>
-              <FriendRequests onViewProfile={(username) => setViewingFriend(username)} />
-            </div>
-
           </div>
         )}
       </main>
