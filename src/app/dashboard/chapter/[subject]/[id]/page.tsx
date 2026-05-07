@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import subjects from "@/data/subjects.json";
 import studyTips from "@/data/study-tips.json";
 import { LevelUpModal } from "@/components/LevelUpModal";
+import { ShareResultModal } from "@/components/ShareResultModal";
 
 const SLUG_MAP: Record<string, string> = {
   portugues: "lingua-portuguesa",
@@ -141,6 +142,7 @@ export default function ChapterPage({
   const [showComboFlair, setShowComboFlair] = useState(false);
   const [questionKey, setQuestionKey] = useState(0);
   const [showStudyPanel, setShowStudyPanel] = useState(false);
+  const [showShareResult, setShowShareResult] = useState(false);
   const questionStartTime = useRef<number>(Date.now());
   const [levelUpData, setLevelUpData] = useState<{
     level: number;
@@ -561,6 +563,17 @@ export default function ChapterPage({
               Praticar novamente
             </button>
             <button
+              onClick={() => setShowShareResult(true)}
+              className="w-full py-4 rounded-2xl font-black text-base transition active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+                color: '#ffffff',
+                boxShadow: '0 10px 30px -8px rgba(6,182,212,0.40)',
+              }}
+            >
+              📊 Compartilhar com amigo
+            </button>
+            <button
               onClick={() => setPhase("lobby")}
               className="w-full py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-base transition active:scale-[0.98]"
             >
@@ -574,6 +587,17 @@ export default function ChapterPage({
             </button>
           </div>
         </div>
+
+        <ShareResultModal
+          isOpen={showShareResult}
+          onClose={() => setShowShareResult(false)}
+          result={{
+            accuracy,
+            total: questions.length,
+            correct: score,
+            subject: subjectTitle || subject,
+          }}
+        />
       </div>
     );
   }
