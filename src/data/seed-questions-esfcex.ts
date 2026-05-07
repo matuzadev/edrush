@@ -290,12 +290,14 @@ export const ESFCEX_CHAPTERS: {
 // ─── Imports parciais (para manter cada bloco em arquivo enxuto) ─────────────
 import { ESFCEX_PORTUGUES } from './seed-questions-esfcex-portugues';
 import { ESFCEX_HISTORIA_GEOGRAFIA } from './seed-questions-esfcex-historia-geografia';
-import { ESFCEX_INFO_PARTE1 } from './seed-questions-esfcex-info1';
+import { ESFCEX_INFO_FUND } from './seed-questions-esfcex-info1a';
+import { ESFCEX_INFO_REDES } from './seed-questions-esfcex-info1b';
 import { ESFCEX_INFO_PARTE2 } from './seed-questions-esfcex-info2';
 
 export const ESFCEX_QUESTIONS: SeedQuestion[] = [
   ...ESFCEX_PORTUGUES,
   ...ESFCEX_HISTORIA_GEOGRAFIA,
-  ...ESFCEX_INFO_PARTE1,
+  ...ESFCEX_INFO_FUND,
+  ...ESFCEX_INFO_REDES,
   ...ESFCEX_INFO_PARTE2,
 ];

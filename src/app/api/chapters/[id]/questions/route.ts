@@ -25,17 +25,12 @@ export async function GET(
   const difficulty = searchParams.get('difficulty');
 
   try {
-    // Buscar questões do capítulo
-    let query = db
-      .select()
-      .from(questions)
-      .where(eq(questions.capitulo, id));
+    // Buscar questões do capítulo (filtra por dificuldade quando fornecida)
+    const whereClause = difficulty
+      ? and(eq(questions.capitulo, id), eq(questions.dificuldade, difficulty))
+      : eq(questions.capitulo, id);
 
-    if (difficulty) {
-      query = query.where(eq(questions.dificuldade, difficulty));
-    }
-
-    const questionsList = await query;
+    const questionsList = await db.select().from(questions).where(whereClause);
 
     // Parse de opções JSON
     const parsedQuestions = questionsList.map((q) => ({
