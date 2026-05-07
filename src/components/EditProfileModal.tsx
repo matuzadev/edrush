@@ -1,12 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
 import { getAvatar } from '@/data/avatars';
+import { BRAZILIAN_STATES, getStateBySigla } from '@/data/brazilian-states';
 
 const BIO_MAX = 160;
+
+function parseLocation(value?: string): { uf: string; cidade: string } {
+  if (!value) return { uf: '', cidade: '' };
+  const idx = value.lastIndexOf(',');
+  if (idx === -1) return { uf: '', cidade: '' };
+  const cidade = value.slice(0, idx).trim();
+  const ufRaw = value.slice(idx + 1).trim().toUpperCase();
+  const uf = getStateBySigla(ufRaw)?.sigla ?? '';
+  return { uf, cidade: uf ? cidade : '' };
+}
+
+const cityCache = new Map<string, string[]>();
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -41,6 +54,64 @@ export function EditProfileModal({
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<ModalTab>('identity');
 
+  const initialParsed = useMemo(() => parseLocation(initialData.location), [initialData.location]);
+  const [selectedUf, setSelectedUf] = useState<string>(initialParsed.uf);
+  const [selectedCidade, setSelectedCidade] = useState<string>(initialParsed.cidade);
+  const [cidades, setCidades] = useState<string[]>([]);
+  const [isLoadingCidades, setIsLoadingCidades] = useState(false);
+  const [cidadesError, setCidadesError] = useState<string | null>(null);
+
+  // Sincroniza estado interno quando o modal reabrir com novo initialData
+  useEffect(() => {
+    if (!isOpen) return;
+    setFormData(initialData);
+    const parsed = parseLocation(initialData.location);
+    setSelectedUf(parsed.uf);
+    setSelectedCidade(parsed.cidade);
+  }, [isOpen, initialData]);
+
+  // Busca cidades quando UF muda — IBGE garante todos os 5570+ municípios do Brasil
+  useEffect(() => {
+    if (!selectedUf) {
+      setCidades([]);
+      setCidadesError(null);
+      return;
+    }
+    const cached = cityCache.get(selectedUf);
+    if (cached) {
+      setCidades(cached);
+      setCidadesError(null);
+      return;
+    }
+    const state = getStateBySigla(selectedUf);
+    if (!state) return;
+    const controller = new AbortController();
+    setIsLoadingCidades(true);
+    setCidadesError(null);
+    fetch(
+      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state.codigo_ibge}/municipios?orderBy=nome`,
+      { signal: controller.signal }
+    )
+      .then((r) => {
+        if (!r.ok) throw new Error('IBGE indisponível');
+        return r.json();
+      })
+      .then((data: { nome: string }[]) => {
+        const names = data.map((m) => m.nome);
+        cityCache.set(selectedUf, names);
+        setCidades(names);
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError') return;
+        setCidades([]);
+        setCidadesError('Não foi possível carregar as cidades. Tente novamente.');
+      })
+      .finally(() => setIsLoadingCidades(false));
+    return () => controller.abort();
+  }, [selectedUf]);
+
+  const formattedLocation = selectedUf && selectedCidade ? `${selectedCidade}, ${selectedUf}` : '';
+
   const selectedAvatar = getAvatar(formData.avatar);
   const bioLength = (formData.bio ?? '').length;
   const usernameTrimmed = (formData.username ?? '').trim();
@@ -59,7 +130,7 @@ export function EditProfileModal({
     onSave({
       username: usernameTrimmed,
       birthday: formData.birthday ?? '',
-      location: formData.location ?? '',
+      location: formattedLocation,
       bio: formData.bio ?? '',
       avatar: formData.avatar,
     });
