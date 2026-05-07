@@ -324,7 +324,7 @@ export function EditProfileModal({
                 />
               </div>
 
-              {/* Location */}
+              {/* Location — UF + Cidade (sem texto livre) */}
               <div>
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <MapPin className="w-3.5 h-3.5 text-yellow-400" />
@@ -332,19 +332,70 @@ export function EditProfileModal({
                     Localização
                   </label>
                 </div>
-                <input
-                  type="text"
-                  placeholder="São Paulo, SP"
-                  value={formData.location ?? ''}
-                  onChange={(e) => setFormData((p) => ({ ...p, location: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 text-sm transition-all outline-none"
-                  style={{
-                    background: 'rgba(30,41,59,0.6)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(251,191,36,0.15)'; }}
-                  onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-2">
+                  {/* UF */}
+                  <select
+                    value={selectedUf}
+                    onChange={(e) => {
+                      setSelectedUf(e.target.value);
+                      setSelectedCidade('');
+                    }}
+                    className="w-full px-3 py-3 rounded-xl text-white text-sm transition-all outline-none appearance-none cursor-pointer"
+                    style={{
+                      background: 'rgba(30,41,59,0.6)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      colorScheme: 'dark',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(251,191,36,0.15)'; }}
+                    onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
+                    aria-label="Estado"
+                  >
+                    <option value="">UF</option>
+                    {BRAZILIAN_STATES.map((uf) => (
+                      <option key={uf.sigla} value={uf.sigla}>
+                        {uf.sigla} — {uf.nome}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Cidade */}
+                  <select
+                    value={selectedCidade}
+                    onChange={(e) => setSelectedCidade(e.target.value)}
+                    disabled={!selectedUf || isLoadingCidades}
+                    className="w-full px-3 py-3 rounded-xl text-white text-sm transition-all outline-none appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    style={{
+                      background: 'rgba(30,41,59,0.6)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      colorScheme: 'dark',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(251,191,36,0.15)'; }}
+                    onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
+                    aria-label="Cidade"
+                  >
+                    <option value="">
+                      {!selectedUf
+                        ? 'Selecione o estado primeiro'
+                        : isLoadingCidades
+                          ? 'Carregando cidades...'
+                          : cidades.length === 0
+                            ? 'Nenhuma cidade disponível'
+                            : 'Selecione a cidade'}
+                    </option>
+                    {/* Mantém a cidade salva visível mesmo se ainda não carregou a lista */}
+                    {selectedCidade && !cidades.includes(selectedCidade) && (
+                      <option value={selectedCidade}>{selectedCidade}</option>
+                    )}
+                    {cidades.map((nome) => (
+                      <option key={nome} value={nome}>
+                        {nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {cidadesError && (
+                  <p className="text-xs text-red-400 mt-1.5">{cidadesError}</p>
+                )}
               </div>
             </div>
           )}
