@@ -5,7 +5,7 @@ import { X, Send, Loader2, Trophy, Check } from 'lucide-react';
 import { getAvatar } from '@/data/avatars';
 
 interface FriendOption {
-  friendId: string;
+  userId: string;
   nome: string | null;
   username: string | null;
   avatar_id: number;
@@ -65,7 +65,7 @@ export function ShareResultModal({ isOpen, onClose, result, defaultMessage }: Sh
         }),
       });
       if (res.ok) {
-        const friend = friends.find(f => f.friendId === selected);
+        const friend = friends.find(f => f.userId === selected);
         setSentTo(friend?.username ?? friend?.nome ?? 'amigo');
         setTimeout(() => { onClose(); setSentTo(null); }, 1400);
       }
@@ -176,11 +176,11 @@ export function ShareResultModal({ isOpen, onClose, result, defaultMessage }: Sh
             ) : (
               friends.map(f => {
                 const avatar = getAvatar(f.avatar_id);
-                const isSelected = selected === f.friendId;
+                const isSelected = selected === f.userId;
                 return (
                   <button
-                    key={f.friendId}
-                    onClick={() => setSelected(f.friendId)}
+                    key={f.userId}
+                    onClick={() => setSelected(f.userId)}
                     className={`w-full flex items-center gap-3 p-2 rounded-xl transition border ${
                       isSelected
                         ? 'bg-cyan-500/10 border-cyan-500/40'
