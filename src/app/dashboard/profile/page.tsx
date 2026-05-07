@@ -78,8 +78,9 @@ export default function ProfilePage() {
   }) => {
     setSaveError(null);
     try {
+      const trimmedUsername = (data.username ?? '').trim();
       await updateProfile({
-        username: data.username,
+        ...(trimmedUsername.length >= 2 ? { username: trimmedUsername } : {}),
         bio: data.bio,
         birthday: data.birthday || undefined,
         location: data.location,
