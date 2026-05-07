@@ -44,12 +44,15 @@ export async function GET() {
       equipped: equipped === b.slug,
     }));
 
+    // Conta unlocked apenas entre as bordas visíveis pra esse usuário
+    const totalUnlockedVisible = visibleBorders.filter(b => unlocked.has(b.slug)).length;
+
     return NextResponse.json({
       borders: items,
       stats,
       equipped,
-      totalUnlocked: unlocked.size,
-      total: BORDERS.length,
+      totalUnlocked: totalUnlockedVisible,
+      total: visibleBorders.length,
     });
   } catch (error) {
     console.error('Erro ao listar bordas:', error);
