@@ -52,7 +52,7 @@ export function computeLevel(xp: number): LevelInfo {
 }
 
 export function xpForSession(correctAnswers: number, totalAnswered: number): number {
-  const base = correctAnswers * 10;
+  const base = correctAnswers * 20;
   const accuracy = totalAnswered > 0 ? correctAnswers / totalAnswered : 0;
   const bonus = accuracy >= 0.95 ? 50 : accuracy >= 0.9 ? 25 : accuracy >= 0.8 ? 10 : accuracy >= 0.7 ? 5 : 0;
   return base + bonus;

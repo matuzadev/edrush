@@ -31,29 +31,55 @@ export default function SettingsPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/auth/login');
+      return;
     }
 
-    // Mock load settings
-    if (user) {
-      setSettings(prev => ({
-        ...prev,
-        displayName: user.email?.split('@')[0] || 'Usuário',
-      }));
+    if (user && !settingsLoaded) {
+      // Carrega settings reais do banco
+      fetch('/api/user/settings')
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data) {
+            setSettings({
+              displayName: data.displayName ?? user.email?.split('@')[0] ?? '',
+              notifications: data.notifications ?? { email: true, milestones: true, weekly: true },
+              preferences: data.preferences ?? { theme: 'dark', language: 'pt', dailyGoal: 20 },
+            });
+          }
+        })
+        .catch(() => {
+          setSettings(prev => ({ ...prev, displayName: user.email?.split('@')[0] || 'Usuário' }));
+        })
+        .finally(() => setSettingsLoaded(true));
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router, settingsLoaded]);
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
-    // Simulate save
-    setTimeout(() => {
+    setSaveError(null);
+    try {
+      const res = await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? 'Falha ao salvar');
+      }
       setSaveSuccess(true);
-      setIsSaving(false);
       setTimeout(() => setSaveSuccess(false), 3000);
-    }, 500);
+    } catch (e: any) {
+      setSaveError(e?.message ?? 'Erro ao salvar configurações');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -128,6 +154,11 @@ export default function SettingsPage() {
         {saveSuccess && (
           <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
             <p className="text-emerald-400 text-sm font-semibold">✓ Configurações salvas com sucesso!</p>
+          </div>
+        )}
+        {saveError && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <p className="text-red-400 text-sm font-semibold">{saveError}</p>
           </div>
         )}
 

@@ -259,6 +259,18 @@ export async function initializeDatabase() {
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_status ON referrals(status)`);
     } catch { /* já existe */ }
 
+    // Adicionar colunas de material de estudos em questions (safe: try/catch por coluna)
+    const newQuestionMaterialColumns = [
+      `ALTER TABLE questions ADD COLUMN material_resumo TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_topicos TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_estrategia TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_referencias TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_conteudo TEXT`,
+    ];
+    for (const sql of newQuestionMaterialColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
     // Adicionar colunas novas em user_responses (safe: try/catch por coluna)
     const newResponseColumns = [
       `ALTER TABLE user_responses ADD COLUMN disciplina TEXT`,

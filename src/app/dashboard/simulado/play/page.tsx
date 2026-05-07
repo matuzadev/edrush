@@ -224,13 +224,17 @@ export default function SimuladoPlayPage() {
               >
                 Voltar
               </Button>
-              <Button 
+              <Button
                 className="flex-1"
                 onClick={() => {
                   setCurrentIndex(0);
                   setUserAnswers([]);
                   setShowResult(false);
                   setIsFinished(false);
+                  startedAtRef.current = new Date().toISOString();
+                  startedTsRef.current = Date.now();
+                  questionStartRef.current = Date.now();
+                  finishedRef.current = false;
                 }}
               >
                 Tentar Novamente

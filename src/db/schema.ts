@@ -164,6 +164,12 @@ export const questions = sqliteTable(
     fonte: text('fonte'), // CESPE, FCC, FGV, etc
     concurso_id: integer('concurso_id').references(() => concursos.id),
     ano: integer('ano'), // Ano da prova
+    // Material de estudos por questão
+    material_resumo: text('material_resumo'), // 2-4 frases sobre o conceito testado
+    material_topicos: text('material_topicos'), // JSON array de strings (chips)
+    material_estrategia: text('material_estrategia'), // como atacar esse tipo de questão
+    material_referencias: text('material_referencias'), // JSON array de {title, type, author}
+    material_conteudo: text('material_conteudo'), // Markdown completo 200-500 palavras
     criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
     atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
   },

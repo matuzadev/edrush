@@ -11,6 +11,14 @@ const SLUG_MAP: Record<string, string> = {
 
 const MAX_LIVES = 3;
 
+interface StudyMaterial {
+  summary: string | null;
+  topics: string[];
+  strategy: string | null;
+  references: { title: string; type: string; author: string }[];
+  fullContent: string | null;
+}
+
 interface DBQuestion {
   id: string;
   question: string;
@@ -22,6 +30,7 @@ interface DBQuestion {
   hint?: string;
   difficulty: string;
   options?: string[] | null;
+  studyMaterial?: StudyMaterial | null;
 }
 
 interface StudyTip {
@@ -213,7 +222,7 @@ export default function ChapterPage({
 
     if (correct) {
       const newCombo = combo + 1;
-      const earnedXp = 10 + (newCombo >= 3 ? 5 : 0);
+      const earnedXp = 20 + (newCombo >= 3 ? 10 : 0);
       setScore(s => s + 1);
       setCombo(newCombo);
       setMaxCombo(m => Math.max(m, newCombo));
@@ -648,25 +657,100 @@ export default function ChapterPage({
             </div>
           )}
 
-          {/* Study tip shortcut during quiz */}
-          {tip && phase === "playing" && (
+          {/* Study material shortcut during quiz — question-specific */}
+          {phase === "playing" && (q?.studyMaterial || tip) && (
             <button
               onClick={() => setShowStudyPanel(s => !s)}
-              className="flex items-center gap-2 text-xs text-slate-600 hover:text-slate-400 transition"
+              className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition"
             >
-              <span>📖</span> {showStudyPanel ? "Ocultar material" : "Ver material de estudos"}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              {showStudyPanel ? "Ocultar material" : "Ver material de estudos"}
             </button>
           )}
 
-          {showStudyPanel && phase === "playing" && tip && (
-            <div className="bg-slate-900 border border-white/8 rounded-2xl p-4 animate-slide-up space-y-3 text-sm">
-              <p className="text-slate-300 leading-relaxed">{tip.quickReview}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {tip.keyTopics.map((t, i) => (
-                  <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
-                    {t}
-                  </span>
-                ))}
+          {showStudyPanel && phase === "playing" && (
+            <div className="relative rounded-2xl border border-white/8 overflow-hidden animate-slide-up">
+              {/* top gradient accent line */}
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-emerald-500 to-cyan-400" />
+              <div className="bg-gradient-to-br from-slate-900/90 to-slate-900/40 p-4 space-y-3">
+                {q?.studyMaterial ? (
+                  <>
+                    {/* Summary */}
+                    {q.studyMaterial.summary && (
+                      <div className="bg-blue-500/8 border border-blue-500/20 rounded-xl px-3 py-2.5">
+                        <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Conceito</p>
+                        <p className="text-slate-300 text-sm leading-relaxed">{q.studyMaterial.summary}</p>
+                      </div>
+                    )}
+
+                    {/* Topics chips */}
+                    {q.studyMaterial.topics?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {q.studyMaterial.topics.map((t: string, i: number) => (
+                          <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Strategy */}
+                    {q.studyMaterial.strategy && (
+                      <div className="bg-yellow-500/8 border border-yellow-500/20 rounded-xl px-3 py-2.5">
+                        <p className="text-xs font-bold text-yellow-400 uppercase tracking-widest mb-1">Estratégia para a prova</p>
+                        <p className="text-slate-300 text-sm leading-relaxed">{q.studyMaterial.strategy}</p>
+                      </div>
+                    )}
+
+                    {/* Full content expandable */}
+                    {q.studyMaterial.fullContent && (
+                      <details className="group">
+                        <summary className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-300 cursor-pointer transition list-none">
+                          <svg className="w-3.5 h-3.5 group-open:rotate-90 transition-transform" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06L7.28 12.78a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/>
+                          </svg>
+                          Conteúdo completo
+                        </summary>
+                        <div className="mt-2 text-xs text-slate-400 leading-relaxed whitespace-pre-line pl-1 border-l-2 border-slate-700 pl-3">
+                          {q.studyMaterial.fullContent}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* References */}
+                    {q.studyMaterial.references?.length > 0 && (
+                      <div className="pt-1 border-t border-white/5">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Referências</p>
+                        <div className="space-y-1.5">
+                          {q.studyMaterial.references.map((ref: { title: string; type: string; author: string }, i: number) => (
+                            <div key={i} className="flex items-start gap-2 bg-slate-800/50 rounded-lg px-2.5 py-2">
+                              <span className="text-base shrink-0">{REF_ICONS[ref.type] ?? "📌"}</span>
+                              <div className="min-w-0">
+                                <p className="text-xs font-semibold text-slate-300 leading-snug">{ref.title}</p>
+                                <p className="text-xs text-slate-500">{ref.author} · <span className="capitalize">{ref.type}</span></p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : tip ? (
+                  /* Fallback to discipline-level tip if no question-specific material */
+                  <>
+                    <p className="text-xs text-slate-500 italic">Material geral da disciplina</p>
+                    <p className="text-slate-300 text-sm leading-relaxed">{tip.quickReview}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {tip.keyTopics.map((t: string, i: number) => (
+                        <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                ) : null}
               </div>
             </div>
           )}
@@ -754,7 +838,7 @@ export default function ChapterPage({
               </div>
               {isCorrect && (
                 <span className="text-blue-400 font-bold text-sm bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 rounded-full shrink-0">
-                  +{10 + (combo >= 3 ? 5 : 0)} XP
+                  +{20 + (combo >= 3 ? 10 : 0)} XP
                 </span>
               )}
             </div>
