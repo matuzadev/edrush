@@ -276,6 +276,7 @@ export default function ChapterPage({
   const saveSession = useCallback(async (finalScore: number, total: number) => {
     try {
       const dbDisciplina = SLUG_MAP[subject] || subject;
+      const numericChapterId = parseInt(String(id), 10);
       const res = await fetch("/api/study/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -283,9 +284,10 @@ export default function ChapterPage({
           questionsAnswered: total,
           correctAnswers: finalScore,
           subject,
-          // Disciplina + título do capítulo permitem ao backend marcar
-          // is_completed em user_chapter_progress quando ≥80% de acerto,
-          // habilitando o "modo revisão" depois.
+          // chapterId (slug subject + id de subjects.json) é a chave Duolingo-style
+          // que dispara o desbloqueio do próximo capítulo na trilha do dashboard.
+          chapterId: Number.isFinite(numericChapterId) ? numericChapterId : undefined,
+          // Compat: dispara também o "modo revisão" via user_chapter_progress.
           disciplina: dbDisciplina,
           chapter: chapterTitle,
         }),
