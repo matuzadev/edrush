@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { questions } from '@/db/schema';
-import { eq, and, like, or, inArray, SQL } from 'drizzle-orm';
+import { createClient } from '@libsql/client';
+import path from 'path';
+
+const dbUrl = process.env.TURSO_DATABASE_URL ?? `file:${path.resolve(process.cwd(), 'data/foco-federal.db')}`;
+const rawClient = createClient({
+  url: dbUrl,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,11 +18,19 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') ?? '100');
 
-    const where: SQL[] = [];
-    if (disciplina) where.push(eq(questions.disciplina, disciplina));
-    if (capitulo) where.push(eq(questions.capitulo, capitulo));
+    // Build raw SQL query to ensure new material columns are fetched
+    const conditions: string[] = [];
+    const args: (string | number)[] = [];
+
+    if (disciplina) {
+      conditions.push('disciplina = ?');
+      args.push(disciplina);
+    }
+    if (capitulo) {
+      conditions.push('capitulo = ?');
+      args.push(capitulo);
+    }
     if (dificuldade) {
-      // Normalize: DB stores both accented ("fácil") and non-accented ("facil") variants
       const DIFF_VARIANTS: Record<string, string[]> = {
         'fácil':   ['fácil', 'facil'],
         'facil':   ['fácil', 'facil'],
@@ -28,35 +41,71 @@ export async function GET(request: NextRequest) {
       };
       const variants = DIFF_VARIANTS[dificuldade.toLowerCase()];
       if (variants) {
-        where.push(inArray(questions.dificuldade, variants));
+        conditions.push(`dificuldade IN (${variants.map(() => '?').join(', ')})`);
+        args.push(...variants);
       } else {
-        where.push(eq(questions.dificuldade, dificuldade));
+        conditions.push('dificuldade = ?');
+        args.push(dificuldade);
       }
     }
-    if (concursoId) where.push(eq(questions.concurso_id, parseInt(concursoId)));
-    if (search) where.push(like(questions.enunciado, `%${search}%`));
+    if (concursoId) {
+      conditions.push('concurso_id = ?');
+      args.push(parseInt(concursoId));
+    }
+    if (search) {
+      conditions.push('enunciado LIKE ?');
+      args.push(`%${search}%`);
+    }
 
-    const resultado = await db.query.questions.findMany({
-      where: where.length > 0 ? and(...where) : undefined,
-      limit,
-      with: { concurso: { columns: { titulo: true, organizador: true } } },
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const sql = `SELECT id, titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
+      resposta_correta, dificuldade, fonte, concurso_id, ano,
+      material_resumo, material_topicos, material_estrategia, material_referencias, material_conteudo
+      FROM questions ${whereClause} LIMIT ?`;
+    args.push(limit);
+
+    const rs = await rawClient.execute({ sql, args });
+    const resultado = rs.rows;
+    // Transform to match expected format (resultado is raw libsql rows)
+    const transformedQuestions = resultado.map((q: any) => {
+      let studyMaterial: {
+        summary: string | null;
+        topics: string[];
+        strategy: string | null;
+        references: { title: string; type: string; author: string }[];
+        fullContent: string | null;
+      } | null = null;
+
+      if (q.material_resumo || q.material_topicos || q.material_estrategia || q.material_referencias || q.material_conteudo) {
+        studyMaterial = {
+          summary: q.material_resumo ?? null,
+          topics: q.material_topicos
+            ? (typeof q.material_topicos === 'string' ? JSON.parse(q.material_topicos) : q.material_topicos)
+            : [],
+          strategy: q.material_estrategia ?? null,
+          references: q.material_referencias
+            ? (typeof q.material_referencias === 'string' ? JSON.parse(q.material_referencias) : q.material_referencias)
+            : [],
+          fullContent: q.material_conteudo ?? null,
+        };
+      }
+
+      return {
+        id: String(q.id),
+        question: q.enunciado,
+        subject: q.disciplina,
+        chapter: q.capitulo,
+        type: q.tipo,
+        correctAnswer: q.resposta_correta,
+        explanation: q.explicacao,
+        hint: q.dica,
+        difficulty: q.dificuldade,
+        options: q.opcoes ? (typeof q.opcoes === 'string' ? JSON.parse(q.opcoes) : q.opcoes) : null,
+        source: q.fonte,
+        year: q.ano,
+        studyMaterial,
+      };
     });
-
-    // Transform to match expected format
-    const transformedQuestions = resultado.map((q: any) => ({
-      id: String(q.id),
-      question: q.enunciado,
-      subject: q.disciplina,
-      chapter: q.capitulo,
-      type: q.tipo,
-      correctAnswer: q.resposta_correta,
-      explanation: q.explicacao,
-      hint: q.dica,
-      difficulty: q.dificuldade,
-      options: q.opcoes ? (typeof q.opcoes === 'string' ? JSON.parse(q.opcoes) : q.opcoes) : null,
-      source: q.fonte,
-      year: q.ano
-    }));
 
     return NextResponse.json({ 
       success: true, 
