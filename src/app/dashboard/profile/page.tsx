@@ -31,6 +31,9 @@ import {
   Lock,
   TrendingUp,
   Award,
+  Crown,
+  AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 
 // Mapa de cores por tier — usando style inline para evitar problema de classes dinâmicas no Tailwind v4
@@ -53,6 +56,36 @@ function accuracyColor(pct: number): string {
   if (pct >= 80) return '#10b981';
   if (pct >= 60) return '#f59e0b';
   return '#ef4444';
+}
+
+// Tiers de domínio por disciplina (visual + label)
+type MasteryTier = {
+  label: string;
+  color: string;
+  accent: string;
+  glow: string;
+  Icon: typeof Crown;
+};
+
+function getMasteryTier(accuracy: number): MasteryTier {
+  if (accuracy >= 85) {
+    return { label: 'Domínio',     color: '#10b981', accent: '#34d399', glow: 'rgba(16,185,129,0.35)', Icon: Crown };
+  }
+  if (accuracy >= 70) {
+    return { label: 'Avançado',    color: '#06b6d4', accent: '#22d3ee', glow: 'rgba(6,182,212,0.35)',  Icon: Sparkles };
+  }
+  if (accuracy >= 55) {
+    return { label: 'Em evolução', color: '#eab308', accent: '#facc15', glow: 'rgba(234,179,8,0.35)',  Icon: Target };
+  }
+  return     { label: 'Foco aqui',  color: '#f43f5e', accent: '#fb7185', glow: 'rgba(244,63,94,0.35)',  Icon: AlertCircle };
+}
+
+// Formata "lingua-portuguesa" → "Língua Portuguesa"
+function formatDisciplina(raw: string): string {
+  return raw
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 export default function ProfilePage() {
