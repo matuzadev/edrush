@@ -338,6 +338,140 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* ── Programa de Indicação (CTA premium) ── */}
+            <Link
+              href="/dashboard/referral"
+              className="referral-cta relative block overflow-hidden rounded-2xl group"
+              style={{
+                background: 'linear-gradient(135deg, rgba(6,78,59,0.55) 0%, rgba(15,23,42,0.85) 50%, rgba(8,51,68,0.55) 100%)',
+                border: '1px solid rgba(16,185,129,0.30)',
+                boxShadow: '0 12px 36px -12px rgba(16,185,129,0.25)',
+              }}
+            >
+              <style>{`
+                @keyframes referralShimmer {
+                  0%   { transform: translateX(-110%) skewX(-12deg); }
+                  100% { transform: translateX(220%)  skewX(-12deg); }
+                }
+                .referral-cta:hover .referral-shine { animation: referralShimmer 1.2s ease-out; }
+                @keyframes referralFloat {
+                  0%, 100% { transform: translateY(0) rotate(-8deg); }
+                  50%      { transform: translateY(-3px) rotate(-8deg); }
+                }
+                .referral-cta:hover .referral-gift { animation: referralFloat 1.6s ease-in-out infinite; }
+              `}</style>
+
+              {/* Linha de gradient no topo */}
+              <div
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+                style={{ background: 'linear-gradient(90deg, transparent, #10b981, #06b6d4, transparent)' }}
+              />
+
+              {/* Brilho sweep no hover */}
+              <div
+                className="referral-shine absolute top-0 -left-1/3 h-full w-1/3 pointer-events-none opacity-60"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(16,185,129,0.20), transparent)',
+                }}
+              />
+
+              {/* Glow blob esquerdo */}
+              <div
+                className="absolute -left-12 -top-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-40"
+                style={{ background: 'radial-gradient(circle, #10b981 0%, transparent 70%)' }}
+              />
+              {/* Glow blob direito */}
+              <div
+                className="absolute -right-16 -bottom-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-30"
+                style={{ background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)' }}
+              />
+
+              {/* Sparkles decorativos */}
+              <Sparkles
+                className="absolute top-3 right-12 text-emerald-400/40 pointer-events-none"
+                size={12}
+              />
+              <Sparkles
+                className="absolute bottom-4 left-32 text-cyan-400/30 pointer-events-none"
+                size={10}
+              />
+
+              <div className="relative flex items-center gap-4 px-5 py-4 sm:py-5">
+                {/* Ícone Gift com glow */}
+                <div
+                  className="referral-gift relative shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(16,185,129,0.30), rgba(6,182,212,0.15))',
+                    border: '1px solid rgba(16,185,129,0.40)',
+                    boxShadow: '0 0 20px -2px rgba(16,185,129,0.45), inset 0 0 12px rgba(16,185,129,0.15)',
+                    transform: 'rotate(-8deg)',
+                  }}
+                >
+                  <Gift size={22} className="text-emerald-300" strokeWidth={2.2} />
+                  {/* Pingo de luz */}
+                  <span
+                    className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
+                    style={{
+                      background: '#fbbf24',
+                      boxShadow: '0 0 8px #fbbf24, 0 0 14px rgba(251,191,36,0.6)',
+                    }}
+                  />
+                </div>
+
+                {/* Conteúdo */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span
+                      className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      style={{
+                        background: 'linear-gradient(90deg, #10b981, #06b6d4)',
+                        color: '#020617',
+                      }}
+                    >
+                      Bônus Exclusivo
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-semibold">
+                      · Sem custo
+                    </span>
+                  </div>
+                  <h3
+                    className="text-base sm:text-lg font-black leading-tight bg-clip-text text-transparent"
+                    style={{ backgroundImage: 'linear-gradient(90deg, #ffffff, #d1fae5)' }}
+                  >
+                    Programa de Indicação
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5 leading-snug">
+                    Convide amigos concurseiros e <span className="font-bold text-emerald-400">ganhe meses grátis</span> a cada inscrição.
+                  </p>
+                </div>
+
+                {/* CTA */}
+                <div
+                  className="shrink-0 hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-black text-xs transition-all group-hover:gap-2.5"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+                    color: '#020617',
+                    boxShadow: '0 4px 16px -4px rgba(16,185,129,0.50)',
+                  }}
+                >
+                  Indicar agora
+                  <ArrowRight size={14} strokeWidth={3} />
+                </div>
+
+                {/* CTA mobile (apenas seta) */}
+                <div
+                  className="shrink-0 sm:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all group-hover:translate-x-0.5"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+                    color: '#020617',
+                    boxShadow: '0 4px 16px -4px rgba(16,185,129,0.50)',
+                  }}
+                >
+                  <ArrowRight size={16} strokeWidth={3} />
+                </div>
+              </div>
+            </Link>
+
             {/* ── Info pessoal ── */}
             <div className="grid grid-cols-3 gap-3">
               {[
