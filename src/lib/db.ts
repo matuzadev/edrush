@@ -1,6 +1,7 @@
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
+import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
@@ -446,6 +447,7 @@ export async function initializeDatabase() {
     } catch { /* já existe */ }
 
     await seedUFs();
+    await seedQuestionsBank();
     console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar banco de dados:', error);
@@ -490,6 +492,83 @@ async function seedUFs() {
       sql: 'INSERT OR IGNORE INTO ufs (codigo_ibge, sigla, nome, regiao, criado_em) VALUES (?, ?, ?, ?, ?)',
       args: [uf.codigo_ibge, uf.sigla, uf.nome, uf.regiao, now],
     });
+  }
+}
+
+// Seed idempotente do banco de questões e dos capítulos correspondentes.
+// Por (disciplina, capítulo): só insere questões se nenhuma existe naquele par.
+// Capítulos: só insere se a tupla (disciplina, numero) ainda não existe.
+async function seedQuestionsBank() {
+  try {
+    // 1) Capítulos
+    for (const ch of SEED_CHAPTERS) {
+      const existing = await client.execute({
+        sql: 'SELECT id FROM chapters WHERE disciplina = ? AND numero = ? LIMIT 1',
+        args: [ch.disciplina, ch.numero],
+      });
+      if (existing.rows.length === 0) {
+        await client.execute({
+          sql: `INSERT INTO chapters (disciplina, numero, titulo, descricao, ordem, is_primeiro, criado_em)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            ch.disciplina,
+            ch.numero,
+            ch.titulo,
+            ch.descricao ?? null,
+            ch.numero,
+            ch.is_primeiro ? 1 : 0,
+            new Date().toISOString(),
+          ],
+        });
+      }
+    }
+
+    // 2) Questões — agrupa pelo par (disciplina, capitulo); só popula se vazio.
+    const groups = new Map<string, typeof SEED_QUESTIONS>();
+    for (const q of SEED_QUESTIONS) {
+      const key = `${q.disciplina}|${q.capitulo}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(q);
+    }
+
+    for (const [key, batch] of groups.entries()) {
+      const [disciplina, capitulo] = key.split('|');
+      const countRs = await client.execute({
+        sql: 'SELECT COUNT(*) AS n FROM questions WHERE disciplina = ? AND capitulo = ?',
+        args: [disciplina, capitulo],
+      });
+      const existingCount = Number((countRs.rows[0] as { n: number })?.n ?? 0);
+      if (existingCount > 0) continue; // já populado, não duplica
+
+      const now = new Date().toISOString();
+      for (const q of batch) {
+        await client.execute({
+          sql: `INSERT INTO questions
+            (titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
+             resposta_correta, dificuldade, fonte, criado_em, atualizado_em)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            q.titulo,
+            q.disciplina,
+            q.capitulo,
+            q.tipo,
+            q.enunciado,
+            q.explicacao ?? null,
+            q.dica ?? null,
+            q.opcoes ? JSON.stringify(q.opcoes) : null,
+            q.resposta_correta,
+            q.dificuldade,
+            q.fonte ?? null,
+            now,
+            now,
+          ],
+        });
+      }
+      console.log(`📚 Seed: ${batch.length} questões inseridas em "${disciplina}" / "${capitulo}"`);
+    }
+  } catch (err) {
+    console.error('⚠️  Falha ao popular banco de questões (seed):', err);
+    // Não relança: app deve subir mesmo se o seed falhar.
   }
 }
 
