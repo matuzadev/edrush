@@ -128,6 +128,7 @@ export async function GET(
       bio: user.bio ?? null,
       location: user.location ?? null,
       criado_em: user.criado_em,
+      equippedBorder: user.equipped_border ?? 'recruta',
       xp: storedXp,
       level: levelInfo.level,
       levelName: levelInfo.name,

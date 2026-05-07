@@ -158,6 +158,7 @@ export async function GET() {
       birthday: user.birthday ?? null,
       location: user.location ?? null,
       avatar_id: user.avatar_id ?? 1,
+      equippedBorder: user.equipped_border ?? 'recruta',
       criado_em: user.criado_em,
       // XP & Level
       xp: storedXp,

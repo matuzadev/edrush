@@ -18,6 +18,7 @@ export interface UserProfile {
   nome: string | null;
   foto_url: string | null;
   avatar_id: number;
+  equippedBorder: string;
   birthday?: string | null;
   location?: string | null;
   bio?: string | null;
@@ -51,6 +52,7 @@ const DEFAULT_PROFILE: UserProfile = {
   nome: null,
   foto_url: null,
   avatar_id: 1,
+  equippedBorder: 'recruta',
   criado_em: new Date().toISOString(),
   xp: 0,
   level: 1,

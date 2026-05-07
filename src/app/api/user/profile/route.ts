@@ -34,6 +34,7 @@ export async function GET() {
       avatar_id: user.avatar_id ?? 1,
       xp: user.xp ?? 0,
       level: user.level ?? 1,
+      equippedBorder: user.equipped_border ?? 'recruta',
       onboardingCompleted: (user.onboarding_completed ?? 0) === 1,
       selectedConcursoId: user.selected_concurso_id,
       selectedConcursoSlug: user.selected_concurso_slug,
