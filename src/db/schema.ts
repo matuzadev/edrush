@@ -99,6 +99,15 @@ export const concursos = sqliteTable(
     fonte_scrape: text('fonte_scrape'), // gov.br, PC, IADES, etc
     logo_url: text('logo_url'), // URL da logo do órgão (ex: /logos/orgaos/pf.png)
     slug: text('slug'), // slug para URL amigável
+    // Colunas enriquecidas (adicionadas via ALTER TABLE idempotente)
+    cargo: text('cargo'), // cargo específico (ex.: "Perito Criminal Federal")
+    area_especialidade: text('area_especialidade'), // área dentro do cargo (ex.: "Informática Forense")
+    edital_numero: text('edital_numero'), // número do edital (ex.: "Ed_1_PF_25_Abertura")
+    edital_ano: integer('edital_ano'),
+    vagas_cargo: integer('vagas_cargo'), // vagas só para este cargo/especialidade
+    url_inscricao: text('url_inscricao'),
+    requisitos: text('requisitos'), // JSON array de strings
+    destaque: integer('destaque').default(0), // 1 = destacado na UI
   },
   (table) => [
     index('idx_concursos_status').on(table.status),

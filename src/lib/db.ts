@@ -2,6 +2,7 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
 import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
+import { SEED_CONCURSOS } from '@/data/seed-concursos';
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
@@ -455,8 +456,24 @@ export async function initializeDatabase() {
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_unlocks_destino ON chapter_unlocks(chapter_id_destino)`);
     } catch { /* já existe */ }
 
+    // Adicionar colunas enriquecidas em concursos (idempotente)
+    const newConcursosColumns = [
+      `ALTER TABLE concursos ADD COLUMN cargo TEXT`,
+      `ALTER TABLE concursos ADD COLUMN area_especialidade TEXT`,
+      `ALTER TABLE concursos ADD COLUMN edital_numero TEXT`,
+      `ALTER TABLE concursos ADD COLUMN edital_ano INTEGER`,
+      `ALTER TABLE concursos ADD COLUMN vagas_cargo INTEGER`,
+      `ALTER TABLE concursos ADD COLUMN url_inscricao TEXT`,
+      `ALTER TABLE concursos ADD COLUMN requisitos TEXT`,
+      `ALTER TABLE concursos ADD COLUMN destaque INTEGER DEFAULT 0`,
+    ];
+    for (const sql of newConcursosColumns) {
+      try { await client.execute(sql); } catch { /* coluna já existe */ }
+    }
+
     await seedUFs();
     await seedQuestionsBank();
+    await seedConcursosBank();
     console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar banco de dados:', error);
@@ -577,6 +594,83 @@ async function seedQuestionsBank() {
     }
   } catch (err) {
     console.error('⚠️  Falha ao popular banco de questões (seed):', err);
+    // Não relança: app deve subir mesmo se o seed falhar.
+  }
+}
+
+// Seed idempotente do catálogo de concursos.
+// Chave de idempotência: slug. Só insere se nenhuma linha com aquele slug existir.
+// Para forçar re-seed de um concurso: DELETE FROM concursos WHERE slug=? e reinicie.
+async function seedConcursosBank() {
+  try {
+    const now = new Date().toISOString();
+    for (const c of SEED_CONCURSOS) {
+      const existing = await client.execute({
+        sql: 'SELECT id FROM concursos WHERE slug = ? LIMIT 1',
+        args: [c.slug],
+      });
+      if (existing.rows.length > 0) continue; // já existe, não duplica
+
+      await client.execute({
+        sql: `INSERT INTO concursos (
+          titulo, organizador, orgao, descricao, slug,
+          vagas_total, vagas_por_funcao, status,
+          data_publicacao_edital, data_abertura_inscricoes, data_fechamento_inscricoes,
+          data_prova_objetiva, data_prova_discursiva, data_resultado_final,
+          url_edital, url_site_oficial, banca,
+          remuneracao_inicial, nivel_escolaridade, fonte_scrape, logo_url,
+          cargo, area_especialidade, edital_numero, edital_ano,
+          vagas_cargo, url_inscricao, requisitos, destaque,
+          criado_em, atualizado_em
+        ) VALUES (
+          ?, ?, ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?
+        )`,
+        args: [
+          c.titulo,
+          c.organizador,
+          c.orgao,
+          c.descricao,
+          c.slug,
+          c.vagas_total ?? null,
+          c.vagas_por_funcao ?? null,
+          c.status,
+          c.data_publicacao_edital ?? null,
+          c.data_abertura_inscricoes ?? null,
+          c.data_fechamento_inscricoes ?? null,
+          c.data_prova_objetiva ?? null,
+          c.data_prova_discursiva ?? null,
+          c.data_resultado_final ?? null,
+          c.url_edital ?? null,
+          c.url_site_oficial ?? null,
+          c.banca ?? null,
+          c.remuneracao_inicial ?? null,
+          c.nivel_escolaridade ?? null,
+          c.fonte_scrape ?? null,
+          c.logo_url ?? null,
+          c.cargo ?? null,
+          c.area_especialidade ?? null,
+          c.edital_numero ?? null,
+          c.edital_ano ?? null,
+          c.vagas_cargo ?? null,
+          c.url_inscricao ?? null,
+          c.requisitos ?? null,
+          c.destaque,
+          now,
+          now,
+        ],
+      });
+      console.log(`🏛️  Seed concurso: "${c.titulo}" (${c.slug})`);
+    }
+  } catch (err) {
+    console.error('⚠️  Falha ao popular banco de concursos (seed):', err);
     // Não relança: app deve subir mesmo se o seed falhar.
   }
 }
