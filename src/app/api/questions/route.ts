@@ -65,6 +65,31 @@ export async function GET(request: NextRequest) {
       args.push(`%${search}%`);
     }
 
+    // Anti-farm: exclui questões já acertadas por esse usuário (qualquer resposta sua com acertou=1)
+    let excludedCount = 0;
+    if (userId && !includeAnswered) {
+      conditions.push(`id NOT IN (
+        SELECT DISTINCT question_id FROM user_responses
+        WHERE user_id = ? AND acertou = 1 AND question_id > 0
+      )`);
+      args.push(userId);
+
+      // Conta quantas seriam excluídas (para retornar como métrica)
+      try {
+        const baseFilters: string[] = [];
+        const baseArgs: (string | number)[] = [];
+        if (disciplina) { baseFilters.push('disciplina = ?'); baseArgs.push(disciplina); }
+        if (capitulo)   { baseFilters.push('capitulo = ?');   baseArgs.push(capitulo); }
+        const wf = baseFilters.length > 0 ? `WHERE ${baseFilters.join(' AND ')} AND ` : 'WHERE ';
+        const countSql = `SELECT COUNT(*) AS n FROM questions ${wf} id IN (
+          SELECT DISTINCT question_id FROM user_responses
+          WHERE user_id = ? AND acertou = 1 AND question_id > 0
+        )`;
+        const countRs = await rawClient.execute({ sql: countSql, args: [...baseArgs, userId] });
+        excludedCount = Number((countRs.rows[0] as { n: number })?.n ?? 0);
+      } catch { /* não bloqueia se falhar */ }
+    }
+
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
     const sql = `SELECT id, titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
       resposta_correta, dificuldade, fonte, concurso_id, ano,
