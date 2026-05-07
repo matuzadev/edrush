@@ -275,10 +275,20 @@ export default function ChapterPage({
 
   const saveSession = useCallback(async (finalScore: number, total: number) => {
     try {
+      const dbDisciplina = SLUG_MAP[subject] || subject;
       const res = await fetch("/api/study/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionsAnswered: total, correctAnswers: finalScore, subject }),
+        body: JSON.stringify({
+          questionsAnswered: total,
+          correctAnswers: finalScore,
+          subject,
+          // Disciplina + título do capítulo permitem ao backend marcar
+          // is_completed em user_chapter_progress quando ≥80% de acerto,
+          // habilitando o "modo revisão" depois.
+          disciplina: dbDisciplina,
+          chapter: chapterTitle,
+        }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -294,7 +304,7 @@ export default function ChapterPage({
     } catch {
       // fire-and-forget se falhar
     }
-  }, [subject]);
+  }, [subject, chapterTitle]);
 
   const handleNext = () => {
     if (lives <= 0 && !isCorrect) {
