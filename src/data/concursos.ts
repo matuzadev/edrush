@@ -2,19 +2,17 @@
 // Estrutura escalável — basta adicionar novas entradas aqui e tudo na UI atualiza.
 
 export interface ConcursoDef {
-  slug: string;            // identificador único (usado em users.selected_concurso_slug)
-  nome: string;            // nome curto pra UI ("Perito Criminal Federal")
-  nomeCompleto: string;    // nome formal completo
-  area: string;            // especialidade ("Informática", "Engenharia", etc.)
-  organizador: string;     // banca/órgão organizador
-  orgao: string;           // órgão público destino ("Polícia Federal", "TRF", etc.)
-  // Visual
-  cor: string;             // accent color hex
-  corAccent: string;       // cor secundária / gradient end
-  iconoColor: string;      // cor do ícone se for SVG monocromático
-  // SVG inline do brasão/distintivo (estilo silhueta, sem cópia de logos oficiais)
+  slug: string;            // identificador único principal
+  aliases?: string[];      // outros slugs aceitos (compat. com concursos cadastrados via slugify)
+  nome: string;
+  nomeCompleto: string;
+  area: string;
+  organizador: string;
+  orgao: string;
+  cor: string;
+  corAccent: string;
+  iconoColor: string;
   svg: string;
-  // Tagline curta exibida no perfil
   tagline: string;
 }
 
@@ -42,6 +40,14 @@ const SVG_PERITO_PF = `
 export const CONCURSOS: ConcursoDef[] = [
   {
     slug: 'perito-criminal-federal-informatica',
+    // Aceita também o slug gerado pelo onboarding atual (slugify do titulo do concurso no DB).
+    // Adicione mais aliases conforme novos titulos forem cadastrados.
+    aliases: [
+      'concurso-simulado-perito-federal',
+      'perito-federal',
+      'perito-criminal-federal',
+      'pcf-informatica',
+    ],
     nome: 'Perito Criminal Federal',
     nomeCompleto: 'Perito Criminal Federal — Polícia Federal',
     area: 'Informática',
@@ -70,9 +76,17 @@ export const CONCURSOS: ConcursoDef[] = [
   // },
 ];
 
-export const CONCURSO_BY_SLUG: Record<string, ConcursoDef> = Object.fromEntries(
-  CONCURSOS.map(c => [c.slug, c])
-);
+// Indexa por slug principal E por todos os aliases.
+export const CONCURSO_BY_SLUG: Record<string, ConcursoDef> = (() => {
+  const map: Record<string, ConcursoDef> = {};
+  for (const c of CONCURSOS) {
+    map[c.slug] = c;
+    for (const alias of c.aliases ?? []) {
+      map[alias] = c;
+    }
+  }
+  return map;
+})();
 
 export function getConcurso(slug: string | null | undefined): ConcursoDef | null {
   if (!slug) return null;

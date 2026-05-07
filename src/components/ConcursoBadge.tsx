@@ -6,7 +6,7 @@ import { Target } from 'lucide-react';
 interface ConcursoBadgeProps {
   slug: string | null | undefined;
   // Variantes de tamanho/densidade
-  variant?: 'card' | 'pill' | 'compact';
+  variant?: 'card' | 'pill' | 'compact' | 'inline';
   className?: string;
 }
 
