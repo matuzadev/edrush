@@ -569,53 +569,242 @@ export default function ProfilePage() {
             </div>
 
             {/* ── Desempenho por disciplina ── */}
-            {byDisciplina.length > 0 && (
-              <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5">
-                <div
-                  className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                  style={{ background: 'linear-gradient(90deg, transparent, #8b5cf6, transparent)' }}
-                />
-                <div className="flex items-center gap-2 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                    <BookOpen size={15} className="text-violet-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white text-sm">Desempenho por Disciplina</h3>
-                    <p className="text-[11px] text-slate-500">Ordenado por volume respondido</p>
-                  </div>
-                </div>
+            {byDisciplina.length > 0 && (() => {
+              const totalAnswered  = byDisciplina.reduce((s, d) => s + d.answered, 0);
+              const totalCorrect   = byDisciplina.reduce((s, d) => s + d.correct, 0);
+              const overallAccuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+              const bestDisc = [...byDisciplina].sort((a, b) => b.accuracy - a.accuracy)[0];
 
-                <div className="space-y-3">
-                  {byDisciplina.map((d) => {
-                    const widthPct = Math.max(2, Math.round((d.answered / maxDisciplinaAnswered) * 100));
-                    const color = accuracyColor(d.accuracy);
-                    return (
-                      <div key={d.disciplina}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-semibold text-slate-300 truncate max-w-[60%]">
-                            {d.disciplina}
-                          </span>
-                          <div className="flex items-center gap-2 text-[11px]">
-                            <span className="text-slate-500">{d.answered} questões</span>
-                            <span className="font-bold" style={{ color }}>{d.accuracy}%</span>
-                          </div>
+              return (
+                <div
+                  className="relative overflow-hidden rounded-3xl p-6"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.55) 100%)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 12px 40px -16px rgba(0,0,0,0.6)',
+                  }}
+                >
+                  {/* Linha de gradiente no topo */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+                    style={{ background: 'linear-gradient(90deg, transparent, #10b981, #06b6d4, #8b5cf6, transparent)' }}
+                  />
+
+                  {/* Glow accent superior direito */}
+                  <div
+                    className="absolute -top-20 -right-20 w-56 h-56 rounded-full blur-3xl opacity-20 pointer-events-none"
+                    style={{ background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)' }}
+                  />
+
+                  {/* Header com 3 métricas agregadas */}
+                  <div className="relative flex items-start justify-between gap-4 mb-6 flex-wrap">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(6,182,212,0.20), rgba(139,92,246,0.10))',
+                          border: '1px solid rgba(6,182,212,0.25)',
+                          boxShadow: '0 0 20px -4px rgba(6,182,212,0.30)',
+                        }}
+                      >
+                        <TrendingUp size={20} className="text-cyan-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-black text-white text-base leading-tight">Desempenho por disciplina</h3>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Mapa de domínio das suas matérias</p>
+                      </div>
+                    </div>
+
+                    {/* Métricas resumo */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div
+                        className="px-3 py-1.5 rounded-xl flex items-center gap-2"
+                        style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.20)' }}
+                      >
+                        <Target size={11} className="text-cyan-400" />
+                        <div className="text-right">
+                          <p className="text-[9px] uppercase font-bold text-slate-500 tracking-widest leading-none">Média</p>
+                          <p className="text-sm font-black tabular-nums leading-tight" style={{ color: accuracyColor(overallAccuracy) }}>
+                            {overallAccuracy}%
+                          </p>
                         </div>
-                        <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                              width: `${widthPct}%`,
-                              background: `linear-gradient(90deg, ${color}99, ${color})`,
-                              boxShadow: `0 0 8px ${color}44`,
-                            }}
-                          />
+                      </div>
+                      <div
+                        className="px-3 py-1.5 rounded-xl flex items-center gap-2"
+                        style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.20)' }}
+                      >
+                        <BookOpen size={11} className="text-violet-400" />
+                        <div className="text-right">
+                          <p className="text-[9px] uppercase font-bold text-slate-500 tracking-widest leading-none">Disciplinas</p>
+                          <p className="text-sm font-black tabular-nums text-white leading-tight">{byDisciplina.length}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Destaque "Top disciplina" */}
+                  {bestDisc && bestDisc.accuracy >= 70 && (() => {
+                    const tier = getMasteryTier(bestDisc.accuracy);
+                    return (
+                      <div
+                        className="mb-5 px-4 py-3 rounded-2xl flex items-center gap-3"
+                        style={{
+                          background: `linear-gradient(135deg, ${tier.color}18, ${tier.accent}05)`,
+                          border: `1px solid ${tier.color}30`,
+                        }}
+                      >
+                        <div
+                          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                          style={{ background: `${tier.color}22`, border: `1px solid ${tier.color}40` }}
+                        >
+                          <tier.Icon size={16} style={{ color: tier.color }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] uppercase font-bold tracking-widest" style={{ color: tier.color }}>
+                            Sua matéria mais forte
+                          </p>
+                          <p className="text-sm font-bold text-white truncate">{formatDisciplina(bestDisc.disciplina)}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xl font-black tabular-nums" style={{ color: tier.color }}>{bestDisc.accuracy}%</p>
+                          <p className="text-[9px] text-slate-500 uppercase font-bold tracking-widest">{tier.label}</p>
                         </div>
                       </div>
                     );
-                  })}
+                  })()}
+
+                  {/* Grid de cards por disciplina */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 relative">
+                    {byDisciplina.map((d) => {
+                      const tier = getMasteryTier(d.accuracy);
+                      const ringProgress = Math.max(0, Math.min(100, d.accuracy));
+                      const volumePct = Math.max(4, Math.round((d.answered / maxDisciplinaAnswered) * 100));
+                      // SVG ring math
+                      const radius = 22;
+                      const circumference = 2 * Math.PI * radius;
+                      const dashOffset = circumference - (ringProgress / 100) * circumference;
+
+                      return (
+                        <div
+                          key={d.disciplina}
+                          className="relative group rounded-2xl p-4 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(30,41,59,0.55), rgba(15,23,42,0.30))',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = `${tier.color}55`;
+                            e.currentTarget.style.boxShadow = `0 12px 30px -12px ${tier.glow}, 0 0 0 1px ${tier.color}22`;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          {/* Glow lateral subtle por tier */}
+                          <div
+                            className="absolute -left-8 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-40 transition-opacity"
+                            style={{ background: tier.color }}
+                          />
+
+                          <div className="relative flex items-center gap-3">
+                            {/* Anel de progresso */}
+                            <div className="relative shrink-0">
+                              <svg width="56" height="56" viewBox="0 0 56 56" className="transform -rotate-90">
+                                <circle
+                                  cx="28" cy="28" r={radius}
+                                  fill="none"
+                                  stroke="rgba(255,255,255,0.06)"
+                                  strokeWidth="4"
+                                />
+                                <circle
+                                  cx="28" cy="28" r={radius}
+                                  fill="none"
+                                  stroke={tier.color}
+                                  strokeWidth="4"
+                                  strokeLinecap="round"
+                                  strokeDasharray={circumference}
+                                  strokeDashoffset={dashOffset}
+                                  style={{
+                                    transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1)',
+                                    filter: `drop-shadow(0 0 4px ${tier.glow})`,
+                                  }}
+                                />
+                              </svg>
+                              {/* Texto centro do anel */}
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-sm font-black tabular-nums leading-none" style={{ color: tier.color }}>
+                                  {d.accuracy}
+                                </span>
+                                <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-0.5">%</span>
+                              </div>
+                            </div>
+
+                            {/* Info à direita */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <p className="text-sm font-bold text-white truncate leading-tight">
+                                  {formatDisciplina(d.disciplina)}
+                                </p>
+                                <div
+                                  className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded-md"
+                                  style={{
+                                    background: `${tier.color}15`,
+                                    border: `1px solid ${tier.color}30`,
+                                  }}
+                                  title={tier.label}
+                                >
+                                  <tier.Icon size={9} style={{ color: tier.color }} />
+                                  <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: tier.color }}>
+                                    {tier.label}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Linha de stats */}
+                              <div className="flex items-center gap-3 text-[11px] text-slate-500 mb-2">
+                                <span><span className="font-bold text-slate-300 tabular-nums">{d.answered}</span> resp.</span>
+                                <span className="text-slate-700">·</span>
+                                <span><span className="font-bold tabular-nums" style={{ color: tier.accent }}>{d.correct}</span> acertos</span>
+                              </div>
+
+                              {/* Barra de volume relativo */}
+                              <div className="relative h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div
+                                  className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                  style={{
+                                    width: `${volumePct}%`,
+                                    background: `linear-gradient(90deg, ${tier.color}, ${tier.accent})`,
+                                    boxShadow: `0 0 6px ${tier.glow}`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Legenda de tiers */}
+                  <div className="mt-5 pt-4 flex items-center justify-center gap-3 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    {[
+                      { label: 'Domínio',     min: '85%+', color: '#10b981' },
+                      { label: 'Avançado',    min: '70%+', color: '#06b6d4' },
+                      { label: 'Em evolução', min: '55%+', color: '#eab308' },
+                      { label: 'Foco aqui',   min: '<55%', color: '#f43f5e' },
+                    ].map((t) => (
+                      <div key={t.label} className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full" style={{ background: t.color, boxShadow: `0 0 6px ${t.color}88` }} />
+                        <span className="text-[10px] font-semibold text-slate-500">
+                          {t.label} <span className="text-slate-600 font-normal">({t.min})</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* ── Referral mini card ── */}
             <Link
