@@ -169,17 +169,20 @@ export default function ChapterPage({
     setPhase("fetching");
     const dbSlug = SLUG_MAP[subject] || subject;
     const diffParam = diff !== "todos" ? `&dificuldade=${encodeURIComponent(diff)}` : "";
+    // subject + chapterId habilitam o "modo revisão" no backend quando o capítulo
+    // já foi completado em alguma sessão anterior (≥80%).
+    const reviewParam = `&subject=${encodeURIComponent(subject)}&chapterId=${encodeURIComponent(String(id))}`;
 
     try {
       let res = await fetch(
-        `/api/questions?disciplina=${encodeURIComponent(dbSlug)}&capitulo=${encodeURIComponent(chapTitle)}&limit=20${diffParam}`
+        `/api/questions?disciplina=${encodeURIComponent(dbSlug)}&capitulo=${encodeURIComponent(chapTitle)}&limit=20${diffParam}${reviewParam}`
       );
       let data = res.ok ? await res.json() : { questions: [] };
 
       // Fallback: whole discipline (same difficulty)
       if (!data.questions?.length) {
         res = await fetch(
-          `/api/questions?disciplina=${encodeURIComponent(dbSlug)}&limit=60${diffParam}`
+          `/api/questions?disciplina=${encodeURIComponent(dbSlug)}&limit=60${diffParam}${reviewParam}`
         );
         data = res.ok ? await res.json() : { questions: [] };
       }
@@ -192,7 +195,7 @@ export default function ChapterPage({
 
     setPhase("playing");
     questionStartTime.current = Date.now();
-  }, [subject]);
+  }, [subject, id]);
 
   const handleStart = () => {
     setCurrent(0); setScore(0); setLives(MAX_LIVES); setCombo(0);
