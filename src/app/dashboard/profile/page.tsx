@@ -806,23 +806,6 @@ export default function ProfilePage() {
               );
             })()}
 
-            {/* ── Referral mini card ── */}
-            <Link
-              href="/dashboard/referral"
-              className="flex items-center justify-between gap-4 bg-gradient-to-r from-emerald-900/30 to-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/40 rounded-2xl px-5 py-4 transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Gift size={18} className="text-emerald-400" />
-                </div>
-                <div>
-                  <p className="font-bold text-white text-sm">Programa de Indicação</p>
-                  <p className="text-slate-500 text-xs">Indique amigos e ganhe meses grátis</p>
-                </div>
-              </div>
-              <ArrowRight size={16} className="text-slate-500 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
-            </Link>
-
             {/* ── Medalhas ── */}
             <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5">
               <div
