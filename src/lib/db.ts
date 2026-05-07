@@ -2,7 +2,7 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
 import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
-import { SEED_CONCURSOS } from '@/data/seed-concursos';
+import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos';
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
@@ -603,6 +603,19 @@ async function seedQuestionsBank() {
 // Para forçar re-seed de um concurso: DELETE FROM concursos WHERE slug=? e reinicie.
 async function seedConcursosBank() {
   try {
+    // Limpa slugs descontinuados (ver DEPRECATED_CONCURSO_SLUGS em seed-concursos.ts).
+    // Roda em todo boot — barato e idempotente: se já não existe, o DELETE é no-op.
+    for (const slug of DEPRECATED_CONCURSO_SLUGS) {
+      try {
+        await client.execute({
+          sql: 'DELETE FROM concursos WHERE slug = ?',
+          args: [slug],
+        });
+      } catch {
+        // ignora — pode falhar se houver FK pendente; não bloqueia o boot
+      }
+    }
+
     const now = new Date().toISOString();
     for (const c of SEED_CONCURSOS) {
       const existing = await client.execute({
