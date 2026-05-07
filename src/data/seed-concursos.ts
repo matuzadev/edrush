@@ -99,8 +99,6 @@ const PF_2025_BASE: Omit<SeedConcurso, 'cargo' | 'area_especialidade' | 'vagas_c
 
 export const SEED_CONCURSOS: SeedConcurso[] = [
   // ── PF 2025: Perito Criminal Federal — Área 3: Informática Forense ───────
-  // Único concurso ativo no catálogo. Para adicionar mais, basta inserir
-  // novas entradas neste array.
   {
     ...PF_2025_BASE,
     slug: 'pf-perito-criminal-informatica-forense-2025',
@@ -120,6 +118,87 @@ export const SEED_CONCURSOS: SeedConcurso[] = [
       'Idoneidade moral comprovada por investigação social',
       'Nacionalidade brasileira',
       'Estar em dia com obrigações eleitorais e militares',
+    ]),
+  },
+
+  // ── EsFCEx 2026 — Oficial do Quadro Complementar (Informática) ──────────
+  // Fontes verificadas (mai/2026):
+  //   Edital ESEX2501 publicado no DOU em 12/03/2026 (CFO/QC + CFO/QCM 2026/2027).
+  //   Site oficial: https://esfcex.eb.mil.br
+  //   Inscrições: 27/03/2026 (10h) a 12/06/2026 (15h).
+  //   Exame Intelectual: 12/07/2026 (09h-13h, horário de Brasília).
+  //   Vagas Informática (CFO/QC): 4 (3 ampla concorrência + 1 cota negros).
+  //   Total CFO/QC: 63 vagas em 19 áreas. Total geral (CFO/QC + Capelães): 66.
+  //   Soldo durante o curso: R$ 8.245,00. Após formação (1º Ten): R$ 9.000+.
+  //   Banca: a própria EsFCEx (concurso interno do Exército Brasileiro).
+  //   Provas: 50 itens objetivos (20 conhecimentos gerais + 30 específicos).
+  //   Disciplinas: Língua Portuguesa, História do Brasil, Geografia do Brasil,
+  //                Conhecimentos Específicos da área (Informática).
+  {
+    titulo: 'EsFCEx 2026 — Oficial do Quadro Complementar (Informática)',
+    organizador: 'EsFCEx (Escola de Saúde e Formação Complementar do Exército)',
+    orgao: 'Exército Brasileiro — Comando do Exército / Ministério da Defesa',
+    descricao:
+      'Curso de Formação de Oficiais do Quadro Complementar (CFO/QC) — ' +
+      'Área de Informática. 4 vagas (3 ampla concorrência + 1 reservada a negros) ' +
+      'para matrícula em 2027. Exige graduação em Ciência da Computação, ' +
+      'Engenharia da Computação, Sistemas de Informação ou Engenharia de Software. ' +
+      'Provas em 12/07/2026 (Exame Intelectual). Soldo durante o curso: R$ 8.245,00.',
+    slug: 'esfcex-oficial-quadro-complementar-informatica-2026',
+    vagas_total: 66,
+    vagas_por_funcao: JSON.stringify({
+      'CFO/QC — Administração': 4,
+      'CFO/QC — Ciências Contábeis': 4,
+      'CFO/QC — Comunicação Social (Jornalismo)': 1,
+      'CFO/QC — Direito': 5,
+      'CFO/QC — Economia': 2,
+      'CFO/QC — Enfermagem': 15,
+      'CFO/QC — Estatística': 1,
+      'CFO/QC — Informática': 4,
+      'CFO/QC — Psicologia': 1,
+      'CFO/QC — Pedagogia': 1,
+      'CFO/QC — Veterinária': 1,
+      'CFO/QC — Magistério Biologia': 2,
+      'CFO/QC — Magistério Geografia': 3,
+      'CFO/QC — Magistério História': 2,
+      'CFO/QC — Magistério Inglês': 3,
+      'CFO/QC — Magistério Matemática': 4,
+      'CFO/QC — Magistério Português': 5,
+      'CFO/QC — Magistério Química': 3,
+      'CFO/QC — Magistério Física': 2,
+      'CFO/QCM — Padre Católico Apostólico Romano': 2,
+      'CFO/QCM — Pastor Evangélico': 1,
+    }),
+    status: 'inscricoes_abertas',
+    data_publicacao_edital: '2026-03-12',
+    data_abertura_inscricoes: '2026-03-27',
+    data_fechamento_inscricoes: '2026-06-12',
+    data_prova_objetiva: '2026-07-12',
+    data_prova_discursiva: null,
+    data_resultado_final: '2027-03-16',
+    url_edital: 'https://esfcex.eb.mil.br/index.php/2026/concurso-2026',
+    url_site_oficial: 'https://esfcex.eb.mil.br',
+    banca: 'EsFCEx (Comissão de Aplicação e Fiscalização própria)',
+    remuneracao_inicial: 8245.00,
+    nivel_escolaridade: 'Superior Completo',
+    fonte_scrape: 'esfcex.eb.mil.br',
+    logo_url: '/imagens/logos/exercito-brasileiro.png',
+    edital_numero: 'ESEX2501 — CFO/QC 2026',
+    edital_ano: 2026,
+    url_inscricao: 'https://esfcex.eb.mil.br',
+    destaque: 1,
+    cargo: 'Oficial do Quadro Complementar (CFO/QC)',
+    area_especialidade: 'Informática',
+    vagas_cargo: 4,
+    requisitos: JSON.stringify([
+      'Bacharelado em Ciência da Computação, Engenharia da Computação, Sistemas de Informação ou Engenharia de Software',
+      'Idade entre 21 e 36 anos (até 31 DEZ do ano da matrícula)',
+      'Nacionalidade brasileira',
+      'Estar em dia com obrigações eleitorais e militares',
+      'Idoneidade moral comprovada e bons antecedentes',
+      'Aptidão em Inspeção de Saúde (IS), Exame de Aptidão Física (EAF) e Avaliação Psicológica',
+      'Não estar respondendo a processo criminal',
+      'Altura mínima: 1,60 m (homens) / 1,55 m (mulheres)',
     ]),
   },
 ];
