@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { study_sessions, users, notifications } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { xpForSession, computeLevel } from '@/lib/levels';
+import { checkAndUnlockBorders } from '@/lib/borders';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -98,12 +99,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Verifica e desbloqueia bordas que o usuário agora atinge.
+    // Falhas aqui não bloqueiam a resposta (fire-and-forget seguro).
+    let newBorders: { slug: string; name: string; tier: string }[] = [];
+    try {
+      const unlocked = await checkAndUnlockBorders(userId);
+      newBorders = unlocked.map(b => ({ slug: b.slug, name: b.name, tier: b.tier }));
+    } catch (e) {
+      console.error('Falha ao verificar bordas:', e);
+    }
+
     return NextResponse.json({
       ok: true,
       xpEarned: earned,
       newLevel,
       leveledUp,
       levelInfo,
+      newBorders,
     });
   } catch (error) {
     console.error('Erro ao salvar sessão de estudo:', error);
