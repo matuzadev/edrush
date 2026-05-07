@@ -6,12 +6,10 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
   Crown,
-  RefreshCw,
   Lock,
   PlayCircle,
   Target,
   TrendingUp,
-  Loader2,
   Layers,
   CheckCheck,
 } from 'lucide-react';
@@ -38,7 +36,7 @@ interface ProgressStats {
 export default function PersonalizedDashboardPage() {
   const params = useParams();
   const router = useRouter();
-  const { data: session, status, update } = useSession();
+  const { data: session, status } = useSession();
   const slug = params.concursoSlug as string;
 
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
@@ -50,7 +48,6 @@ export default function PersonalizedDashboardPage() {
     subjectsDone: 0,
     loaded: false,
   });
-  const [isResetting, setIsResetting] = useState(false);
   // Capítulos completados: chave "subject:chapterId" → true.
   // Alimentado por /api/user/chapter-completion. Usado para liberar o próximo
   // capítulo na trilha (estilo Duolingo).
@@ -116,19 +113,6 @@ export default function PersonalizedDashboardPage() {
       setSelectedAreas(allSlugs);
       setActiveSubject(allSlugs[0]);
       setStats((prev) => ({ ...prev, loaded: true }));
-    }
-  }
-
-  async function handleChangeConcurso() {
-    setIsResetting(true);
-    try {
-      const res = await fetch('/api/onboarding/reset', { method: 'POST' });
-      if (res.ok) {
-        await update(); // Atualizar JWT
-        router.push('/onboarding/select-concurso');
-      }
-    } catch {
-      setIsResetting(false);
     }
   }
 
@@ -245,19 +229,6 @@ export default function PersonalizedDashboardPage() {
               }
             `}</style>
           </div>
-          <button
-            onClick={handleChangeConcurso}
-            disabled={isResetting}
-            className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-400 transition border border-white/10 hover:border-emerald-500/30 rounded-lg px-2.5 py-1.5"
-            title="Trocar concurso"
-          >
-            {isResetting ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <RefreshCw size={12} />
-            )}
-            <span>Trocar concurso</span>
-          </button>
         </div>
       </nav>
 
@@ -413,14 +384,6 @@ export default function PersonalizedDashboardPage() {
           >
             Ir para simulado aplicado
           </Link>
-          <button
-            onClick={handleChangeConcurso}
-            disabled={isResetting}
-            className="sm:hidden flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 border border-white/10 hover:border-emerald-500/30 text-slate-300 hover:text-emerald-400 rounded-full text-sm font-semibold transition"
-          >
-            {isResetting ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-            Trocar concurso
-          </button>
         </div>
 
         {/* Seletor de matérias */}

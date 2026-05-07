@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Settings, User, LogOut, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { Settings, User, LogOut, ChevronDown, RefreshCw, Loader2 } from 'lucide-react';
 import { AvatarSelector } from '@/components/AvatarSelector';
 import { getAvatar } from '@/data/avatars';
 import { usUserProfile } from '@/hooks/useProfile';
@@ -44,8 +46,30 @@ const LEVEL_BADGE_BG: Record<number, string> = {
 
 export function UserMenu({ onLogout }: UserMenuProps) {
   const [open, setOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { profile, isLoading } = usUserProfile();
+  const router = useRouter();
+  const { update } = useSession();
+
+  // Limpa o concurso selecionado e leva o usuário para a tela de seleção.
+  // Mesmo handler usado antes nos botões "Trocar concurso" do dashboard.
+  async function handleChangeConcurso() {
+    if (isResetting) return;
+    setIsResetting(true);
+    try {
+      const res = await fetch('/api/onboarding/reset', { method: 'POST' });
+      if (res.ok) {
+        await update();
+        setOpen(false);
+        router.push('/onboarding/select-concurso');
+      } else {
+        setIsResetting(false);
+      }
+    } catch {
+      setIsResetting(false);
+    }
+  }
 
   // Fechar ao clicar fora
   useEffect(() => {
@@ -194,6 +218,19 @@ export function UserMenu({ onLogout }: UserMenuProps) {
               <Settings className="w-4 h-4 text-blue-400" />
               Configurações
             </Link>
+            <button
+              onClick={handleChangeConcurso}
+              disabled={isResetting}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
+              role="menuitem"
+            >
+              {isResetting ? (
+                <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4 text-emerald-400" />
+              )}
+              {isResetting ? 'Trocando...' : 'Trocar concurso'}
+            </button>
           </div>
 
           {/* Separador + Sair */}

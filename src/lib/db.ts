@@ -605,14 +605,26 @@ async function seedConcursosBank() {
   try {
     // Limpa slugs descontinuados (ver DEPRECATED_CONCURSO_SLUGS em seed-concursos.ts).
     // Roda em todo boot — barato e idempotente: se já não existe, o DELETE é no-op.
+    // Cascateia em tabelas-filhas (editais, concurso_candidato, questions) para
+    // evitar erro de FK silencioso.
     for (const slug of DEPRECATED_CONCURSO_SLUGS) {
       try {
+        const idRs = await client.execute({
+          sql: 'SELECT id FROM concursos WHERE slug = ?',
+          args: [slug],
+        });
+        const ids = idRs.rows.map((r) => Number((r as unknown as { id: number }).id));
+        for (const id of ids) {
+          await client.execute({ sql: 'DELETE FROM editais WHERE concurso_id = ?', args: [id] });
+          await client.execute({ sql: 'DELETE FROM concurso_candidato WHERE concurso_id = ?', args: [id] });
+          await client.execute({ sql: 'UPDATE questions SET concurso_id = NULL WHERE concurso_id = ?', args: [id] });
+        }
         await client.execute({
           sql: 'DELETE FROM concursos WHERE slug = ?',
           args: [slug],
         });
-      } catch {
-        // ignora — pode falhar se houver FK pendente; não bloqueia o boot
+      } catch (err) {
+        console.warn(`⚠️  Falha ao limpar slug deprecated "${slug}":`, err);
       }
     }
 
