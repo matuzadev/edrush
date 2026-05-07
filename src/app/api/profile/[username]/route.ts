@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users, study_sessions, user_responses } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
+
+const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 import { computeLevel, computeMedals } from '@/lib/levels';
 
 function computeStreak(sessionDates: string[]): number {
