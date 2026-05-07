@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { user_borders, users, study_sessions, notifications } from '@/db/schema';
 import { eq, sql, and } from 'drizzle-orm';
 import { computeLevel, computeMedals } from '@/lib/levels';
-import { BORDERS, BORDER_BY_SLUG, meetsCriteria, type UserBorderStats, type BorderDef } from '@/data/borders';
+import { BORDERS, BORDER_BY_SLUG, meetsCriteria, canUserAccessBorder, type UserBorderStats, type BorderDef } from '@/data/borders';
 
 export type { UserBorderStats } from '@/data/borders';
 
@@ -75,6 +75,12 @@ export async function getUnlockedBorderSlugs(userId: string): Promise<Set<string
 // Verifica e desbloqueia novas bordas baseado nos stats atuais.
 // Retorna lista de bordas recém-desbloqueadas (para notificar o frontend).
 export async function checkAndUnlockBorders(userId: string): Promise<BorderDef[]> {
+  const userRow = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { email: true },
+  });
+  const userEmail = userRow?.email ?? null;
+
   const [stats, unlocked] = await Promise.all([
     getUserBorderStats(userId),
     getUnlockedBorderSlugs(userId),
@@ -85,7 +91,14 @@ export async function checkAndUnlockBorders(userId: string): Promise<BorderDef[]
 
   for (const border of BORDERS) {
     if (unlocked.has(border.slug)) continue;
-    if (!meetsCriteria(border, stats)) continue;
+
+    // Bordas exclusivas: só desbloqueiam para os e-mails autorizados (sem critérios numéricos)
+    if (border.exclusive) {
+      if (!canUserAccessBorder(border, userEmail)) continue;
+      // se autorizado, desbloqueio imediato
+    } else if (!meetsCriteria(border, stats)) {
+      continue;
+    }
 
     try {
       await db.insert(user_borders).values({
@@ -138,10 +151,23 @@ export async function getEquippedBorderSlug(userId: string): Promise<string> {
 
 // Equipa uma borda (verifica se está desbloqueada antes)
 export async function equipBorder(userId: string, slug: string): Promise<{ ok: boolean; error?: string }> {
-  if (!BORDER_BY_SLUG[slug]) {
+  const border = BORDER_BY_SLUG[slug];
+  if (!border) {
     return { ok: false, error: 'Borda inexistente' };
   }
-  // 'recruta' é sempre permitida (default de todos)
+
+  // Bordas exclusivas: além do unlock, valida o e-mail do usuário
+  if (border.exclusive) {
+    const userRow = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { email: true },
+    });
+    if (!canUserAccessBorder(border, userRow?.email ?? null)) {
+      return { ok: false, error: 'Esta borda é exclusiva' };
+    }
+  }
+
+  // 'recruta' é sempre permitida (default de todos); demais precisam estar desbloqueadas
   if (slug !== 'recruta') {
     const unlocked = await getUnlockedBorderSlugs(userId);
     if (!unlocked.has(slug)) {

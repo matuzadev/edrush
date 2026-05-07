@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
-import { BORDERS, describeCriteria } from '@/data/borders';
+import { db } from '@/lib/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { BORDERS, describeCriteria, canUserAccessBorder } from '@/data/borders';
 import { getUserBorderStats, getUnlockedBorderSlugs, getEquippedBorderSlug, checkAndUnlockBorders } from '@/lib/borders';
 
 // GET /api/borders
@@ -15,16 +18,20 @@ export async function GET() {
   const userId = (session.user as { id: string }).id;
 
   try {
-    // Garante que recruta está sempre desbloqueada (todos têm)
+    // Garante que recruta + bordas exclusivas autorizadas estão desbloqueadas
     await checkAndUnlockBorders(userId);
 
-    const [stats, unlocked, equipped] = await Promise.all([
+    const [stats, unlocked, equipped, userRow] = await Promise.all([
       getUserBorderStats(userId),
       getUnlockedBorderSlugs(userId),
       getEquippedBorderSlug(userId),
+      db.query.users.findFirst({ where: eq(users.id, userId), columns: { email: true } }),
     ]);
+    const userEmail = userRow?.email ?? null;
 
-    const items = BORDERS.map(b => ({
+    const visibleBorders = BORDERS.filter(b => canUserAccessBorder(b, userEmail));
+
+    const items = visibleBorders.map(b => ({
       slug: b.slug,
       name: b.name,
       description: b.description,
