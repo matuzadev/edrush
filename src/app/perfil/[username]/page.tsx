@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';
+import { ConcursoBadge } from '@/components/ConcursoBadge';
 
 interface ProfileData {
   username: string;
@@ -28,6 +29,7 @@ interface ProfileData {
   totalMedals: number;
   achievements: Medal[];
   activityLog: { date: string; questionsAnswered: number }[];
+  concursoSlug?: string | null;
 }
 
 async function fetchProfile(username: string): Promise<ProfileData | null> {
@@ -132,6 +134,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             </div>
           </div>
         </div>
+
+        {/* Concurso em estudo */}
+        {p.concursoSlug && (
+          <ConcursoBadge slug={p.concursoSlug} variant="card" />
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

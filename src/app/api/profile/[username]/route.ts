@@ -129,6 +129,7 @@ export async function GET(
       location: user.location ?? null,
       criado_em: user.criado_em,
       equippedBorder: user.equipped_border ?? 'recruta',
+      concursoSlug: user.selected_concurso_slug ?? null,
       xp: storedXp,
       level: levelInfo.level,
       levelName: levelInfo.name,

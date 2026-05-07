@@ -159,6 +159,7 @@ export async function GET() {
       location: user.location ?? null,
       avatar_id: user.avatar_id ?? 1,
       equippedBorder: user.equipped_border ?? 'recruta',
+      concursoSlug: user.selected_concurso_slug ?? null,
       criado_em: user.criado_em,
       // XP & Level
       xp: storedXp,

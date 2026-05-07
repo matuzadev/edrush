@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { X, Loader2, Trophy, Target, TrendingUp, Flame, BookOpen } from 'lucide-react';
 import { getAvatar } from '@/data/avatars';
 import { AvatarBorder } from './AvatarBorder';
+import { ConcursoBadge } from './ConcursoBadge';
 
 interface ActivityDay {
   date: string;
@@ -38,6 +39,7 @@ interface FriendProfile {
   nome: string | null;
   avatar_id: number;
   equippedBorder?: string;
+  concursoSlug?: string | null;
   bio: string | null;
   location: string | null;
   criado_em: string;
@@ -220,6 +222,13 @@ export function FriendProfileModal({ username, onClose }: FriendProfileModalProp
                   )}
                 </div>
               </div>
+
+              {/* Concurso em estudo */}
+              {profile.concursoSlug && (
+                <div className="mt-4">
+                  <ConcursoBadge slug={profile.concursoSlug} variant="compact" />
+                </div>
+              )}
 
               {/* Barra de XP */}
               <div className="mt-4">
