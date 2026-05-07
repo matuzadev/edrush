@@ -341,13 +341,48 @@ export default function ProfilePage() {
                   </p>
                 )}
 
-                <button
-                  onClick={() => setIsEditModalOpen(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_28px_rgba(16,185,129,0.4)]"
-                >
-                  <Edit className="w-4 h-4" />
-                  Editar Perfil
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_28px_rgba(16,185,129,0.4)]"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Editar Perfil
+                  </button>
+                  <button
+                    onClick={() => setIsFriendsPopupOpen(true)}
+                    className="relative flex items-center gap-1.5 px-3 py-2.5 rounded-xl font-semibold text-sm text-slate-300 hover:text-white transition-all"
+                    style={{
+                      background: 'rgba(15,23,42,0.6)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(34,211,238,0.35)';
+                      e.currentTarget.style.background = 'rgba(8,47,73,0.55)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                      e.currentTarget.style.background = 'rgba(15,23,42,0.6)';
+                    }}
+                    title="Amigos"
+                    aria-label="Abrir lista de amigos"
+                  >
+                    <Users className="w-4 h-4 text-cyan-400" />
+                    <span className="hidden sm:inline">Amigos</span>
+                    {friendsCount !== null && friendsCount > 0 && (
+                      <span
+                        className="ml-0.5 min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black flex items-center justify-center tabular-nums"
+                        style={{
+                          background: 'rgba(34,211,238,0.15)',
+                          color: '#22d3ee',
+                          border: '1px solid rgba(34,211,238,0.30)',
+                        }}
+                      >
+                        {friendsCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
