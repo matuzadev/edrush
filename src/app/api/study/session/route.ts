@@ -18,14 +18,23 @@ export async function POST(req: NextRequest) {
 
   const userId = (session.user as any).id as string;
 
-  let body: { questionsAnswered: number; correctAnswers: number; concursoSlug?: string; subject?: string };
+  let body: {
+    questionsAnswered: number;
+    correctAnswers: number;
+    concursoSlug?: string;
+    subject?: string;
+    // Marca o capítulo como completado em user_chapter_progress quando accuracy ≥ 80%.
+    // Permite o "modo revisão" (todas as questões liberadas após terminar o capítulo).
+    disciplina?: string; // ex.: 'lingua-portuguesa'
+    chapter?: string;    // título do capítulo, ex.: 'Ortografia e Acentuação'
+  };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Body inválido' }, { status: 400 });
   }
 
-  const { questionsAnswered, correctAnswers, concursoSlug, subject } = body;
+  const { questionsAnswered, correctAnswers, concursoSlug, subject, disciplina, chapter } = body;
 
   if (
     typeof questionsAnswered !== 'number' ||
@@ -52,6 +61,96 @@ export async function POST(req: NextRequest) {
       subject: subject ?? null,
       criado_em: now.toISOString(),
     });
+
+    // Atualiza progresso do capítulo (e desbloqueia próximos quando completar ≥ 80%).
+    // Não bloqueia a resposta se algo falhar.
+    if (disciplina && chapter && questionsAnswered > 0) {
+      try {
+        const accuracy = (correctAnswers / questionsAnswered) * 100;
+        const completou = accuracy >= 80;
+
+        const ch = await db.query.chapters.findFirst({
+          where: and(eq(chapters.disciplina, disciplina), eq(chapters.titulo, chapter)),
+        });
+
+        if (ch) {
+          const existing = await db.query.user_chapter_progress.findFirst({
+            where: and(
+              eq(user_chapter_progress.user_id, userId),
+              eq(user_chapter_progress.chapter_id, ch.id),
+            ),
+          });
+
+          if (existing) {
+            await db.update(user_chapter_progress).set({
+              acertos_total: correctAnswers,
+              questoes_respondidas: questionsAnswered,
+              percentual_acerto: accuracy,
+              // só promove para completed; nunca desmarca um capítulo já completado
+              is_completed: existing.is_completed === 1 || completou ? 1 : 0,
+              completado_em: existing.completado_em ?? (completou ? now.toISOString() : null),
+              atualizado_em: now.toISOString(),
+            }).where(and(
+              eq(user_chapter_progress.user_id, userId),
+              eq(user_chapter_progress.chapter_id, ch.id),
+            ));
+          } else {
+            await db.insert(user_chapter_progress).values({
+              user_id: userId,
+              chapter_id: ch.id,
+              is_unlocked: 1,
+              is_completed: completou ? 1 : 0,
+              acertos_total: correctAnswers,
+              questoes_respondidas: questionsAnswered,
+              percentual_acerto: accuracy,
+              tempo_estudo_ms: 0,
+              iniciado_em: now.toISOString(),
+              completado_em: completou ? now.toISOString() : null,
+              criado_em: now.toISOString(),
+              atualizado_em: now.toISOString(),
+            });
+          }
+
+          // Quando completa, desbloqueia os próximos capítulos definidos em chapter_unlocks.
+          if (completou) {
+            const unlocks = await db.select().from(chapter_unlocks)
+              .where(eq(chapter_unlocks.chapter_id_origem, ch.id));
+            for (const u of unlocks) {
+              const destProg = await db.query.user_chapter_progress.findFirst({
+                where: and(
+                  eq(user_chapter_progress.user_id, userId),
+                  eq(user_chapter_progress.chapter_id, u.chapter_id_destino),
+                ),
+              });
+              if (destProg) {
+                await db.update(user_chapter_progress).set({
+                  is_unlocked: 1,
+                  atualizado_em: now.toISOString(),
+                }).where(and(
+                  eq(user_chapter_progress.user_id, userId),
+                  eq(user_chapter_progress.chapter_id, u.chapter_id_destino),
+                ));
+              } else {
+                await db.insert(user_chapter_progress).values({
+                  user_id: userId,
+                  chapter_id: u.chapter_id_destino,
+                  is_unlocked: 1,
+                  is_completed: 0,
+                  acertos_total: 0,
+                  questoes_respondidas: 0,
+                  percentual_acerto: 0,
+                  tempo_estudo_ms: 0,
+                  criado_em: now.toISOString(),
+                  atualizado_em: now.toISOString(),
+                });
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao atualizar progresso de capítulo (sem bloquear):', err);
+      }
+    }
 
     let leveledUp = false;
     let newLevel = 1;
