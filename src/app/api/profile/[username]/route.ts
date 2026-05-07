@@ -62,17 +62,57 @@ export async function GET(
       .from(study_sessions)
       .where(sql`${study_sessions.user_id} = ${user.id} AND ${study_sessions.session_date} >= ${ninetyAgoStr}`);
 
-    const activityMap = new Map<string, number>();
+    const activityMap = new Map<string, { answered: number; correct: number }>();
     for (const s of sessions) {
-      activityMap.set(s.session_date, (activityMap.get(s.session_date) ?? 0) + s.questions_answered);
+      const ex = activityMap.get(s.session_date);
+      if (ex) {
+        ex.answered += s.questions_answered;
+        ex.correct  += s.correct_answers;
+      } else {
+        activityMap.set(s.session_date, { answered: s.questions_answered, correct: s.correct_answers });
+      }
     }
 
     const activityLog: { date: string; questionsAnswered: number }[] = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(); d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
-      activityLog.push({ date: dateStr, questionsAnswered: activityMap.get(dateStr) ?? 0 });
+      activityLog.push({ date: dateStr, questionsAnswered: activityMap.get(dateStr)?.answered ?? 0 });
     }
+
+    // Weekly progress (últimos 7 dias)
+    const weeklyProgress: { day: string; date: string; answered: number; correct: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const day = activityMap.get(dateStr);
+      weeklyProgress.push({
+        day: WEEKDAY_LABELS[d.getDay()],
+        date: dateStr,
+        answered: day?.answered ?? 0,
+        correct: day?.correct ?? 0,
+      });
+    }
+
+    // Top disciplinas (até 6) — fonte: user_responses
+    const byDisciplinaRaw = await db
+      .select({
+        disciplina: user_responses.disciplina,
+        answered:   sql<number>`COUNT(*)`,
+        correct:    sql<number>`SUM(${user_responses.acertou})`,
+      })
+      .from(user_responses)
+      .where(sql`${user_responses.user_id} = ${user.id} AND ${user_responses.disciplina} IS NOT NULL`)
+      .groupBy(user_responses.disciplina)
+      .orderBy(sql`COUNT(*) DESC`)
+      .limit(6);
+
+    const byDisciplina = byDisciplinaRaw.map(r => ({
+      disciplina: r.disciplina ?? 'Outros',
+      answered: Number(r.answered),
+      correct: Number(r.correct),
+      accuracy: Number(r.answered) > 0 ? Math.round((Number(r.correct) / Number(r.answered)) * 100) : 0,
+    }));
 
     const streak = computeStreak(sessions.map(s => s.session_date));
 
@@ -106,6 +146,8 @@ export async function GET(
       totalMedals: medals.length,
       achievements: medals,
       activityLog,
+      weeklyProgress,
+      byDisciplina,
     });
   } catch (error) {
     console.error('Erro ao buscar perfil público:', error);
