@@ -5,7 +5,7 @@ import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles } from 'l
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
 import { getAvatar } from '@/data/avatars';
-import { BRAZILIAN_STATES, getStateBySigla } from '@/data/brazilian-states';
+import { BRAZILIAN_STATES, getStateBySigla, DF_REGIOES_ADMINISTRATIVAS } from '@/data/brazilian-states';
 
 const BIO_MAX = 160;
 
@@ -75,6 +75,14 @@ export function EditProfileModal({
     if (!selectedUf) {
       setCidades([]);
       setCidadesError(null);
+      return;
+    }
+    // DF: o IBGE retorna só "Brasília", mas o usuário pensa em RAs (Planaltina,
+    // Sobradinho, Recanto das Emas, etc.) — usamos a lista oficial das 35 RAs.
+    if (selectedUf === 'DF') {
+      setCidades(DF_REGIOES_ADMINISTRATIVAS);
+      setCidadesError(null);
+      setIsLoadingCidades(false);
       return;
     }
     const cached = cityCache.get(selectedUf);
