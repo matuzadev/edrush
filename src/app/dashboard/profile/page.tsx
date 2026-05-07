@@ -523,8 +523,12 @@ export default function ProfilePage() {
               </div>
             </Link>
 
-            {/* ── Concurso em estudo (estilo Duolingo) ── */}
-            <ConcursoBadge slug={profile.concursoSlug} variant="card" />
+            {/* ── Concurso em estudo (linha discreta) ── */}
+            {profile.concursoSlug && (
+              <div className="px-1">
+                <ConcursoBadge slug={profile.concursoSlug} variant="inline" />
+              </div>
+            )}
 
             {/* ── Info pessoal ── */}
             <div className="grid grid-cols-3 gap-3">
