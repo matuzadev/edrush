@@ -4,6 +4,7 @@ import { useEffect, useState, use, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import subjects from "@/data/subjects.json";
 import studyTips from "@/data/study-tips.json";
+import { LevelUpModal } from "@/components/LevelUpModal";
 
 const SLUG_MAP: Record<string, string> = {
   portugues: "lingua-portuguesa",
@@ -141,6 +142,11 @@ export default function ChapterPage({
   const [questionKey, setQuestionKey] = useState(0);
   const [showStudyPanel, setShowStudyPanel] = useState(false);
   const questionStartTime = useRef<number>(Date.now());
+  const [levelUpData, setLevelUpData] = useState<{
+    level: number;
+    levelInfo: { name: string; color: string; bg: string; border: string };
+    xpEarned: number;
+  } | null>(null);
 
   // Load metadata (no questions yet)
   useEffect(() => {
@@ -265,23 +271,36 @@ export default function ChapterPage({
     return () => window.removeEventListener("keydown", handler);
   }, [phase, selected, handleConfirm]);
 
-  const saveSession = useCallback((finalScore: number, total: number) => {
-    fetch("/api/study/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questionsAnswered: total, correctAnswers: finalScore, subject }),
-    }).catch(() => {});
+  const saveSession = useCallback(async (finalScore: number, total: number) => {
+    try {
+      const res = await fetch("/api/study/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionsAnswered: total, correctAnswers: finalScore, subject }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.leveledUp && data.levelInfo) {
+          setLevelUpData({
+            level: data.newLevel,
+            levelInfo: data.levelInfo,
+            xpEarned: data.xpEarned,
+          });
+          return; // Modal vai chamar setPhase("finished") via onClose
+        }
+      }
+    } catch {
+      // fire-and-forget se falhar
+    }
   }, [subject]);
 
   const handleNext = () => {
     if (lives <= 0 && !isCorrect) {
-      saveSession(score, current + 1);
-      setPhase("finished");
+      saveSession(score, current + 1).then(() => setPhase("finished"));
       return;
     }
     if (current + 1 >= questions.length) {
-      saveSession(score, questions.length);
-      setPhase("finished");
+      saveSession(score, questions.length).then(() => setPhase("finished"));
     } else {
       setCurrent(i => i + 1);
       setSelected("");
@@ -863,6 +882,18 @@ export default function ChapterPage({
             🔥 ×{combo}
           </span>
         </div>
+      )}
+
+      {levelUpData && (
+        <LevelUpModal
+          level={levelUpData.level}
+          levelInfo={levelUpData.levelInfo}
+          xpEarned={levelUpData.xpEarned}
+          onClose={() => {
+            setLevelUpData(null);
+            setPhase("finished");
+          }}
+        />
       )}
     </div>
   );
