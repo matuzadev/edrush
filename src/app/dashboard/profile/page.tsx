@@ -93,7 +93,7 @@ function formatDisciplina(raw: string): string {
 export default function ProfilePage() {
   const router = useRouter();
   const { user, signOut, isLoading: authLoading } = useAuth();
-  const { profile, isLoading: profileLoading, error, updateProfile } = usUserProfile();
+  const { profile, isLoading: profileLoading, error, updateProfile, fetchProfile } = usUserProfile();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddFriendsOpen, setIsAddFriendsOpen] = useState(false);
