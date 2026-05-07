@@ -76,10 +76,17 @@ export default function PersonalizedDashboardPage() {
 
   async function loadUserData() {
     try {
-      const [profileRes, statsRes] = await Promise.all([
+      const [profileRes, statsRes, completionRes] = await Promise.all([
         fetch('/api/user/profile'),
         fetch('/api/user/stats'),
+        fetch('/api/user/chapter-completion'),
       ]);
+
+      if (completionRes.ok) {
+        const cdata = await completionRes.json();
+        const list: { subject: string; chapterId: number }[] = cdata.completed ?? [];
+        setCompletedSet(new Set(list.map((c) => `${c.subject}:${c.chapterId}`)));
+      }
 
       let areas: string[] = [];
       if (profileRes.ok) {
