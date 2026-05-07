@@ -34,6 +34,7 @@ import {
   Crown,
   AlertCircle,
   Sparkles,
+  X,
 } from 'lucide-react';
 
 // Mapa de cores por tier — usando style inline para evitar problema de classes dinâmicas no Tailwind v4
@@ -1080,6 +1081,87 @@ export default function ProfilePage() {
         isOpen={isAddFriendsOpen}
         onClose={() => setIsAddFriendsOpen(false)}
       />
+
+      {/* Popup de Amigos (lista compacta) */}
+      {isFriendsPopupOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(8px)' }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Amigos"
+          onClick={(e) => { if (e.target === e.currentTarget) setIsFriendsPopupOpen(false); }}
+        >
+          <style>{`
+            @keyframes friendsPopupEnter {
+              from { opacity: 0; transform: scale(0.96) translateY(8px); }
+              to   { opacity: 1; transform: scale(1) translateY(0); }
+            }
+          `}</style>
+          <div
+            className="relative w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden rounded-2xl"
+            style={{
+              background: 'linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.88) 100%)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              boxShadow: '0 20px 60px -12px rgba(0,0,0,0.7)',
+              animation: 'friendsPopupEnter 0.2s ease-out',
+            }}
+          >
+            <div
+              className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+              style={{ background: 'linear-gradient(90deg, transparent, #22d3ee, #3b82f6, transparent)' }}
+            />
+
+            {/* Header */}
+            <div className="shrink-0 flex items-center gap-3 px-5 pt-5 pb-4 border-b border-white/8">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(34,211,238,0.20), rgba(59,130,246,0.10))',
+                  border: '1px solid rgba(34,211,238,0.30)',
+                }}
+              >
+                <Users size={16} className="text-cyan-300" strokeWidth={2.2} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-black text-white text-base leading-tight">Seus amigos</h3>
+                <p className="text-[11px] text-slate-500">
+                  {friendsCount === null ? '…' : `${friendsCount} ${friendsCount === 1 ? 'pessoa' : 'pessoas'}`}
+                </p>
+              </div>
+              <button
+                onClick={() => { setIsFriendsPopupOpen(false); setIsAddFriendsOpen(true); }}
+                className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition"
+                style={{
+                  background: 'linear-gradient(135deg, #22d3ee, #3b82f6)',
+                  color: '#020617',
+                }}
+                title="Adicionar amigo"
+              >
+                <span className="text-base leading-none font-black">+</span>
+                <span className="hidden sm:inline">Adicionar</span>
+              </button>
+              <button
+                onClick={() => setIsFriendsPopupOpen(false)}
+                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition"
+                aria-label="Fechar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Lista */}
+            <div className="overflow-y-auto px-4 py-4">
+              <FriendRequests
+                onViewProfile={(username) => {
+                  setIsFriendsPopupOpen(false);
+                  setViewingFriend(username);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <FriendProfileModal
         username={viewingFriend}
         onClose={() => setViewingFriend(null)}
