@@ -68,7 +68,7 @@ export async function GET() {
         FROM messages
         WHERE sender_id = ${friendId} AND receiver_id = ${userId} AND read = 0
       `);
-      const unreadCount = Number((unreadRaw.rows[0] as { n: number })?.n ?? 0);
+      const unreadCount = Number((unreadRaw.rows[0] as unknown as { n: number })?.n ?? 0);
       totalUnread += unreadCount;
 
       const u = userMap.get(friendId);
