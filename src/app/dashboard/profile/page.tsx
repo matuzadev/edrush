@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usUserProfile } from '@/hooks/useProfile';
 import { AvatarSelector } from '@/components/AvatarSelector';
 import { AvatarBorder } from '@/components/AvatarBorder';
-import { BordersGallery } from '@/components/BordersGallery';
 import { AddFriendsModal } from '@/components/AddFriendsModal';
 import { EditProfileModal } from '@/components/EditProfileModal';
 import { FriendRequests } from '@/components/FriendRequests';
