@@ -753,8 +753,11 @@ export default function SelectConcursoPage() {
     [concursos]
   );
 
+  // "Todos os Concursos" inclui os destaques também — o usuário pediu para
+  // que concursos em destaque apareçam também na lista completa abaixo, não
+  // apenas na seção "Em Destaque". A duplicação visual é intencional.
   const nonFeatured = useMemo(
-    () => concursos.filter((c) => !c.destaque),
+    () => concursos,
     [concursos]
   );
 
