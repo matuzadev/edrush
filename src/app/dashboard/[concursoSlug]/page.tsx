@@ -391,7 +391,12 @@ export default function PersonalizedDashboardPage() {
                 <div className="absolute top-0 bottom-0 w-1.5 bg-slate-800 -z-0" />
 
                 {activeSubjectData.chapters.map((chapter: any, index: number) => {
-                  const isLocked = index > 0;
+                  // Duolingo-style: capítulo desbloqueia se for o primeiro OU se
+                  // o anterior já foi completado (≥80% em ≥1 sessão).
+                  const prev = index > 0 ? activeSubjectData.chapters[index - 1] : null;
+                  const isCompleted = completedSet.has(`${activeSubject}:${chapter.id}`);
+                  const prevCompleted = prev ? completedSet.has(`${activeSubject}:${prev.id}`) : true;
+                  const isLocked = index > 0 && !prevCompleted;
 
                   return (
                     <div key={chapter.id} className="relative z-10 flex flex-col items-center group">
@@ -402,12 +407,17 @@ export default function PersonalizedDashboardPage() {
                           ${
                             isLocked
                               ? 'bg-slate-800 border-slate-900 cursor-not-allowed opacity-80'
-                              : 'bg-emerald-500 border-emerald-700 animate-pulse-ring'
+                              : isCompleted
+                                ? 'bg-cyan-500 border-cyan-700'
+                                : 'bg-emerald-500 border-emerald-700 animate-pulse-ring'
                           }
                         `}
+                        title={isCompleted ? 'Concluído — toque para revisar' : isLocked ? 'Bloqueado: complete o anterior' : 'Começar capítulo'}
                       >
                         {isLocked ? (
                           <Lock className="w-8 h-8 text-slate-500" />
+                        ) : isCompleted ? (
+                          <CheckCheck className="w-9 h-9 text-white" />
                         ) : (
                           <PlayCircle className="w-10 h-10 text-white fill-emerald-600/30" />
                         )}
