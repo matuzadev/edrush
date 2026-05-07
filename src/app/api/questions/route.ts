@@ -67,6 +67,12 @@ export async function GET(request: NextRequest) {
 
     // Modo revisão: se a (disciplina, capítulo) já está marcado como completo
     // para este usuário, libera todas as questões — inclusive já acertadas.
+    // Detecta de duas formas (qualquer uma libera): (1) user_chapter_progress
+    // com is_completed=1; (2) qualquer sessão em study_sessions com ≥80% para
+    // o par (subject, chapter_id) — passa a funcionar para TODAS as matérias
+    // sem precisar seedar a tabela chapters.
+    const subjectParam = searchParams.get('subject');
+    const chapterIdParam = searchParams.get('chapterId');
     let chapterCompleted = false;
     if (userId && disciplina && capitulo) {
       try {
@@ -79,7 +85,23 @@ export async function GET(request: NextRequest) {
           args: [disciplina, capitulo, userId],
         });
         chapterCompleted = completedRs.rows.length > 0;
-      } catch { /* sem registros / sem tabela ainda — segue normal */ }
+      } catch { /* segue normal */ }
+    }
+    if (!chapterCompleted && userId && subjectParam && chapterIdParam) {
+      try {
+        const chId = parseInt(chapterIdParam, 10);
+        if (Number.isFinite(chId)) {
+          const rs2 = await rawClient.execute({
+            sql: `SELECT 1 FROM study_sessions
+                  WHERE user_id = ? AND subject = ? AND chapter_id = ?
+                    AND questions_answered > 0
+                    AND (correct_answers * 100.0 / questions_answered) >= 80
+                  LIMIT 1`,
+            args: [userId, subjectParam, chId],
+          });
+          chapterCompleted = rs2.rows.length > 0;
+        }
+      } catch { /* segue normal */ }
     }
 
     // Anti-farm: exclui questões já acertadas por esse usuário (qualquer resposta sua com acertou=1).
