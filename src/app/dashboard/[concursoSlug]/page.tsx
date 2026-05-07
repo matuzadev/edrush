@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
-  Star,
+  Crown,
   RefreshCw,
   Lock,
   PlayCircle,
