@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BugReportButton } from "@/components/BugReportButton";
 import "./globals.css";
 
@@ -26,9 +27,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/imagens/favicon.png" />
       </head>
       <body className={`${inter.className} bg-[#020617] text-[#f8fafc] antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
         <BugReportButton />
       </body>
     </html>
