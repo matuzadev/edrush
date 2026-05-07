@@ -226,16 +226,33 @@ export async function initializeDatabase() {
       }
     }
 
-    // Adicionar colunas novas em users (xp, level, referral)
+    // Adicionar colunas novas em users (xp, level, referral, borda equipada)
     const newUsersColumns = [
       `ALTER TABLE users ADD COLUMN xp INTEGER DEFAULT 0`,
       `ALTER TABLE users ADD COLUMN level INTEGER DEFAULT 1`,
       `ALTER TABLE users ADD COLUMN referral_code TEXT`,
       `ALTER TABLE users ADD COLUMN referred_by_code TEXT`,
+      `ALTER TABLE users ADD COLUMN equipped_border TEXT DEFAULT 'recruta'`,
     ];
     for (const sql of newUsersColumns) {
       try { await client.execute(sql); } catch { /* já existe */ }
     }
+
+    // Tabela de bordas desbloqueadas
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_borders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          border_slug TEXT NOT NULL,
+          unlocked_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_borders_user ON user_borders(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_borders_slug ON user_borders(border_slug)`);
+      await client.execute(`CREATE UNIQUE INDEX IF NOT EXISTS idx_user_borders_pair ON user_borders(user_id, border_slug)`);
+    } catch { /* já existe */ }
 
     // Criar tabela de referrals
     try {
