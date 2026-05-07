@@ -288,6 +288,29 @@ export async function initializeDatabase() {
       }
     }
 
+    // Tabela de mensagens (chat entre amigos)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS messages (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          sender_id TEXT NOT NULL,
+          receiver_id TEXT NOT NULL,
+          type TEXT NOT NULL DEFAULT 'text',
+          content TEXT NOT NULL,
+          payload TEXT,
+          read INTEGER NOT NULL DEFAULT 0,
+          criado_em TEXT NOT NULL,
+          FOREIGN KEY (sender_id) REFERENCES users(id),
+          FOREIGN KEY (receiver_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_pair ON messages(sender_id, receiver_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_read ON messages(read)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_criado ON messages(criado_em)`);
+    } catch { /* já existe */ }
+
     // Tabela de preferências do usuário (settings)
     try {
       await client.execute(`
