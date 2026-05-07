@@ -140,10 +140,11 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       questions: transformedQuestions,
-      count: transformedQuestions.length 
+      count: transformedQuestions.length,
+      excludedAlreadyCorrect: excludedCount, // questões filtradas por anti-farm
     });
   } catch (error) {
     console.error('Erro ao buscar questões:', error);
