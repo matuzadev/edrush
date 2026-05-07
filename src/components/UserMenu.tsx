@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Settings, User, LogOut, ChevronDown } from 'lucide-react';
 import { AvatarSelector } from '@/components/AvatarSelector';
+import { getAvatar } from '@/data/avatars';
 import { usUserProfile } from '@/hooks/useProfile';
 
 interface UserMenuProps {
@@ -63,6 +64,7 @@ export function UserMenu({ onLogout }: UserMenuProps) {
   const badgeBg = LEVEL_BADGE_BG[level] ?? LEVEL_BADGE_BG[1];
   const displayName = profile.nome ?? profile.username ?? profile.email.split('@')[0] ?? 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
+  const avatarDef = getAvatar(profile.avatar_id ?? 1);
 
   return (
     <div ref={containerRef} className="relative">
@@ -77,7 +79,10 @@ export function UserMenu({ onLogout }: UserMenuProps) {
         {/* Avatar container */}
         <div
           className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white/10 transition"
-          style={{ boxShadow: open ? `0 0 0 2px ${glowColor}` : undefined }}
+          style={{
+            boxShadow: open ? `0 0 0 2px ${glowColor}, 0 0 10px ${avatarDef.colors.primary}44` : undefined,
+            background: `linear-gradient(135deg, ${avatarDef.colors.primary}22, ${avatarDef.colors.accent}11)`,
+          }}
         >
           {isLoading ? (
             <div className="w-full h-full bg-slate-700 animate-pulse" />
@@ -85,9 +90,10 @@ export function UserMenu({ onLogout }: UserMenuProps) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={profile.foto_url} alt={displayName} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-600 to-cyan-600">
-              <span className="text-sm font-black text-white">{initial}</span>
-            </div>
+            <div
+              className="w-full h-full flex items-center justify-center"
+              dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
+            />
           )}
         </div>
 
@@ -116,15 +122,19 @@ export function UserMenu({ onLogout }: UserMenuProps) {
             <div className="flex items-center gap-3">
               <div
                 className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 shrink-0"
-                style={{ boxShadow: `0 0 12px ${glowColor}` }}
+                style={{
+                  boxShadow: `0 0 12px ${glowColor}, 0 0 20px ${avatarDef.colors.primary}33`,
+                  background: `linear-gradient(135deg, ${avatarDef.colors.primary}22, ${avatarDef.colors.accent}11)`,
+                }}
               >
                 {profile.foto_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={profile.foto_url} alt={displayName} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-600 to-cyan-600">
-                    <span className="text-base font-black text-white">{initial}</span>
-                  </div>
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
+                  />
                 )}
               </div>
               <div className="min-w-0">
