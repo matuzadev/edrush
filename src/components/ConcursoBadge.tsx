@@ -86,6 +86,30 @@ export function ConcursoBadge({ slug, variant = 'card', className }: ConcursoBad
     );
   }
 
+  if (variant === 'inline') {
+    return (
+      <div
+        className={`inline-flex items-center gap-2 ${className ?? ''}`}
+        title={concurso.nomeCompleto}
+      >
+        <span
+          className="w-4 h-4 inline-block shrink-0 opacity-80"
+          dangerouslySetInnerHTML={{ __html: concurso.svg }}
+        />
+        <span className="text-[10px] uppercase tracking-widest font-bold text-slate-600">
+          Estudando
+        </span>
+        <span className="text-slate-700">·</span>
+        <span className="text-xs font-semibold text-slate-300 truncate">
+          {concurso.nome}
+          {concurso.area && (
+            <span className="text-slate-500 font-normal"> em {concurso.area}</span>
+          )}
+        </span>
+      </div>
+    );
+  }
+
   // variant === 'card' (default)
   return (
     <div
