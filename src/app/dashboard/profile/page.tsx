@@ -1063,55 +1063,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* ── Bordas Personalizadas ── */}
-            <div
-              className="relative overflow-hidden rounded-2xl"
-              style={{
-                background: 'linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.55))',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 12px 40px -16px rgba(0,0,0,0.6)',
-              }}
-            >
-              <div
-                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent, #fbbf24, #a855f7, #67e8f9, transparent)' }}
-              />
-              <div
-                className="absolute -top-20 -left-20 w-56 h-56 rounded-full blur-3xl pointer-events-none opacity-25"
-                style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)' }}
-              />
-              <div
-                className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full blur-3xl pointer-events-none opacity-20"
-                style={{ background: 'radial-gradient(circle, #fbbf24 0%, transparent 70%)' }}
-              />
-
-              <div className="relative p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(168,85,247,0.20), rgba(251,191,36,0.10))',
-                      border: '1px solid rgba(168,85,247,0.30)',
-                      boxShadow: '0 0 16px -2px rgba(168,85,247,0.30)',
-                    }}
-                  >
-                    <Sparkles size={18} className="text-violet-300" strokeWidth={2.2} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-black text-white text-base leading-tight">Bordas Personalizadas</h3>
-                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                      Conquiste bordas estudando — quem te ver no chat ou amigos verá sua escolha.
-                    </p>
-                  </div>
-                </div>
-
-                <BordersGallery
-                  avatarId={profile.avatar_id}
-                  onEquipped={() => fetchProfile()}
-                />
-              </div>
-            </div>
-
           </div>
         )}
       </main>
