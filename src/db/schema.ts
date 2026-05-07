@@ -57,6 +57,7 @@ export const users = sqliteTable(
     level: integer('level').default(1),
     referral_code: text('referral_code').unique(),
     referred_by_code: text('referred_by_code'),
+    equipped_border: text('equipped_border').default('recruta'), // slug da borda equipada
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
@@ -264,6 +265,22 @@ export const friendships = sqliteTable(
     index('idx_friendships_requester').on(table.requester_id),
     index('idx_friendships_receiver').on(table.receiver_id),
     index('idx_friendships_status').on(table.status),
+  ]
+);
+
+// Tabela de Bordas Desbloqueadas pelo Usuário (catálogo das bordas vive no client em data/borders.ts)
+export const user_borders = sqliteTable(
+  'user_borders',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    border_slug: text('border_slug').notNull(),
+    unlocked_at: text('unlocked_at').notNull(),
+  },
+  (table) => [
+    index('idx_user_borders_user').on(table.user_id),
+    index('idx_user_borders_slug').on(table.border_slug),
+    index('idx_user_borders_pair').on(table.user_id, table.border_slug),
   ]
 );
 
