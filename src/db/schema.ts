@@ -268,6 +268,25 @@ export const friendships = sqliteTable(
   ]
 );
 
+// Tabela de estado do Foco Sentinela (companheiro virtual do dashboard)
+export const user_sentinela = sqliteTable(
+  'user_sentinela',
+  {
+    user_id: text('user_id').primaryKey().references(() => users.id),
+    last_mood: text('last_mood').notNull().default('awake'),
+    last_message_id: text('last_message_id'),
+    last_seen_at: text('last_seen_at'),       // último mousemove/click no olho
+    last_visit_at: text('last_visit_at'),     // último GET /api/sentinela
+    total_interactions: integer('total_interactions').notNull().default(0),
+    muted: integer('muted').notNull().default(0),  // 0 = exibe balões; 1 = só o olho silencioso
+    hidden: integer('hidden').notNull().default(0), // 0 = visível; 1 = oculto
+    shown_messages: text('shown_messages').notNull().default('[]'), // JSON array de IDs
+    preferences: text('preferences').notNull().default('{}'),       // JSON livre
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  }
+);
+
 // Tabela de Bordas Desbloqueadas pelo Usuário (catálogo das bordas vive no client em data/borders.ts)
 export const user_borders = sqliteTable(
   'user_borders',
