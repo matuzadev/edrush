@@ -9,6 +9,7 @@ import { AvatarSelector } from '@/components/AvatarSelector';
 import { AddFriendsModal } from '@/components/AddFriendsModal';
 import { EditProfileModal } from '@/components/EditProfileModal';
 import { FriendRequests } from '@/components/FriendRequests';
+import { FriendProfileModal } from '@/components/FriendProfileModal';
 import { NotificationBell } from '@/components/NotificationBell';
 import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';

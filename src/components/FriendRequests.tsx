@@ -188,6 +188,7 @@ export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
               <UserCard
                 key={entry.friendshipId}
                 entry={entry}
+                clickable
                 actions={
                   <button
                     onClick={() => handleRemoveFriend(entry.friendshipId)}
