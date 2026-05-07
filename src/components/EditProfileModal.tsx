@@ -40,12 +40,21 @@ export function EditProfileModal({
 
   const selectedAvatar = getAvatar(formData.avatar);
   const bioLength = (formData.bio ?? '').length;
+  const usernameTrimmed = (formData.username ?? '').trim();
+  const usernameError =
+    usernameTrimmed.length > 0 && (usernameTrimmed.length < 2 || usernameTrimmed.length > 30)
+      ? 'O nome de usuário deve ter entre 2 e 30 caracteres'
+      : null;
 
   const handleSave = async () => {
+    if (usernameError) {
+      setActiveTab('identity');
+      return;
+    }
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 600));
     onSave({
-      username: formData.username,
+      username: usernameTrimmed,
       birthday: formData.birthday ?? '',
       location: formData.location ?? '',
       bio: formData.bio ?? '',
