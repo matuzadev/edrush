@@ -252,6 +252,8 @@ export async function GET() {
       activityLog,
       byDisciplina,
       weeklyProgress,
+      // Loadout — selos equipados pelo usuário (renderizados inline no header)
+      equippedBadges,
     });
   } catch (error) {
     console.error('Erro ao buscar stats:', error);
