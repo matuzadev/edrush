@@ -23,6 +23,7 @@ export interface StoreItemLite {
   rarity: string;
   category: string;
   metadata: unknown;
+  imageUrl?: string | null;
 }
 
 interface Props {
@@ -297,7 +298,28 @@ export function StoreItemPreview({ item, size = 96 }: Props) {
 
   let inner: React.ReactNode = null;
 
-  if (item.category === 'avatar_orgao') {
+  // Se um imageUrl externo for fornecido (ex.: arquivo em /public), ele tem prioridade
+  // sobre os SVGs inline gerados por categoria. Aceita paths absolutos (/foo.svg),
+  // URLs http(s) e data: URIs.
+  const hasExternalImage =
+    typeof item.imageUrl === 'string' &&
+    item.imageUrl.length > 0 &&
+    (item.imageUrl.startsWith('/') ||
+      item.imageUrl.startsWith('http') ||
+      item.imageUrl.startsWith('data:'));
+
+  if (hasExternalImage) {
+    inner = (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={item.imageUrl as string}
+        alt={item.name}
+        width={size}
+        height={size}
+        style={{ width: size, height: size, objectFit: 'contain', borderRadius: '50%' }}
+      />
+    );
+  } else if (item.category === 'avatar_orgao') {
     const avatarId = getAvatarId(item.metadata);
     if (avatarId !== null) {
       const def = getAvatar(avatarId);
