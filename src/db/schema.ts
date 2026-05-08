@@ -58,6 +58,10 @@ export const users = sqliteTable(
     referral_code: text('referral_code').unique(),
     referred_by_code: text('referred_by_code'),
     equipped_border: text('equipped_border').default('recruta'), // slug da borda equipada
+    // Economia de cristais + buffs
+    crystals: integer('crystals').notNull().default(0),
+    expBuffMultiplier: real('exp_buff_multiplier').notNull().default(1.0),
+    expBuffExpiresAt: text('exp_buff_expires_at'),
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
@@ -444,6 +448,78 @@ export const chapter_unlocks = sqliteTable(
     index('idx_unlocks_destino').on(table.chapter_id_destino),
     primaryKey({ columns: [table.chapter_id_origem, table.chapter_id_destino] }),
   ]
+);
+
+// Tabela de transações de cristais (auditoria)
+export const crystalTransactions = sqliteTable(
+  'crystal_transactions',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    amount: integer('amount').notNull(), // positivo = ganho, negativo = gasto
+    type: text('type').notNull(), // earn_question | earn_chapter | earn_streak | spend_store | admin_grant | refund | other
+    reason: text('reason').notNull(),
+    referenceId: text('reference_id'),
+    createdAt: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_crystal_tx_user').on(table.userId, table.createdAt),
+    index('idx_crystal_tx_type').on(table.type),
+  ]
+);
+
+// Catálogo de itens da loja
+export const storeItems = sqliteTable(
+  'store_items',
+  {
+    id: text('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+    category: text('category').notNull(), // avatar_orgao | avatar_vitoria | borda_perfil | mini_logo_badge | exp_buff | plataforma_trial
+    priceCrystals: integer('price_crystals').notNull(),
+    rarity: text('rarity').notNull(), // common | rare | epic | legendary | mythic
+    imageUrl: text('image_url'),
+    metadata: text('metadata'), // JSON
+    isActive: integer('is_active').notNull().default(1),
+    stock: integer('stock'), // null = ilimitado
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    index('idx_store_active').on(table.category, table.isActive),
+    index('idx_store_rarity').on(table.rarity),
+  ]
+);
+
+// Inventário do usuário
+export const userInventory = sqliteTable(
+  'user_inventory',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    storeItemId: text('store_item_id').notNull().references(() => storeItems.id),
+    acquiredAt: text('acquired_at').notNull(),
+    expiresAt: text('expires_at'),
+    isEquipped: integer('is_equipped').notNull().default(0),
+  },
+  (table) => [
+    index('idx_user_inv_user').on(table.userId),
+    index('idx_user_inv_item').on(table.storeItemId),
+    index('idx_user_inv_equipped').on(table.userId, table.isEquipped),
+  ]
+);
+
+// Loadout do perfil (vitrine)
+export const userProfileLoadout = sqliteTable(
+  'user_profile_loadout',
+  {
+    userId: text('user_id').primaryKey().references(() => users.id),
+    borderItemId: text('border_item_id'),
+    avatarItemId: text('avatar_item_id'),
+    equippedBadgeIds: text('equipped_badge_ids'), // JSON array max 3
+    updatedAt: text('updated_at').notNull(),
+  }
 );
 
 // Relações

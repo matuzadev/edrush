@@ -3,6 +3,8 @@ import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
 import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
 import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos';
+import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
+import crypto from 'crypto';
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
@@ -467,6 +469,98 @@ export async function initializeDatabase() {
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_unlocks_destino ON chapter_unlocks(chapter_id_destino)`);
     } catch { /* já existe */ }
 
+    // ── ECONOMIA DE CRISTAIS + LOJA ─────────────────────────────────────
+    // Colunas em users (idempotente)
+    const newUsersCrystalColumns = [
+      `ALTER TABLE users ADD COLUMN crystals INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE users ADD COLUMN exp_buff_multiplier REAL NOT NULL DEFAULT 1.0`,
+      `ALTER TABLE users ADD COLUMN exp_buff_expires_at TEXT`,
+    ];
+    for (const sql of newUsersCrystalColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
+    // Tabela de transações de cristais
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS crystal_transactions (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          amount INTEGER NOT NULL,
+          type TEXT NOT NULL,
+          reason TEXT NOT NULL,
+          reference_id TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_crystal_tx_user ON crystal_transactions(user_id, created_at DESC)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_crystal_tx_type ON crystal_transactions(type)`);
+    } catch { /* já existe */ }
+
+    // Tabela de itens da loja
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS store_items (
+          id TEXT PRIMARY KEY,
+          slug TEXT NOT NULL UNIQUE,
+          name TEXT NOT NULL,
+          description TEXT NOT NULL,
+          category TEXT NOT NULL,
+          price_crystals INTEGER NOT NULL,
+          rarity TEXT NOT NULL,
+          image_url TEXT,
+          metadata TEXT,
+          is_active INTEGER NOT NULL DEFAULT 1,
+          stock INTEGER,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_store_active ON store_items(category, is_active)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_store_rarity ON store_items(rarity)`);
+    } catch { /* já existe */ }
+
+    // Tabela de inventário
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_inventory (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          store_item_id TEXT NOT NULL,
+          acquired_at TEXT NOT NULL,
+          expires_at TEXT,
+          is_equipped INTEGER NOT NULL DEFAULT 0,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (store_item_id) REFERENCES store_items(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_inv_user ON user_inventory(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_inv_item ON user_inventory(store_item_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_inv_equipped ON user_inventory(user_id, is_equipped)`);
+    } catch { /* já existe */ }
+
+    // Tabela de loadout (vitrine)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_profile_loadout (
+          user_id TEXT PRIMARY KEY,
+          border_item_id TEXT,
+          avatar_item_id TEXT,
+          equipped_badge_ids TEXT,
+          updated_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+    } catch { /* já existe */ }
+
+    // Seed de itens da loja (idempotente: só insere se store_items vazio)
+    await seedStoreItems();
+
+    // Backfill de cristais (UMA VEZ): se nenhuma transação ainda foi registrada,
+    // dá 500 cristais a todos os usuários e logga transação admin_grant.
+    await backfillCrystals();
+
     // Adicionar colunas enriquecidas em concursos (idempotente)
     const newConcursosColumns = [
       `ALTER TABLE concursos ADD COLUMN cargo TEXT`,
@@ -582,8 +676,10 @@ async function seedQuestionsBank() {
         await client.execute({
           sql: `INSERT INTO questions
             (titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
-             resposta_correta, dificuldade, fonte, criado_em, atualizado_em)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             resposta_correta, dificuldade, fonte,
+             material_resumo, material_topicos, material_estrategia,
+             criado_em, atualizado_em)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
             q.titulo,
             q.disciplina,
@@ -596,6 +692,9 @@ async function seedQuestionsBank() {
             q.resposta_correta,
             q.dificuldade,
             q.fonte ?? null,
+            q.material_resumo ?? null,
+            q.material_topicos ? JSON.stringify(q.material_topicos) : null,
+            q.material_estrategia ?? null,
             now,
             now,
           ],
@@ -708,6 +807,76 @@ async function seedConcursosBank() {
   } catch (err) {
     console.error('⚠️  Falha ao popular banco de concursos (seed):', err);
     // Não relança: app deve subir mesmo se o seed falhar.
+  }
+}
+
+// Seed idempotente do catálogo de itens da loja.
+// Só insere se store_items estiver vazio. Para forçar re-seed: TRUNCATE store_items.
+async function seedStoreItems() {
+  try {
+    const countRs = await client.execute('SELECT COUNT(*) AS n FROM store_items');
+    const count = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
+    if (count > 0) return;
+
+    const now = new Date().toISOString();
+    for (const item of STORE_ITEMS_SEED) {
+      await client.execute({
+        sql: `INSERT INTO store_items
+          (id, slug, name, description, category, price_crystals, rarity, image_url, metadata, is_active, stock, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          crypto.randomUUID(),
+          item.slug,
+          item.name,
+          item.description,
+          item.category,
+          item.priceCrystals,
+          item.rarity,
+          item.imageUrl ?? null,
+          item.metadata ? JSON.stringify(item.metadata) : null,
+          item.isActive === false ? 0 : 1,
+          item.stock ?? null,
+          now,
+          now,
+        ],
+      });
+    }
+    console.log(`🛒 Seed loja: ${STORE_ITEMS_SEED.length} itens inseridos`);
+  } catch (err) {
+    console.error('⚠️  Falha ao popular store_items (seed):', err);
+  }
+}
+
+// Backfill de cristais — roda só uma vez (quando crystal_transactions está vazio).
+// Concede 500 cristais de boas-vindas a todos os usuários cadastrados.
+async function backfillCrystals() {
+  try {
+    const txCountRs = await client.execute('SELECT COUNT(*) AS n FROM crystal_transactions');
+    const txCount = Number((txCountRs.rows[0] as unknown as { n: number })?.n ?? 0);
+    if (txCount > 0) return;
+
+    const usersRs = await client.execute('SELECT id FROM users');
+    if (usersRs.rows.length === 0) return;
+
+    const now = new Date().toISOString();
+    for (const row of usersRs.rows) {
+      const userId = (row as unknown as { id: string }).id;
+      // Apenas concede para users com 0 cristais (defesa contra reset)
+      const updRs = await client.execute({
+        sql: 'UPDATE users SET crystals = crystals + 500 WHERE id = ? AND crystals = 0',
+        args: [userId],
+      });
+      if (updRs.rowsAffected === 1) {
+        await client.execute({
+          sql: `INSERT INTO crystal_transactions (id, user_id, amount, type, reason, reference_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          args: [crypto.randomUUID(), userId, 500, 'admin_grant', 'Bônus de boas-vindas', null, now],
+        });
+      }
+    }
+    console.log(`💎 Backfill cristais: ${usersRs.rows.length} usuários processados`);
+  } catch (err) {
+    console.error('⚠️  Falha no backfill de cristais:', err);
   }
 }
 

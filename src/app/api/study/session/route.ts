@@ -9,6 +9,21 @@ import {
 import { eq, and } from 'drizzle-orm';
 import { xpForSession, computeLevel } from '@/lib/levels';
 import { checkAndUnlockBorders } from '@/lib/borders';
+import { grantCrystals } from '@/lib/crystals';
+
+// Recompensa de cristais por sessão de estudo. A regra é simples e desacoplada
+// do sistema de XP para o jogador "sentir" os ganhos:
+//   - 2 cristais por questão correta (incentiva precisão)
+//   - +5 bônus se a sessão tiver ≥80% acerto (incentiva qualidade)
+//   - +1 bônus por questão correta a partir da 10ª (incentiva volume)
+function crystalsForSession(correct: number, total: number): number {
+  if (total <= 0 || correct <= 0) return 0;
+  const accuracy = correct / total;
+  let amount = correct * 2;
+  if (accuracy >= 0.8) amount += 5;
+  if (correct > 10) amount += correct - 10;
+  return amount;
+}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -48,7 +63,10 @@ export async function POST(req: NextRequest) {
 
   const now = new Date();
   const sessionDate = now.toISOString().split('T')[0];
-  const earned = xpForSession(correctAnswers, questionsAnswered);
+  const baseEarned = xpForSession(correctAnswers, questionsAnswered);
+  // O buff é resolvido depois (precisamos ler o usuário). Mantemos `earned`
+  // como o valor base aqui e re-calculamos antes do UPDATE.
+  let earned = baseEarned;
 
   try {
     // Insert session
@@ -114,6 +132,23 @@ export async function POST(req: NextRequest) {
 
           // Quando completa, desbloqueia os próximos capítulos definidos em chapter_unlocks.
           if (completou) {
+            // Recompensa adicional de 25 cristais por capítulo concluído pela primeira vez.
+            // Detectado pelo flip de existing.is_completed (0→1) ou por um insert com completou=1.
+            const wasFirstCompletion = !existing || existing.is_completed !== 1;
+            if (wasFirstCompletion) {
+              try {
+                await grantCrystals(
+                  userId,
+                  25,
+                  'earn_chapter',
+                  `Capítulo concluído: ${chapter}`,
+                  String(ch.id),
+                );
+              } catch (e) {
+                console.error('Falha ao premiar capítulo concluído:', e);
+              }
+            }
+
             const unlocks = await db.select().from(chapter_unlocks)
               .where(eq(chapter_unlocks.chapter_id_origem, ch.id));
             for (const u of unlocks) {
@@ -156,15 +191,25 @@ export async function POST(req: NextRequest) {
     let leveledUp = false;
     let newLevel = 1;
     let levelInfo: { name: string; color: string; bg: string; border: string } | null = null;
+    let buffApplied: { multiplier: number; expiresAt: string } | null = null;
 
     if (earned > 0) {
-      // Fetch current level and XP before update
+      // Fetch current level/XP + buff de EXP em uma só query
       const userRow = await db.query.users.findFirst({
         where: eq(users.id, userId),
-        columns: { xp: true, level: true },
+        columns: { xp: true, level: true, expBuffMultiplier: true, expBuffExpiresAt: true },
       });
       const currentXp = userRow?.xp ?? 0;
       const oldLevel = userRow?.level ?? 1;
+
+      // Aplica multiplicador de XP se buff ainda ativo
+      const buffExpires = userRow?.expBuffExpiresAt ?? null;
+      const buffMult = userRow?.expBuffMultiplier ?? 1;
+      if (buffExpires && new Date(buffExpires).getTime() > now.getTime() && buffMult > 1) {
+        earned = Math.round(baseEarned * buffMult);
+        buffApplied = { multiplier: buffMult, expiresAt: buffExpires };
+      }
+
       const newXp = currentXp + earned;
       const newLevelInfo = computeLevel(newXp);
       newLevel = newLevelInfo.level;
@@ -212,13 +257,36 @@ export async function POST(req: NextRequest) {
       console.error('Falha ao verificar bordas:', e);
     }
 
+    // Concede cristais pela sessão (não-crítico — falha não bloqueia).
+    let crystalsEarned = 0;
+    let crystalsBalance: number | null = null;
+    try {
+      crystalsEarned = crystalsForSession(correctAnswers, questionsAnswered);
+      if (crystalsEarned > 0) {
+        const result = await grantCrystals(
+          userId,
+          crystalsEarned,
+          'earn_question',
+          `Sessão de estudo · ${correctAnswers}/${questionsAnswered}`,
+          subject ?? null,
+        );
+        crystalsBalance = result.balance;
+      }
+    } catch (e) {
+      console.error('Falha ao conceder cristais (silenciado):', e);
+    }
+
     return NextResponse.json({
       ok: true,
       xpEarned: earned,
+      xpBase: baseEarned,
       newLevel,
       leveledUp,
       levelInfo,
       newBorders,
+      crystalsEarned,
+      crystalsBalance,
+      buffApplied,
     });
   } catch (error) {
     console.error('Erro ao salvar sessão de estudo:', error);

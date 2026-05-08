@@ -21,11 +21,17 @@ export type SeedQuestion = {
   dica?: string;
   dificuldade: SeedDifficulty;
   fonte?: string;
+  // Campos de material de estudos — usados principalmente no cap. 1 de cada disciplina
+  material_resumo?: string;      // 2-4 frases sobre o conceito testado
+  material_topicos?: string[];   // chips de tópicos (viram JSON no banco)
+  material_estrategia?: string;  // como atacar esse tipo de questão na prova
 };
 
 // Importa o banco do EsFCEx (Exército — Informática). Mantemos arquivos
 // separados para cada concurso para evitar inflar este arquivo.
 import { ESFCEX_CHAPTERS, ESFCEX_QUESTIONS } from './seed-questions-esfcex';
+// Direito Administrativo — banco completo PF (430 questões em 11 capítulos).
+import { PF_DIR_ADMIN_CHAPTERS, PF_DIR_ADMIN_QUESTIONS } from './seed-questions-pf-direito-admin';
 
 // ─── Capítulos seed: Português para Perito Criminal Federal ────────────────
 // Currículo alinhado ao edital típico de PF/Perito Criminal. Os títulos devem
@@ -45,6 +51,8 @@ export const SEED_CHAPTERS: { disciplina: string; numero: number; titulo: string
   { disciplina: 'lingua-portuguesa', numero: 12, titulo: 'Redação Oficial',                          descricao: 'Padrões da redação oficial conforme o Manual de Redação da Presidência da República.' },
   // ── EsFCEx — Exército (todos os capítulos do mapeamento concurso-areas) ──
   ...ESFCEX_CHAPTERS,
+  // ── PF — Direito Administrativo (11 capítulos) ──
+  ...PF_DIR_ADMIN_CHAPTERS,
 ];
 
 // ─── Banco de questões: Português — Ortografia e Acentuação ─────────────────
@@ -4101,4 +4109,6 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
   ...PT_CAP12,
   // ── EsFCEx — Exército Brasileiro (Informática) — 300+ questões ───────────
   ...ESFCEX_QUESTIONS,
+  // ── PF — Direito Administrativo (430 questões em 11 capítulos) ───────────
+  ...PF_DIR_ADMIN_QUESTIONS,
 ];
