@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usUserProfile } from '@/hooks/useProfile';
 import { AvatarSelector } from '@/components/AvatarSelector';
 import { AvatarBorder } from '@/components/AvatarBorder';
+import { StoreItemPreview } from '@/components/store/StoreItemPreview';
 import { ConcursoBadge } from '@/components/ConcursoBadge';
 import { AddFriendsModal } from '@/components/AddFriendsModal';
 import { EditProfileModal } from '@/components/EditProfileModal';
@@ -302,6 +303,15 @@ export default function ProfilePage() {
                         <Flame className="w-3.5 h-3.5" />
                         {profile.streak} dias
                       </span>
+                    )}
+                    {profile.equippedBadges && profile.equippedBadges.length > 0 && (
+                      <div className="flex items-center gap-1.5" title="Selos equipados">
+                        {profile.equippedBadges.map((badge) => (
+                          <div key={badge.id} title={badge.name}>
+                            <StoreItemPreview item={badge} size={28} />
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">/perfil/{displayName}</p>
