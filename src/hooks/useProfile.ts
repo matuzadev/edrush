@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import type { Medal } from '@/lib/levels';
+import type { StoreItemLite } from '@/components/store/StoreItemPreview';
 
 export type Achievement = Medal;
 
