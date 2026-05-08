@@ -142,6 +142,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 500,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="none" stroke="%23A9A9A9" stroke-width="6" rx="5"/></svg>',
     metadata: { color: 'gray' },
   },
   {
@@ -151,6 +152,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 500,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23E8E8E8;stop-opacity:1"/><stop offset="100%" style="stop-color:%23C0C0C0;stop-opacity:1"/></linearGradient></defs><rect x="10" y="10" width="80" height="80" fill="none" stroke="url(%23silverGrad)" stroke-width="6" rx="5"/></svg>',
     metadata: { color: 'silver' },
   },
   {
@@ -160,6 +162,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 500,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="bronzeGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23CD7F32;stop-opacity:1"/><stop offset="100%" style="stop-color:%238B4513;stop-opacity:1"/></linearGradient></defs><rect x="10" y="10" width="80" height="80" fill="none" stroke="url(%23bronzeGrad)" stroke-width="6" rx="5"/></svg>',
     metadata: { color: 'bronze' },
   },
   {
@@ -169,6 +172,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 1500,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="none" stroke="%231E90FF" stroke-width="6" rx="5"/><rect x="15" y="15" width="70" height="70" fill="none" stroke="%231E90FF" stroke-width="1" rx="3" opacity="0.5"/></svg>',
     metadata: { color: 'blue' },
   },
   {
@@ -178,6 +182,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 1500,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="none" stroke="%238B00FF" stroke-width="6" rx="5"/><rect x="15" y="15" width="70" height="70" fill="none" stroke="%23DDA0DD" stroke-width="1" rx="3" opacity="0.5"/></svg>',
     metadata: { color: 'violet' },
   },
   {
@@ -187,6 +192,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 5000,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="goldBorder"><stop offset="0%" style="stop-color:%23FFFF00;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></radialGradient></defs><rect x="10" y="10" width="80" height="80" fill="none" stroke="url(%23goldBorder)" stroke-width="8" rx="5"/><rect x="12" y="12" width="76" height="76" fill="none" stroke="%23FFD700" stroke-width="1" rx="4" opacity="0.3"/></svg>',
     metadata: { color: 'gold' },
   },
   {
@@ -196,6 +202,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 5000,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="rubyBorder"><stop offset="0%" style="stop-color:%23FF4444;stop-opacity:1"/><stop offset="100%" style="stop-color:%23CC0000;stop-opacity:1"/></radialGradient></defs><rect x="10" y="10" width="80" height="80" fill="none" stroke="url(%23rubyBorder)" stroke-width="8" rx="5"/><rect x="12" y="12" width="76" height="76" fill="none" stroke="%23FF1744" stroke-width="1" rx="4" opacity="0.3"/></svg>',
     metadata: { color: 'ruby' },
   },
   {
@@ -205,6 +212,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'borda_perfil',
     priceCrystals: 15000,
     rarity: 'legendary',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="celestial" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23FFBB33;stop-opacity:1"/><stop offset="50%" style="stop-color:%23FF44CC;stop-opacity:1"/><stop offset="100%" style="stop-color:%2300FFFF;stop-opacity:1"/></linearGradient></defs><rect x="10" y="10" width="80" height="80" fill="none" stroke="url(%23celestial)" stroke-width="10" rx="5"/><rect x="10" y="10" width="80" height="80" fill="none" stroke="url(%23celestial)" stroke-width="1" rx="5" opacity="0.4" stroke-dasharray="5,3"/></svg>',
     metadata: {
       animated: true,
       gradient: 'from-amber-300 via-fuchsia-400 to-cyan-300',
@@ -219,6 +227,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 2000,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%231E90FF"/><path d="M30 50 L45 65 L70 35" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     metadata: { kind: 'verified' },
   },
   {
@@ -228,6 +237,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 3500,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23228B22"/><path d="M35 55 L45 40 L55 40 L65 55 L55 55 L50 65 L45 55 Z" fill="%23FFD700"/><text x="50" y="75" text-anchor="middle" font-size="11" fill="%23FFD700" font-weight="bold">VET</text></svg>',
     metadata: { kind: 'veteran' },
   },
   {
@@ -237,6 +247,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 5000,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23FF6347"/><path d="M25 50 L35 35 L45 40 L50 25 L55 40 L65 35 L75 50 L70 60 L65 55 L50 70 L35 55 L30 60 Z" fill="%23FFD700"/><text x="50" y="80" text-anchor="middle" font-size="9" fill="%23fff" font-weight="bold">TOP</text></svg>',
     metadata: { kind: 'top-contributor' },
   },
   {
@@ -246,6 +257,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 7500,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23663399"/><path d="M40 35 L40 65 L60 50 Z" fill="%23FFD700"/><text x="50" y="80" text-anchor="middle" font-size="10" fill="%23FFD700" font-weight="bold">BETA</text></svg>',
     metadata: { kind: 'beta-tester' },
   },
   {
@@ -255,6 +267,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 10000,
     rarity: 'legendary',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="founderGrad"><stop offset="0%" style="stop-color:%23FFFF00;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23founderGrad)"/><circle cx="50" cy="50" r="35" fill="%23FF1493"/><path d="M50 30 L58 45 L75 45 L62 56 L70 70 L50 60 L30 70 L38 56 L25 45 L42 45 Z" fill="%23FFD700"/></svg>',
     metadata: { kind: 'founder' },
   },
 
@@ -266,6 +279,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'exp_buff',
     priceCrystals: 1500,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%2332CD32"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M35 60 L50 35 L65 60 Z" fill="%23FFD700"/><text x="50" y="75" text-anchor="middle" font-size="12" fill="%23fff" font-weight="bold">1.5x</text></svg>',
     metadata: { multiplier: 1.5, durationHours: 24 },
   },
   {
@@ -275,6 +289,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'exp_buff',
     priceCrystals: 3000,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%231E90FF"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M30 60 L50 30 L70 60 Z" fill="%23FFD700"/><path d="M30 70 L50 40 L70 70 Z" fill="%23FFD700" opacity="0.7"/><text x="50" y="85" text-anchor="middle" font-size="12" fill="%23fff" font-weight="bold">2x</text></svg>',
     metadata: { multiplier: 2.0, durationHours: 24 },
   },
   {
@@ -284,6 +299,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'exp_buff',
     priceCrystals: 8000,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="buffGrad"><stop offset="0%" style="stop-color:%23FF6347;stop-opacity:1"/><stop offset="100%" style="stop-color:%23DC143C;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23buffGrad)"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M25 65 L50 25 L75 65 Z" fill="%23FFD700"/><path d="M20 75 L50 35 L80 75 Z" fill="%23FFD700" opacity="0.6"/><text x="50" y="90" text-anchor="middle" font-size="11" fill="%23fff" font-weight="bold">2x 7d</text></svg>',
     metadata: { multiplier: 2.0, durationHours: 168 },
   },
 
@@ -295,6 +311,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'plataforma_trial',
     priceCrystals: 40000,
     rarity: 'mythic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="mythicGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23FF00FF;stop-opacity:1"/><stop offset="50%" style="stop-color:%2300FFFF;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23mythicGrad)"/><path d="M50 20 L60 40 L82 40 L65 55 L75 75 L50 60 L25 75 L35 55 L18 40 L40 40 Z" fill="white" stroke="%23FFD700" stroke-width="1"/><text x="50" y="85" text-anchor="middle" font-size="10" fill="white" font-weight="bold">30 DIAS</text></svg>',
     metadata: { days: 30 },
   },
 ];
