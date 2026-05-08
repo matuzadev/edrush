@@ -4,6 +4,7 @@ import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { chapter_unlocks } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { isAdminSession } from '@/lib/admin';
 
 /**
  * POST /api/admin/chapters/configure-unlocks
@@ -17,10 +18,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // TODO: Validar se é admin
-  // if (session.user.role !== 'admin') {
-  //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  // }
+  if (!isAdminSession(session)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await request.json();
   const { chapterId, unlocksChapterIds, percentualNecessario } = body;

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BugReport } from '@/lib/bug-report';
+import { maskEmail } from '@/lib/sanitize';
+import { rateLimit } from '@/lib/rate-limit';
 // import { saveBugReportToDatabase } from '@/lib/db-bug-reports';
 // import { sendBugReportEmail } from '@/lib/email-bug-report';
 
@@ -15,6 +17,9 @@ import { BugReport } from '@/lib/bug-report';
  * 4. Descomentar as linhas de salvamento no banco e envio de email abaixo
  */
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   try {
     const body: BugReport = await request.json();
 
@@ -54,14 +59,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ============ LOG ============
-    console.log('🐛 Bug Report Received:', {
+    // Validar formato base64 do screenshot — só PNG/JPEG/WebP.
+    if (body.screenshot && !/^data:image\/(png|jpeg|webp);base64,/.test(body.screenshot)) {
+      return NextResponse.json(
+        { error: 'Formato de screenshot inválido' },
+        { status: 400 }
+      );
+    }
+
+    // ============ LOG (PII mascarada) ============
+    console.log('Bug Report Received:', {
       id: body.id,
-      title: body.title,
       severity: body.severity,
       page: body.page,
-      email: body.email,
+      email: maskEmail(body.email),
       hasScreenshot: !!body.screenshot,
+      // Título e descrição NÃO são logados — podem conter PII (nome, dados de
+      // tela com e-mail, dados de outros usuários, etc).
     });
 
     // ============ SALVAMENTO NO BANCO (OPCIONAL) ============

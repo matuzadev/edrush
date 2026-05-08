@@ -439,6 +439,17 @@ export async function initializeDatabase() {
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_unlocked ON user_chapter_progress(is_unlocked)`);
     } catch { /* já existe */ }
 
+    // Criar tabela de eventos Stripe processados (idempotência de webhook)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS processed_stripe_events (
+          event_id TEXT PRIMARY KEY,
+          event_type TEXT NOT NULL,
+          processed_at TEXT NOT NULL
+        )
+      `);
+    } catch { /* já existe */ }
+
     // Criar tabela de Desbloqueios
     try {
       await client.execute(`
