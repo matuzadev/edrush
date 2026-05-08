@@ -45,6 +45,7 @@ export interface UserProfile {
   totalMedals: number;
   achievements: Achievement[];
   activityLog: ActivityDay[];
+  equippedBadges?: StoreItemLite[];
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -75,6 +76,7 @@ const DEFAULT_PROFILE: UserProfile = {
   totalMedals: 21,
   achievements: [],
   activityLog: [],
+  equippedBadges: [],
 };
 
 export const usUserProfile = () => {
