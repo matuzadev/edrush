@@ -6,6 +6,25 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { DUMMY_BCRYPT_HASH, maskEmail } from '@/lib/sanitize';
+
+// Mensagem genérica para erros de autenticação. Não diferenciar
+// "usuário não existe" vs "senha incorreta" evita enumeração de e-mails.
+const AUTH_ERROR_GENERIC = 'E-mail ou senha inválidos';
+
+// Failsafe: detecta NEXTAUTH_SECRET ausente/placeholder. Em vez de travar o
+// build (que roda com NODE_ENV=production), trava apenas em RUNTIME — no
+// primeiro request de auth, via callback abaixo.
+function assertNextAuthSecretSafe(): void {
+  if (process.env.NODE_ENV !== 'production') return;
+  const s = process.env.NEXTAUTH_SECRET;
+  if (!s || s === 'gere-com-openssl-rand-base64-32' || s.length < 32) {
+    throw new Error(
+      'NEXTAUTH_SECRET ausente ou com valor placeholder. ' +
+        'Gere com: openssl rand -base64 32',
+    );
+  }
+}
 
 // Inicializar banco ao carregar (async, fire-and-forget na inicialização do módulo)
 initializeDatabase().catch(console.error);
@@ -23,25 +42,26 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Senha', type: 'password' },
       },
       async authorize(credentials) {
+        assertNextAuthSecretSafe();
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email e senha são obrigatórios');
+          throw new Error(AUTH_ERROR_GENERIC);
         }
+
+        const email = (credentials.email as string).toLowerCase().trim();
+        const password = credentials.password as string;
 
         const result = await db.query.users.findFirst({
-          where: eq(users.email, credentials.email as string),
+          where: eq(users.email, email),
         });
 
-        if (!result) {
-          throw new Error('Usuário não encontrado');
-        }
+        // Sempre roda bcrypt.compare — mesmo quando usuário não existe — contra
+        // um hash dummy. Isso elimina o oracle de tempo entre "não existe" e
+        // "senha errada", e a mensagem de erro é a mesma nos dois casos.
+        const hashToCheck = result?.senha_hash || DUMMY_BCRYPT_HASH;
+        const isPasswordValid = await bcrypt.compare(password, hashToCheck);
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          result.senha_hash || ''
-        );
-
-        if (!isPasswordValid) {
-          throw new Error('Senha incorreta');
+        if (!result || !isPasswordValid || !result.senha_hash) {
+          throw new Error(AUTH_ERROR_GENERIC);
         }
 
         return {
@@ -76,7 +96,8 @@ export const authOptions: NextAuthOptions = {
             });
           }
         } catch (error) {
-          console.error('Erro ao criar usuário Google:', error);
+          // Não logar `user`/`profile` — contém e-mail.
+          console.error('Erro ao criar usuário Google (email mascarado):', maskEmail(user.email), error);
           return false;
         }
       }
@@ -120,12 +141,34 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60,
+    // 14 dias é o sweet spot — JWT comprometido não fica 30d ativo, e o
+    // usuário não precisa logar toda semana. Considerar revogação stateful
+    // (tabela revoked_jwt) se precisar invalidar antes do TTL.
+    maxAge: 14 * 24 * 60 * 60,
+  },
+  cookies: {
+    // Cookies da sessão sempre Secure em prod. SameSite=lax mitiga CSRF
+    // (mantendo navegação cross-site para Stripe/Google).
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.session-token'
+        : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
   },
 };
 
+// Cost factor 12 — recomendação OWASP 2024+ contra GPUs modernas. Custa ~250ms
+// por hash em servidor médio (aceitável para login não-massivo).
+const BCRYPT_COST = 12;
+
 export async function hashPassword(password: string): Promise<string> {
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(BCRYPT_COST);
   return bcrypt.hash(password, salt);
 }
 

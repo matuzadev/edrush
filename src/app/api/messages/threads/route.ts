@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
-import { sql } from 'drizzle-orm';
+import { friendships, users, messages } from '@/db/schema';
+import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 // GET /api/messages/threads
 // Retorna lista de conversas: cada amigo aceito com {lastMessage, unreadCount}
@@ -14,26 +15,42 @@ export async function GET() {
   const userId = (session.user as { id: string }).id;
 
   try {
-    // 1) Lista amigos aceitos
-    const friendsRaw = await db.run(sql`
-      SELECT
-        CASE WHEN requester_id = ${userId} THEN receiver_id ELSE requester_id END AS friend_id
-      FROM friendships
-      WHERE status = 'accepted'
-        AND (requester_id = ${userId} OR receiver_id = ${userId})
-    `);
-    const friendIds = (friendsRaw.rows as unknown as { friend_id: string }[]).map(r => r.friend_id);
+    // 1) Lista amigos aceitos — Drizzle parametriza ${userId} via tagged template.
+    const friendRows = await db
+      .select({
+        requester_id: friendships.requester_id,
+        receiver_id: friendships.receiver_id,
+      })
+      .from(friendships)
+      .where(
+        and(
+          eq(friendships.status, 'accepted'),
+          or(eq(friendships.requester_id, userId), eq(friendships.receiver_id, userId)),
+        ),
+      );
+    const friendIds = friendRows.map((r) =>
+      r.requester_id === userId ? r.receiver_id : r.requester_id,
+    );
 
     if (friendIds.length === 0) {
       return NextResponse.json({ threads: [], totalUnread: 0 });
     }
 
-    // 2) Dados básicos de cada amigo
-    const usersRaw = await db.run(sql.raw(
-      `SELECT id, nome, username, avatar_id, xp, level FROM users WHERE id IN (${friendIds.map(id => `'${id.replace(/'/g, "''")}'`).join(', ')})`
-    ));
+    // 2) Dados básicos de cada amigo — inArray (parametrizado).
+    const friendUsers = await db
+      .select({
+        id: users.id,
+        nome: users.nome,
+        username: users.username,
+        avatar_id: users.avatar_id,
+        xp: users.xp,
+        level: users.level,
+      })
+      .from(users)
+      .where(inArray(users.id, friendIds));
+
     const userMap = new Map<string, { id: string; nome: string | null; username: string | null; avatar_id: number; xp: number; level: number }>();
-    for (const row of usersRaw.rows as unknown as { id: string; nome: string | null; username: string | null; avatar_id: number | null; xp: number | null; level: number | null }[]) {
+    for (const row of friendUsers) {
       userMap.set(row.id, {
         id: row.id,
         nome: row.nome,
@@ -59,25 +76,41 @@ export async function GET() {
     let totalUnread = 0;
 
     for (const friendId of friendIds) {
-      const lastMsgRaw = await db.run(sql`
-        SELECT id, sender_id, receiver_id, type, content, payload, read, criado_em
-        FROM messages
-        WHERE (sender_id = ${userId} AND receiver_id = ${friendId})
-           OR (sender_id = ${friendId} AND receiver_id = ${userId})
-        ORDER BY criado_em DESC
-        LIMIT 1
-      `);
-      const lastMsg = (lastMsgRaw.rows[0] ?? null) as unknown as null | {
-        id: number; sender_id: string; receiver_id: string; type: string;
-        content: string; payload: string | null; read: number; criado_em: string;
-      };
+      // Última mensagem entre os dois — Drizzle (parametrizado).
+      const lastMsgRows = await db
+        .select({
+          id: messages.id,
+          sender_id: messages.sender_id,
+          receiver_id: messages.receiver_id,
+          type: messages.type,
+          content: messages.content,
+          payload: messages.payload,
+          read: messages.read,
+          criado_em: messages.criado_em,
+        })
+        .from(messages)
+        .where(
+          or(
+            and(eq(messages.sender_id, userId), eq(messages.receiver_id, friendId)),
+            and(eq(messages.sender_id, friendId), eq(messages.receiver_id, userId)),
+          ),
+        )
+        .orderBy(desc(messages.criado_em))
+        .limit(1);
+      const lastMsg = lastMsgRows[0] ?? null;
 
-      const unreadRaw = await db.run(sql`
-        SELECT COUNT(*) AS n
-        FROM messages
-        WHERE sender_id = ${friendId} AND receiver_id = ${userId} AND read = 0
-      `);
-      const unreadCount = Number((unreadRaw.rows[0] as unknown as { n: number })?.n ?? 0);
+      // Count de não lidas (apenas as recebidas pelo usuário corrente).
+      const unreadRs = await db
+        .select({ n: sql<number>`COUNT(*)` })
+        .from(messages)
+        .where(
+          and(
+            eq(messages.sender_id, friendId),
+            eq(messages.receiver_id, userId),
+            eq(messages.read, 0),
+          ),
+        );
+      const unreadCount = Number(unreadRs[0]?.n ?? 0);
       totalUnread += unreadCount;
 
       const u = userMap.get(friendId);

@@ -4,6 +4,7 @@ import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { messages, friendships } from '@/db/schema';
 import { and, eq, or, sql, desc } from 'drizzle-orm';
+import { rateLimit } from '@/lib/rate-limit';
 
 // GET /api/messages?with={otherUserId}&limit=50
 // Retorna histórico de mensagens entre o usuário atual e o outro
@@ -67,6 +68,9 @@ export async function GET(req: NextRequest) {
 // POST /api/messages
 // Body: { receiverId, content, type?, payload? }
 export async function POST(req: NextRequest) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
+
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });

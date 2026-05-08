@@ -4,6 +4,7 @@ import { users } from '@/db/schema';
 import { eq, or } from 'drizzle-orm';
 import { hashPassword } from '@/auth';
 import { registerReferral } from '@/lib/referral';
+import { strictRateLimit } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
 initializeDatabase();
@@ -11,6 +12,9 @@ initializeDatabase();
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
 
 export async function POST(req: NextRequest) {
+  const limited = strictRateLimit(req);
+  if (limited) return limited;
+
   try {
     const { email, password, name, username, birthday, location, referralCode } = await req.json();
 
