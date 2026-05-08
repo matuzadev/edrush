@@ -68,7 +68,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 1500,
     rarity: 'rare',
-    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="exGrad" cx="50%" cy="30%"><stop offset="0%" style="stop-color:%23228B22;stop-opacity:1"/><stop offset="100%" style="stop-color:%231a5c1a;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23exGrad)"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M30 50 L50 35 L70 50 L65 65 L35 65 Z" fill="%23FFD700"/><text x="50" y="72" text-anchor="middle" font-size="11" fill="%23fff" font-weight="bold">EXÉRCITO</text></svg>',
+    imageUrl: '/Gemini_Generated_Image_sx6am1sx6am1sx6a.svg',
     metadata: { avatarId: 26 },
   },
   {
