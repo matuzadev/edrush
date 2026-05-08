@@ -38,6 +38,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 800,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23003366"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M35 45 Q50 35 65 45 Q60 55 50 60 Q40 55 35 45" fill="%23FFD700"/><circle cx="50" cy="50" r="12" fill="%23fff"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="%23FFD700" font-weight="bold">PF</text></svg>',
     metadata: { avatarId: 13 },
   },
   {
@@ -47,6 +48,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 900,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23DC143C"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><rect x="35" y="40" width="30" height="20" fill="%23FFD700" rx="3"/><text x="50" y="54" text-anchor="middle" font-size="12" fill="%23DC143C" font-weight="bold">PRF</text><text x="50" y="75" text-anchor="middle" font-size="9" fill="%23FFD700" font-weight="bold">ESTRADAS</text></svg>',
     metadata: { avatarId: 14 },
   },
   {
@@ -56,6 +58,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 1100,
     rarity: 'common',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23000066"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FF1744" stroke-width="2"/><path d="M35 40 L50 30 L65 40 L60 60 L40 60 Z" fill="%23FF1744"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="%23FF1744" font-weight="bold">PM</text></svg>',
     metadata: { avatarId: 16 },
   },
   {
@@ -65,7 +68,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 1500,
     rarity: 'rare',
-    // Avatar 26 = Forças Armadas (proxy mais próximo no catálogo).
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="exGrad" cx="50%" cy="30%"><stop offset="0%" style="stop-color:%23228B22;stop-opacity:1"/><stop offset="100%" style="stop-color:%231a5c1a;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23exGrad)"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M30 50 L50 35 L70 50 L65 65 L35 65 Z" fill="%23FFD700"/><text x="50" y="72" text-anchor="middle" font-size="11" fill="%23fff" font-weight="bold">EXÉRCITO</text></svg>',
     metadata: { avatarId: 26 },
   },
   {
@@ -75,7 +78,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 1800,
     rarity: 'rare',
-    // Sem avatar específico de Marinha em avatars.ts — fallback Escudo Federal (id 2).
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23001a4d"/><circle cx="50" cy="50" r="40" fill="none" stroke="%2300BFFF" stroke-width="2"/><path d="M30 50 Q50 35 70 50" fill="none" stroke="%2300BFFF" stroke-width="3"/><path d="M35 55 Q50 45 65 55" fill="none" stroke="%2300BFFF" stroke-width="2"/><path d="M40 60 Q50 55 60 60" fill="none" stroke="%2300BFFF" stroke-width="1.5"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="%2300BFFF" font-weight="bold">MARINHA</text></svg>',
     metadata: { avatarId: 2, kind: 'marinha' },
   },
   {
@@ -85,6 +88,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_orgao',
     priceCrystals: 2500,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23663300"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M45 35 L50 45 L55 35 Z" fill="%23FFD700"/><rect x="40" y="45" width="20" height="15" fill="%23FFD700"/><path d="M40 60 L50 70 L60 60 Z" fill="%23FFD700"/><text x="50" y="80" text-anchor="middle" font-size="9" fill="%23FFD700" font-weight="bold">MP</text></svg>',
     metadata: { avatarId: 21 },
   },
 
@@ -96,6 +100,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_vitoria',
     priceCrystals: 1500,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23FFA500"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M35 55 L40 40 L50 35 L60 40 L65 55 Z" fill="%23FFD700"/><rect x="45" y="55" width="10" height="15" fill="%23FFD700"/><ellipse cx="50" cy="70" rx="12" ry="4" fill="%23FF8C00"/><text x="50" y="80" text-anchor="middle" font-size="9" fill="%23fff" font-weight="bold">TROFÉU</text></svg>',
     metadata: { kind: 'trofeu' },
   },
   {
@@ -105,6 +110,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_vitoria',
     priceCrystals: 2200,
     rarity: 'rare',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23FF1493"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFD700" stroke-width="2"/><path d="M30 60 L35 45 L45 50 L50 40 L55 50 L65 45 L70 60 Z" fill="%23FFD700"/><rect x="30" y="60" width="40" height="8" fill="%23FFD700"/><circle cx="35" cy="48" r="3" fill="%23FF1493"/><circle cx="50" cy="40" r="3" fill="%23FF1493"/><circle cx="65" cy="48" r="3" fill="%23FF1493"/><text x="50" y="80" text-anchor="middle" font-size="9" fill="%23FFD700" font-weight="bold">COROA</text></svg>',
     metadata: { kind: 'coroa' },
   },
   {
@@ -114,6 +120,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_vitoria',
     priceCrystals: 3000,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="goldGrad"><stop offset="0%" style="stop-color:%23FFFF00;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23goldGrad)"/><circle cx="50" cy="50" r="35" fill="none" stroke="%23FF6347" stroke-width="3"/><circle cx="50" cy="50" r="25" fill="%23FFFF00"/><text x="50" y="58" text-anchor="middle" font-size="24" fill="%23FFD700" font-weight="bold">1º</text><line x1="50" y1="10" x2="50" y2="25" stroke="%23FFD700" stroke-width="2"/><text x="50" y="85" text-anchor="middle" font-size="9" fill="%23fff" font-weight="bold">OURO</text></svg>',
     metadata: { kind: 'medalha-ouro' },
   },
   {
@@ -123,6 +130,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'avatar_vitoria',
     priceCrystals: 4000,
     rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23228B22"/><circle cx="50" cy="50" r="40" fill="none" stroke="%2308860D" stroke-width="2"/><path d="M25 50 Q30 35 40 30 Q50 25 60 30 Q70 35 75 50" fill="none" stroke="%23FFD700" stroke-width="3" stroke-linecap="round"/><path d="M25 50 Q30 65 40 70 Q50 75 60 70 Q70 65 75 50" fill="none" stroke="%23FFD700" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="8" fill="%23FFD700"/><text x="50" y="80" text-anchor="middle" font-size="9" fill="%23FFD700" font-weight="bold">LOUROS</text></svg>',
     metadata: { kind: 'louros' },
   },
 
