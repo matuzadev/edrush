@@ -6,6 +6,65 @@ import { users, study_sessions, notifications, user_responses } from '@/db/schem
 import { eq, sql, and } from 'drizzle-orm';
 import { createNotification } from '@/lib/notifications';
 import { computeLevel, computeMedals, xpForSession } from '@/lib/levels';
+import { createClient } from '@libsql/client';
+
+const lsClient = createClient({
+  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+interface EquippedBadge {
+  id: string;
+  slug: string;
+  name: string;
+  rarity: string;
+  category: string;
+  metadata: unknown;
+  imageUrl: string | null;
+}
+
+// Selos atualmente equipados pelo usuário (ordem em equipped_badge_ids do loadout).
+async function fetchEquippedBadges(userId: string): Promise<EquippedBadge[]> {
+  const ldRs = await lsClient.execute({
+    sql: 'SELECT equipped_badge_ids FROM user_profile_loadout WHERE user_id = ?',
+    args: [userId],
+  });
+  if (ldRs.rows.length === 0) return [];
+  const raw = (ldRs.rows[0] as unknown as { equipped_badge_ids: string | null }).equipped_badge_ids;
+  if (!raw) return [];
+  let badgeIds: string[] = [];
+  try {
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) badgeIds = arr.filter((x): x is string => typeof x === 'string');
+  } catch { return []; }
+  if (badgeIds.length === 0) return [];
+
+  const placeholders = badgeIds.map(() => '?').join(',');
+  const now = new Date().toISOString();
+  const itemsRs = await lsClient.execute({
+    sql: `SELECT si.id, si.slug, si.name, si.rarity, si.category, si.metadata, si.image_url
+          FROM user_inventory ui
+          JOIN store_items si ON si.id = ui.store_item_id
+          WHERE ui.user_id = ?
+            AND ui.store_item_id IN (${placeholders})
+            AND (ui.expires_at IS NULL OR ui.expires_at > ?)`,
+    args: [userId, ...badgeIds, now],
+  });
+  const byId = new Map<string, EquippedBadge>();
+  for (const row of itemsRs.rows) {
+    const r = row as unknown as {
+      id: string; slug: string; name: string; rarity: string; category: string;
+      metadata: string | null; image_url: string | null;
+    };
+    let metadata: unknown = null;
+    if (r.metadata) { try { metadata = JSON.parse(r.metadata); } catch { metadata = null; } }
+    byId.set(r.id, {
+      id: r.id, slug: r.slug, name: r.name, rarity: r.rarity, category: r.category,
+      metadata, imageUrl: r.image_url,
+    });
+  }
+  return badgeIds.map((id) => byId.get(id)).filter((b): b is EquippedBadge => !!b);
+}
 
 function computeStreak(sessionDates: string[]): number {
   if (sessionDates.length === 0) return 0;
@@ -128,6 +187,14 @@ export async function GET() {
       level: levelInfo.level,
     });
     const unlockedMedals = medals.filter(m => m.unlocked);
+
+    // Selos equipados (até 3) — para renderizar inline no header do perfil
+    let equippedBadges: EquippedBadge[] = [];
+    try {
+      equippedBadges = await fetchEquippedBadges(userId);
+    } catch (err) {
+      console.warn('Falha ao buscar selos equipados (silenciado):', err);
+    }
 
     // Notify newly unlocked medals
     const alreadyNotified = await db
