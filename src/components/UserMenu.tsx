@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Settings, User, LogOut, ChevronDown, RefreshCw, Loader2 } from 'lucide-react';
+import { Settings, User, LogOut, ChevronDown, RefreshCw, Loader2, ShoppingBag, Package } from 'lucide-react';
 import { AvatarSelector } from '@/components/AvatarSelector';
 import { getAvatar } from '@/data/avatars';
 import { usUserProfile } from '@/hooks/useProfile';
@@ -208,6 +208,24 @@ export function UserMenu({ onLogout }: UserMenuProps) {
             >
               <User className="w-4 h-4 text-emerald-400" />
               Perfil
+            </Link>
+            <Link
+              href="/dashboard/loja"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition"
+              role="menuitem"
+            >
+              <ShoppingBag className="w-4 h-4 text-fuchsia-400" />
+              Loja de Cristais
+            </Link>
+            <Link
+              href="/dashboard/inventario"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition"
+              role="menuitem"
+            >
+              <Package className="w-4 h-4 text-cyan-400" />
+              Inventário
             </Link>
             <Link
               href="/dashboard/settings"

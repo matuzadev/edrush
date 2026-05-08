@@ -2,6 +2,135 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users, study_sessions, user_responses } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
+import { createClient } from '@libsql/client';
+
+// Cliente libsql direto para queries de loadout/inventory (não temos
+// query builder Drizzle gerado para essas tabelas em cada select).
+const lsClient = createClient({
+  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+interface ItemRef {
+  id: string;
+  slug: string;
+  name: string;
+  rarity: string;
+  category: string;
+  metadata: unknown;
+}
+
+interface InventoryRow {
+  id: string;
+  slug: string;
+  name: string;
+  rarity: string;
+  category: string;
+  metadata: string | null;
+  expires_at: string | null;
+}
+
+function parseMeta(raw: string | null): unknown {
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function rowToItemRef(r: { id: string; slug: string; name: string; rarity: string; category: string; metadata: string | null }): ItemRef {
+  return {
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    rarity: r.rarity,
+    category: r.category,
+    metadata: parseMeta(r.metadata),
+  };
+}
+
+async function fetchProfileShowcase(userId: string): Promise<{
+  loadout: { border: ItemRef | null; avatar: ItemRef | null; badges: ItemRef[] };
+  inventory: Array<{ category: string; items: ItemRef[] }>;
+  expBuff: { multiplier: number; expiresAt: string } | null;
+}> {
+  // Loadout (pode não existir)
+  const loadoutRs = await lsClient.execute({
+    sql: `SELECT border_item_id, avatar_item_id, equipped_badge_ids
+          FROM user_profile_loadout WHERE user_id = ?`,
+    args: [userId],
+  });
+
+  let borderId: string | null = null;
+  let avatarId: string | null = null;
+  let badgeIds: string[] = [];
+  if (loadoutRs.rows.length > 0) {
+    const r = loadoutRs.rows[0] as unknown as {
+      border_item_id: string | null;
+      avatar_item_id: string | null;
+      equipped_badge_ids: string | null;
+    };
+    borderId = r.border_item_id;
+    avatarId = r.avatar_item_id;
+    if (r.equipped_badge_ids) {
+      try {
+        const arr = JSON.parse(r.equipped_badge_ids);
+        if (Array.isArray(arr)) badgeIds = arr.filter((x): x is string => typeof x === 'string');
+      } catch { /* ignora */ }
+    }
+  }
+
+  // Inventário ativo (não-expirado)
+  const now = new Date().toISOString();
+  const invRs = await lsClient.execute({
+    sql: `SELECT si.id, si.slug, si.name, si.rarity, si.category, si.metadata, ui.expires_at
+          FROM user_inventory ui
+          JOIN store_items si ON si.id = ui.store_item_id
+          WHERE ui.user_id = ?
+            AND (ui.expires_at IS NULL OR ui.expires_at > ?)
+          ORDER BY si.category, si.rarity DESC`,
+    args: [userId, now],
+  });
+
+  const allItems: ItemRef[] = (invRs.rows as unknown as InventoryRow[]).map(rowToItemRef);
+  const itemsById = new Map(allItems.map((it) => [it.id, it]));
+
+  // Agrupa inventário por categoria (vitrine)
+  const grouped = new Map<string, ItemRef[]>();
+  for (const it of allItems) {
+    const arr = grouped.get(it.category) ?? [];
+    arr.push(it);
+    grouped.set(it.category, arr);
+  }
+  const inventory = [...grouped.entries()].map(([category, items]) => ({ category, items }));
+
+  // Resolve loadout para refs reais; se item não está mais no inventário, vira null
+  const border = borderId ? itemsById.get(borderId) ?? null : null;
+  const avatar = avatarId ? itemsById.get(avatarId) ?? null : null;
+  const badges = badgeIds.map((id) => itemsById.get(id)).filter((b): b is ItemRef => !!b);
+
+  // Buff de EXP (só retorna se ainda estiver ativo)
+  const buffRs = await lsClient.execute({
+    sql: 'SELECT exp_buff_multiplier, exp_buff_expires_at FROM users WHERE id = ?',
+    args: [userId],
+  });
+  let expBuff: { multiplier: number; expiresAt: string } | null = null;
+  if (buffRs.rows.length > 0) {
+    const b = buffRs.rows[0] as unknown as {
+      exp_buff_multiplier: number;
+      exp_buff_expires_at: string | null;
+    };
+    if (b.exp_buff_expires_at && new Date(b.exp_buff_expires_at).getTime() > Date.now()) {
+      expBuff = {
+        multiplier: Number(b.exp_buff_multiplier ?? 1),
+        expiresAt: b.exp_buff_expires_at,
+      };
+    }
+  }
+
+  return {
+    loadout: { border, avatar, badges },
+    inventory,
+    expBuff,
+  };
+}
 
 const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 import { computeLevel, computeMedals } from '@/lib/levels';
@@ -121,10 +250,29 @@ export async function GET(
 
     const medals = computeMedals({ totalAnswered, totalCorrect, totalSessions, streak, level: levelInfo.level });
 
+    const isCeo = user.email === 'matheus@gmail.com';
+
+    // Vitrine + loadout + buff (com fallback seguro caso falhe)
+    let showcase: {
+      loadout: { border: ItemRef | null; avatar: ItemRef | null; badges: ItemRef[] };
+      inventory: Array<{ category: string; items: ItemRef[] }>;
+      expBuff: { multiplier: number; expiresAt: string } | null;
+    } = {
+      loadout: { border: null, avatar: null, badges: [] },
+      inventory: [],
+      expBuff: null,
+    };
+    try {
+      showcase = await fetchProfileShowcase(user.id);
+    } catch (err) {
+      console.warn('Falha ao buscar vitrine do perfil (silenciado):', err);
+    }
+
     return NextResponse.json({
       username: user.username ?? user.nome ?? 'Concurseiro',
       nome: user.nome,
       avatar_id: user.avatar_id ?? 1,
+      isCeo,
       bio: user.bio ?? null,
       location: user.location ?? null,
       criado_em: user.criado_em,
@@ -150,6 +298,10 @@ export async function GET(
       activityLog,
       weeklyProgress,
       byDisciplina,
+      // Vitrine de itens da loja (compras)
+      loadout: showcase.loadout,
+      inventory: showcase.inventory,
+      expBuff: showcase.expBuff,
     });
   } catch (error) {
     console.error('Erro ao buscar perfil público:', error);

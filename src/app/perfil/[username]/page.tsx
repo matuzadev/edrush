@@ -3,11 +3,23 @@ import Link from 'next/link';
 import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';
 import { ConcursoBadge } from '@/components/ConcursoBadge';
+import { CeoBrasao } from '@/components/profile/CeoBrasao';
+import { ProfileShowcase } from '@/components/profile/ProfileShowcase';
+
+interface ItemRef {
+  id: string;
+  slug: string;
+  name: string;
+  rarity: string;
+  category: string;
+  metadata: unknown;
+}
 
 interface ProfileData {
   username: string;
   nome: string | null;
   avatar_id: number;
+  isCeo?: boolean;
   bio: string | null;
   location: string | null;
   criado_em: string;
@@ -30,6 +42,9 @@ interface ProfileData {
   achievements: Medal[];
   activityLog: { date: string; questionsAnswered: number }[];
   concursoSlug?: string | null;
+  loadout?: { border: ItemRef | null; avatar: ItemRef | null; badges: ItemRef[] };
+  inventory?: Array<{ category: string; items: ItemRef[] }>;
+  expBuff?: { multiplier: number; expiresAt: string } | null;
 }
 
 async function fetchProfile(username: string): Promise<ProfileData | null> {
@@ -110,7 +125,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             </div>
 
             {/* Name + username */}
-            <h1 className="text-2xl font-black text-white">{p.username}</h1>
+            <h1 className="text-2xl font-black text-white flex items-center gap-2 flex-wrap">
+              <span>{p.username}</span>
+              {p.isCeo && <CeoBrasao />}
+            </h1>
             {p.nome && p.nome !== p.username && <p className="text-slate-500 text-sm">{p.nome}</p>}
             {p.bio && <p className="text-slate-300 text-sm mt-2 leading-relaxed">{p.bio}</p>}
             {p.location && <p className="text-slate-500 text-xs mt-1.5">📍 {p.location}</p>}
@@ -138,6 +156,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {/* Concurso em estudo */}
         {p.concursoSlug && (
           <ConcursoBadge slug={p.concursoSlug} variant="card" />
+        )}
+
+        {/* Vitrine de itens (loadout + inventário comprado) */}
+        {(p.loadout || (p.inventory && p.inventory.length > 0) || p.expBuff) && (
+          <ProfileShowcase
+            loadout={p.loadout ?? { border: null, avatar: null, badges: [] }}
+            inventory={p.inventory ?? []}
+            expBuff={p.expBuff ?? null}
+          />
         )}
 
         {/* Stats */}

@@ -12,6 +12,8 @@ import {
   TrendingUp,
   Layers,
   CheckCheck,
+  BookOpen,
+  ChevronRight,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
@@ -41,6 +43,7 @@ export default function PersonalizedDashboardPage() {
 
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [activeSubject, setActiveSubject] = useState<string>('');
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [stats, setStats] = useState<ProgressStats>({
     totalAnswered: 0,
     totalCorrect: 0,
@@ -93,6 +96,7 @@ export default function PersonalizedDashboardPage() {
         if (areas.length > 0) setActiveSubject(areas[0]);
         else setActiveSubject(Object.keys(subjects)[0]);
       }
+      setProfileLoaded(true);
 
       if (statsRes.ok) {
         const data = await statsRes.json();
@@ -113,6 +117,7 @@ export default function PersonalizedDashboardPage() {
       setSelectedAreas(allSlugs);
       setActiveSubject(allSlugs[0]);
       setStats((prev) => ({ ...prev, loaded: true }));
+      setProfileLoaded(true);
     }
   }
 
@@ -132,9 +137,12 @@ export default function PersonalizedDashboardPage() {
     );
   }
 
-  // Determinar matérias a exibir: apenas as selecionadas no onboarding
-  const displaySubjects =
-    selectedAreas.length > 0
+  // Determinar matérias a exibir: apenas as selecionadas no onboarding.
+  // Enquanto o perfil não carrega, retorna [] para evitar flash de TODAS as
+  // matérias do subjects.json (Perito + ESFCEX + …) misturadas.
+  const displaySubjects = !profileLoaded
+    ? []
+    : selectedAreas.length > 0
       ? selectedAreas.filter((s) => (subjects as any)[s])
       : Object.keys(subjects);
 
@@ -248,8 +256,14 @@ export default function PersonalizedDashboardPage() {
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">{concursoDisplayName}</h1>
             <p className="text-slate-500 text-sm">
-              {displaySubjects.length} matéria{displaySubjects.length !== 1 ? 's' : ''} selecionada
-              {displaySubjects.length !== 1 ? 's' : ''}
+              {profileLoaded ? (
+                <>
+                  {displaySubjects.length} matéria{displaySubjects.length !== 1 ? 's' : ''} selecionada
+                  {displaySubjects.length !== 1 ? 's' : ''}
+                </>
+              ) : (
+                <span className="inline-block h-3 w-32 rounded bg-slate-800 animate-pulse" />
+              )}
             </p>
           </div>
         </div>
@@ -387,25 +401,143 @@ export default function PersonalizedDashboardPage() {
         </div>
 
         {/* Seletor de matérias */}
-        {displaySubjects.length > 0 && (
-          <>
-            <div className="flex gap-3 mb-10 overflow-x-auto pb-2 scrollbar-hide">
-              {displaySubjects.map((subjectSlug) => (
-                <button
-                  key={subjectSlug}
-                  onClick={() => setActiveSubject(subjectSlug)}
-                  className={`px-5 py-2 rounded-full font-semibold transition-all whitespace-nowrap text-sm ${
-                    activeSubject === subjectSlug
-                      ? 'bg-emerald-500 text-[#020617] shadow-[0_0_20px_rgba(16,185,129,0.3)]'
-                      : 'bg-slate-900 text-slate-400 border border-white/5 hover:border-emerald-500/50'
-                  }`}
+        {!profileLoaded ? (
+          <div className="mb-4">
+            <div className="flex items-baseline justify-between mb-4">
+              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                Suas Matérias
+              </h2>
+              <span className="inline-block h-2.5 w-16 rounded bg-slate-800 animate-pulse" />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-white/[0.05] bg-slate-900/40 px-3 py-3 animate-pulse"
+                  style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  {(subjects as any)[subjectSlug]?.title ?? subjectSlug}
-                </button>
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-6 shrink-0 rounded-full bg-slate-800" />
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <div className="h-2.5 w-4/5 rounded bg-slate-800" />
+                      <div className="h-2 w-1/2 rounded bg-slate-800/70" />
+                    </div>
+                  </div>
+                </div>
               ))}
+            </div>
+          </div>
+        ) : displaySubjects.length > 0 && (
+          <>
+            <div className="mb-4">
+              <div className="flex items-baseline justify-between mb-4">
+                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                  Suas Matérias
+                </h2>
+                <span className="text-[10px] tabular-nums text-slate-600 uppercase tracking-widest">
+                  {displaySubjects.length} no plano
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
+                {displaySubjects.map((subjectSlug) => {
+                  const subjectData = (subjects as any)[subjectSlug];
+                  const title = subjectData?.title ?? subjectSlug;
+                  const chapterCount = subjectData?.chapters?.length ?? 0;
+                  const isActive = activeSubject === subjectSlug;
+                  const completedChapters = subjectData?.chapters?.filter(
+                    (ch: { id: number }) => completedSet.has(`${subjectSlug}:${ch.id}`)
+                  ).length ?? 0;
+                  const progressPct = chapterCount > 0
+                    ? Math.round((completedChapters / chapterCount) * 100)
+                    : 0;
+
+                  return (
+                    <button
+                      key={subjectSlug}
+                      onClick={() => setActiveSubject(subjectSlug)}
+                      data-active={isActive}
+                      style={{
+                        ['--p' as string]: `${progressPct}%`,
+                        ['--deg' as string]: `${(progressPct / 100) * 360}deg`,
+                      }}
+                      className="
+                        group relative isolate overflow-hidden rounded-xl
+                        border border-white/[0.07] bg-slate-900/40 backdrop-blur-sm
+                        px-3 py-3 text-left
+                        transition-[transform,border-color,background-color,box-shadow] duration-300
+                        hover:-translate-y-0.5 hover:border-white/15 hover:bg-slate-900/70
+                        hover:shadow-[0_8px_30px_-12px_rgba(16,185,129,0.25)]
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]
+                        data-[active=true]:border-emerald-400/40
+                        data-[active=true]:bg-emerald-500/[0.08]
+                        data-[active=true]:shadow-[0_8px_32px_-8px_rgba(16,185,129,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]
+                        before:pointer-events-none before:absolute before:inset-0 before:-z-10
+                        before:bg-[radial-gradient(140%_90%_at_50%_-10%,rgba(16,185,129,0.20),transparent_60%)]
+                        before:opacity-0 before:transition-opacity before:duration-500
+                        hover:before:opacity-100 data-[active=true]:before:opacity-100
+                        after:pointer-events-none after:absolute after:inset-x-3 after:bottom-1.5 after:h-[2px] after:rounded-full
+                        after:bg-gradient-to-r after:from-emerald-400/80 after:via-emerald-400 after:to-cyan-300
+                        after:[width:calc(var(--p)-1.5rem)]
+                        after:shadow-[0_0_10px_rgba(16,185,129,0.6)]
+                        after:opacity-30 after:transition-[opacity,width] after:duration-700
+                        group-hover:after:opacity-70 data-[active=true]:after:opacity-100
+                      "
+                    >
+                      <div className="flex items-center gap-2.5">
+                        {/* Conic ring de progresso ao redor do dot */}
+                        <span
+                          aria-hidden
+                          className="
+                            relative grid place-items-center size-6 shrink-0 rounded-full
+                            bg-[conic-gradient(from_-90deg,theme(colors.emerald.400)_var(--deg),theme(colors.slate.700/0.5)_0)]
+                            transition-[transform] duration-500
+                            group-hover:rotate-[15deg] group-data-[active=true]:rotate-[15deg]
+                            after:absolute after:inset-[2px] after:rounded-full after:bg-slate-950
+                            group-data-[active=true]:after:bg-emerald-950
+                          "
+                        >
+                          <span className="
+                            relative z-10 size-1.5 rounded-full bg-slate-500
+                            transition-[background-color,box-shadow] duration-300
+                            group-data-[active=true]:bg-emerald-300
+                            group-data-[active=true]:shadow-[0_0_8px_rgba(110,231,183,0.9)]
+                          " />
+                        </span>
+
+                        <div className="flex-1 min-w-0">
+                          <span className="
+                            block truncate text-[13px] font-semibold tracking-tight
+                            text-slate-200 transition-colors
+                            group-hover:text-white
+                            group-data-[active=true]:text-emerald-100
+                          ">
+                            {title}
+                          </span>
+                          <span className="
+                            block text-[10px] font-medium tabular-nums text-slate-500
+                            transition-colors group-data-[active=true]:text-emerald-400/80
+                          ">
+                            {completedChapters}/{chapterCount} · {progressPct}%
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Trilha de capítulos */}
+            {activeSubjectData && (
+              <div className="mt-8 mb-4">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-1.5 h-5 rounded-full bg-emerald-500" />
+                  <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest">
+                    {activeSubjectData.title}
+                  </h2>
+                </div>
+              </div>
+            )}
             {activeSubjectData && (
               <div className="relative flex flex-col items-center gap-8">
                 <div className="absolute top-0 bottom-0 w-1.5 bg-slate-800 -z-0" />
@@ -419,7 +551,11 @@ export default function PersonalizedDashboardPage() {
                   const isLocked = index > 0 && !prevCompleted;
 
                   return (
-                    <div key={chapter.id} className="relative z-10 flex flex-col items-center group">
+                    <div
+                      key={chapter.id}
+                      className="relative z-10 flex flex-col items-center group"
+                      style={{ transform: `translateX(${index % 2 === 0 ? -40 : 40}px)` }}
+                    >
                       <Link
                         href={isLocked ? '#' : `/dashboard/chapter/${activeSubject}/${chapter.id}`}
                         className={`
@@ -449,11 +585,6 @@ export default function PersonalizedDashboardPage() {
                         </span>
                         <h3 className="text-white font-medium text-center">{chapter.title}</h3>
                       </div>
-
-                      <style jsx>{`
-                        div:nth-child(even) { transform: translateX(40px); }
-                        div:nth-child(odd) { transform: translateX(-40px); }
-                      `}</style>
                     </div>
                   );
                 })}
