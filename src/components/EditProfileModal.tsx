@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles } from 'lucide-react';
+import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
+import { SealsGallery } from './profile/SealsGallery';
 import { getAvatar } from '@/data/avatars';
 import { BRAZILIAN_STATES, getStateBySigla, DF_REGIOES_ADMINISTRATIVAS } from '@/data/brazilian-states';
 
@@ -32,6 +33,7 @@ interface EditProfileModalProps {
     avatar: number;
   }) => void;
   onBorderEquipped?: () => void;
+  onSealsEquipped?: () => void;
   initialData: {
     username: string;
     birthday?: string;
@@ -41,13 +43,14 @@ interface EditProfileModalProps {
   };
 }
 
-type ModalTab = 'identity' | 'avatar' | 'borders';
+type ModalTab = 'identity' | 'avatar' | 'borders' | 'seals';
 
 export function EditProfileModal({
   isOpen,
   onClose,
   onSave,
   onBorderEquipped,
+  onSealsEquipped,
   initialData,
 }: EditProfileModalProps) {
   const [formData, setFormData] = useState(initialData);
@@ -222,6 +225,7 @@ export function EditProfileModal({
             { key: 'identity', label: 'Identidade', icon: User },
             { key: 'avatar',   label: 'Avatar',     icon: Smile },
             { key: 'borders',  label: 'Bordas',     icon: Sparkles },
+            { key: 'seals',    label: 'Selos',      icon: Star },
           ] as const).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -424,6 +428,10 @@ export function EditProfileModal({
               </p>
               <BordersGallery avatarId={formData.avatar} onEquipped={onBorderEquipped} />
             </div>
+          )}
+
+          {activeTab === 'seals' && (
+            <SealsGallery onEquipped={onSealsEquipped} />
           )}
         </div>
 

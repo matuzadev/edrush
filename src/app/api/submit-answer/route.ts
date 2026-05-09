@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyToken } from '../question-token/route';
+import { verifyToken } from '@/lib/question-token';
 import { MOCK_QUESTIONS } from '@/lib/questions';
 
 export async function POST(req: Request) {
