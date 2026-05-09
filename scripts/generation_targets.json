@@ -1,0 +1,140 @@
+{
+  "_comentario": "Targets de geração - total ~12.000 questões. Edite à vontade. O script é incremental: re-rodar pula o que já foi gerado.",
+
+  "Direito Constitucional": {
+    "Princípios Fundamentais": 150,
+    "Direitos e Garantias Fundamentais": 250,
+    "Aplicabilidade das Normas Constitucionais": 100,
+    "Organização do Estado": 150,
+    "Poder Legislativo": 150,
+    "Poder Executivo": 100,
+    "Poder Judiciário": 150,
+    "Controle de Constitucionalidade": 150,
+    "Ordem Social": 100,
+    "Ordem Econômica e Financeira": 100,
+    "Tributação e Orçamento": 100,
+    "Defesa do Estado e Instituições": 100
+  },
+
+  "Direito Administrativo": {
+    "Princípios da Administração Pública": 150,
+    "Organização da Administração Pública": 100,
+    "Atos Administrativos": 200,
+    "Licitações e Contratos Administrativos": 200,
+    "Servidores Públicos (Lei 8.112)": 200,
+    "Poderes Administrativos": 100,
+    "Controle da Administração": 100,
+    "Responsabilidade Civil do Estado": 100,
+    "Bens Públicos": 80,
+    "Processo Administrativo": 80,
+    "Improbidade Administrativa (Lei 8.429)": 150
+  },
+
+  "Português": {
+    "Ortografia e Acentuação": 100,
+    "Morfologia: Classes de Palavras": 150,
+    "Sintaxe: Análise do Período": 200,
+    "Concordância Verbal e Nominal": 200,
+    "Regência Verbal e Nominal": 150,
+    "Crase": 100,
+    "Pontuação": 100,
+    "Compreensão e Interpretação de Textos": 250,
+    "Tipologia e Gêneros Textuais": 100,
+    "Semântica e Significação": 100,
+    "Coesão e Coerência": 150,
+    "Redação Oficial": 100
+  },
+
+  "Raciocínio Lógico": {
+    "Proposições e Conectivos Lógicos": 150,
+    "Tabelas-Verdade e Tautologias": 150,
+    "Equivalências e Implicações Lógicas": 150,
+    "Silogismos e Argumentos": 150,
+    "Lógica de Predicados": 100,
+    "Sequências e Padrões": 100,
+    "Conjuntos e Diagramas de Venn": 100,
+    "Probabilidade e Combinatória": 200
+  },
+
+  "Direito Penal": {
+    "Princípios e Aplicação da Lei Penal": 100,
+    "Teoria do Crime": 150,
+    "Tipicidade, Antijuridicidade, Culpabilidade": 150,
+    "Concurso de Pessoas e de Crimes": 100,
+    "Penas e Medidas de Segurança": 100,
+    "Crimes contra a Pessoa": 150,
+    "Crimes contra o Patrimônio": 150,
+    "Crimes contra a Administração Pública": 200,
+    "Lei de Improbidade Administrativa": 100,
+    "Crimes Hediondos e Lei Antidrogas": 100,
+    "Lei Maria da Penha e Estatuto do Idoso": 80,
+    "Crimes Cibernéticos e Lei Carolina Dieckmann": 80
+  },
+
+  "Informática Básica": {
+    "Hardware e Sistemas Operacionais": 100,
+    "Pacote Office (Word, Excel, PowerPoint)": 150,
+    "Sistemas Operacionais (Windows, Linux)": 100,
+    "Redes de Computadores": 150,
+    "Segurança da Informação": 200,
+    "Internet, Intranet e Navegação": 150,
+    "Computação em Nuvem": 80,
+    "Banco de Dados Básico": 80
+  },
+
+  "Matemática Financeira": {
+    "Juros Simples e Compostos": 150,
+    "Porcentagem, Aumentos e Descontos": 150,
+    "Sistemas de Amortização e Equivalência": 100,
+    "Fluxo de Caixa e Valor Presente": 80,
+    "Operações Financeiras": 80
+  },
+
+  "Direito Tributário": {
+    "Sistema Tributário Nacional": 100,
+    "Tributos: Espécies e Características": 150,
+    "Princípios Tributários": 100,
+    "Imunidades e Isenções": 80,
+    "Obrigação Tributária": 100,
+    "Crédito Tributário": 100,
+    "Administração Tributária": 80,
+    "Processo Tributário": 80
+  },
+
+  "Direito Previdenciário": {
+    "Seguridade Social: Princípios e Estrutura": 100,
+    "Regime Geral de Previdência Social (RGPS)": 150,
+    "Benefícios Previdenciários": 150,
+    "Custeio da Previdência": 80,
+    "Aposentadorias e Pensões": 100
+  },
+
+  "Atualidades e Conhecimentos Gerais": {
+    "Política Nacional Brasileira": 80,
+    "Política Internacional": 80,
+    "Economia Brasileira": 80,
+    "Meio Ambiente e Sustentabilidade": 70,
+    "Tecnologia e Inovação": 70,
+    "Direitos Humanos e Cidadania": 70
+  },
+
+  "Contabilidade Geral": {
+    "Princípios Contábeis": 80,
+    "Estrutura Conceitual e DRE": 100,
+    "Balanço Patrimonial": 100,
+    "Operações com Mercadorias": 80,
+    "Depreciação, Amortização e Exaustão": 80,
+    "Demonstração dos Fluxos de Caixa": 80
+  },
+
+  "Direito Civil": {
+    "Lei de Introdução às Normas (LINDB)": 80,
+    "Pessoas Naturais e Jurídicas": 100,
+    "Negócios Jurídicos": 100,
+    "Obrigações": 100,
+    "Contratos": 100,
+    "Responsabilidade Civil": 100,
+    "Direito de Família": 80,
+    "Direito das Sucessões": 80
+  }
+}
