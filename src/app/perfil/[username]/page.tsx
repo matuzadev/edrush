@@ -5,6 +5,15 @@ import type { Medal } from '@/lib/levels';
 import { ConcursoBadge } from '@/components/ConcursoBadge';
 import { CeoBrasao } from '@/components/profile/CeoBrasao';
 import { ProfileShowcase } from '@/components/profile/ProfileShowcase';
+import { StoreItemPreview } from '@/components/store/StoreItemPreview';
+
+const RARITY_GLOW: Record<string, string> = {
+  common:    'rgba(100,116,139,0.45)',
+  rare:      'rgba(59,130,246,0.55)',
+  epic:      'rgba(168,85,247,0.65)',
+  legendary: 'rgba(245,158,11,0.75)',
+  mythic:    'rgba(244,63,94,0.85)',
+};
 
 interface ItemRef {
   id: string;
@@ -127,6 +136,23 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             {/* Name + username */}
             <h1 className="text-2xl font-black text-white flex items-center gap-2 flex-wrap">
               <span>{p.username}</span>
+              {p.loadout?.badges && p.loadout.badges.length > 0 && (
+                <span className="inline-flex items-center gap-1 align-middle">
+                  {p.loadout.badges.slice(0, 3).map((b) => {
+                    const glow = RARITY_GLOW[b.rarity] ?? RARITY_GLOW.common;
+                    return (
+                      <span
+                        key={b.id}
+                        title={b.name}
+                        className="inline-flex items-center justify-center"
+                        style={{ width: 26, height: 26, filter: `drop-shadow(0 0 6px ${glow})` }}
+                      >
+                        <StoreItemPreview item={b} size={26} />
+                      </span>
+                    );
+                  })}
+                </span>
+              )}
               {p.isCeo && <CeoBrasao />}
             </h1>
             {p.nome && p.nome !== p.username && <p className="text-slate-500 text-sm">{p.nome}</p>}
