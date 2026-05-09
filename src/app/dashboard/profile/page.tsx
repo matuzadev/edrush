@@ -288,6 +288,15 @@ export default function ProfilePage() {
                 <div className="mb-5">
                   <div className="flex items-center gap-3 flex-wrap">
                     <h1 className="text-2xl font-black text-white">{displayName}</h1>
+                    {profile.equippedBadges && profile.equippedBadges.length > 0 && (
+                      <div className="flex items-center gap-1.5" title="Selos equipados">
+                        {profile.equippedBadges.map((badge) => (
+                          <div key={badge.id} title={badge.name}>
+                            <StoreItemPreview item={badge} size={28} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <span
                       className="px-2.5 py-0.5 rounded-full text-xs font-black border"
                       style={{
@@ -303,15 +312,6 @@ export default function ProfilePage() {
                         <Flame className="w-3.5 h-3.5" />
                         {profile.streak} dias
                       </span>
-                    )}
-                    {profile.equippedBadges && profile.equippedBadges.length > 0 && (
-                      <div className="flex items-center gap-1.5" title="Selos equipados">
-                        {profile.equippedBadges.map((badge) => (
-                          <div key={badge.id} title={badge.name}>
-                            <StoreItemPreview item={badge} size={28} />
-                          </div>
-                        ))}
-                      </div>
                     )}
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">/perfil/{displayName}</p>
