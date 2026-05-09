@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import type { Medal } from '@/lib/levels';
+import type { StoreItemLite } from '@/components/store/StoreItemPreview';
 
 export type Achievement = Medal;
 
@@ -44,6 +45,7 @@ export interface UserProfile {
   totalMedals: number;
   achievements: Achievement[];
   activityLog: ActivityDay[];
+  equippedBadges?: StoreItemLite[];
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -74,6 +76,7 @@ const DEFAULT_PROFILE: UserProfile = {
   totalMedals: 21,
   achievements: [],
   activityLog: [],
+  equippedBadges: [],
 };
 
 export const usUserProfile = () => {

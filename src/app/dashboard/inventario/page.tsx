@@ -20,6 +20,10 @@ import {
   Clock,
   ShoppingBag,
   Save,
+  Flame,
+  BookOpen,
+  ArrowDownRight,
+  ArrowUpRight,
 } from 'lucide-react';
 
 interface StoreItem {
@@ -65,6 +69,84 @@ const RARITY_TINT: Record<string, { color: string; bg: string; border: string }>
 // Slot equipável no loadout
 function isEquipableCategory(c: string): boolean {
   return c === 'borda_perfil' || c === 'avatar_orgao' || c === 'avatar_vitoria' || c === 'mini_logo_badge';
+}
+
+// ─── Visual de cada tipo de transação ────────────────────────────────
+type TxStyle = {
+  Icon: typeof Zap;
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+  accent: string;
+};
+
+const TX_STYLES: Record<string, TxStyle> = {
+  earn_question: {
+    Icon: BookOpen,
+    label: 'Questão',
+    color: '#34d399',
+    bg: 'rgba(16,185,129,0.14)',
+    border: 'rgba(16,185,129,0.40)',
+    accent: 'linear-gradient(180deg, #10b981, #047857)',
+  },
+  earn_chapter: {
+    Icon: Sparkles,
+    label: 'Capítulo',
+    color: '#22d3ee',
+    bg: 'rgba(6,182,212,0.14)',
+    border: 'rgba(6,182,212,0.40)',
+    accent: 'linear-gradient(180deg, #06b6d4, #0e7490)',
+  },
+  earn_streak: {
+    Icon: Flame,
+    label: 'Sequência',
+    color: '#fb923c',
+    bg: 'rgba(249,115,22,0.14)',
+    border: 'rgba(249,115,22,0.40)',
+    accent: 'linear-gradient(180deg, #f97316, #c2410c)',
+  },
+  spend_store: {
+    Icon: ShoppingBag,
+    label: 'Compra',
+    color: '#f0abfc',
+    bg: 'rgba(168,85,247,0.16)',
+    border: 'rgba(168,85,247,0.45)',
+    accent: 'linear-gradient(180deg, #a855f7, #6b21a8)',
+  },
+};
+
+const TX_FALLBACK: TxStyle = {
+  Icon: Gem,
+  label: 'Outra',
+  color: '#94a3b8',
+  bg: 'rgba(100,116,139,0.14)',
+  border: 'rgba(100,116,139,0.40)',
+  accent: 'linear-gradient(180deg, #64748b, #334155)',
+};
+
+function relativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 60_000) return 'agora';
+  const min = Math.floor(ms / 60_000);
+  if (min < 60) return `há ${min}min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `há ${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `há ${d}d`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `há ${mo}mês${mo > 1 ? 'es' : ''}`;
+  const y = Math.floor(mo / 12);
+  return `há ${y}a`;
+}
+
+function formatFullDate(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export default function InventarioPage() {
@@ -439,51 +521,187 @@ export default function InventarioPage() {
         )}
 
         {/* Histórico de transações */}
-        {transactions.length > 0 && (
-          <section
-            className="mt-6 relative overflow-hidden rounded-2xl p-5"
-            style={{
-              background: 'linear-gradient(135deg, rgba(15,23,42,0.85), rgba(15,23,42,0.40))',
-              border: '1px solid rgba(255,255,255,0.06)',
-            }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-fuchsia-500/10 flex items-center justify-center">
-                <Clock size={14} className="text-fuchsia-400" />
-              </div>
-              <h3 className="font-bold text-white text-sm">Últimas transações</h3>
-            </div>
-            <div className="space-y-2">
-              {transactions.map((tx) => {
-                const isPositive = tx.amount > 0;
-                return (
+        {transactions.length > 0 && (() => {
+          const totalIn = transactions
+            .filter((tx) => tx.amount > 0)
+            .reduce((sum, tx) => sum + tx.amount, 0);
+          const totalOut = transactions
+            .filter((tx) => tx.amount < 0)
+            .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+          return (
+            <section
+              className="mt-8 relative overflow-hidden rounded-3xl"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.55) 100%)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 12px 40px -12px rgba(168,85,247,0.18)',
+              }}
+            >
+              {/* Linha de gradiente no topo */}
+              <div
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent, #a855f7, #06b6d4, #10b981, transparent)',
+                }}
+              />
+
+              {/* Header */}
+              <div className="px-6 pt-5 pb-4 flex items-center justify-between gap-4 flex-wrap border-b border-white/5">
+                <div className="flex items-center gap-3">
                   <div
-                    key={tx.id}
-                    className="flex items-center justify-between py-2 px-3 rounded-xl"
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center"
                     style={{
-                      background: isPositive ? 'rgba(16,185,129,0.06)' : 'rgba(244,63,94,0.06)',
-                      border: '1px solid rgba(255,255,255,0.04)',
+                      background:
+                        'linear-gradient(135deg, rgba(168,85,247,0.25), rgba(59,130,246,0.10))',
+                      border: '1px solid rgba(168,85,247,0.35)',
+                      boxShadow: '0 0 14px rgba(168,85,247,0.20)',
                     }}
                   >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold text-slate-200 truncate">{tx.reason}</p>
-                      <p className="text-[10px] text-slate-500">
-                        {new Date(tx.createdAt).toLocaleString('pt-BR')}
-                      </p>
-                    </div>
-                    <span
-                      className="text-sm font-black tabular-nums shrink-0 flex items-center gap-1"
-                      style={{ color: isPositive ? '#34d399' : '#fb7185' }}
-                    >
-                      <Gem size={11} />
-                      {isPositive ? '+' : ''}{tx.amount.toLocaleString('pt-BR')}
+                    <Clock size={16} className="text-fuchsia-300" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-white text-base leading-none">
+                      Últimas transações
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Histórico de cristais ganhos e gastos
+                    </p>
+                  </div>
+                </div>
+
+                {/* Resumo entrada/saída */}
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{
+                      background: 'rgba(16,185,129,0.10)',
+                      border: '1px solid rgba(16,185,129,0.30)',
+                    }}
+                  >
+                    <ArrowUpRight size={12} className="text-emerald-400" />
+                    <span className="text-[11px] font-black tabular-nums text-emerald-300">
+                      +{totalIn.toLocaleString('pt-BR')}
                     </span>
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                  <div
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{
+                      background: 'rgba(244,63,94,0.08)',
+                      border: '1px solid rgba(244,63,94,0.25)',
+                    }}
+                  >
+                    <ArrowDownRight size={12} className="text-rose-400" />
+                    <span className="text-[11px] font-black tabular-nums text-rose-300">
+                      −{totalOut.toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lista */}
+              <div className="px-3 sm:px-4 py-3 space-y-1.5">
+                {transactions.map((tx) => {
+                  const isPositive = tx.amount > 0;
+                  const style = TX_STYLES[tx.type] ?? TX_FALLBACK;
+                  const Icon = style.Icon;
+                  return (
+                    <div
+                      key={tx.id}
+                      className="group relative flex items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 rounded-2xl transition-all hover:translate-x-0.5"
+                      style={{
+                        background: 'rgba(15,23,42,0.55)',
+                        border: '1px solid rgba(255,255,255,0.04)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(15,23,42,0.85)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = style.border;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(15,23,42,0.55)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.04)';
+                      }}
+                    >
+                      {/* Barra lateral de destaque por tipo */}
+                      <div
+                        className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r"
+                        style={{ background: style.accent }}
+                      />
+
+                      {/* Ícone com fundo colorido */}
+                      <div
+                        className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{
+                          background: style.bg,
+                          border: `1px solid ${style.border}`,
+                          boxShadow: `0 0 12px -4px ${style.color}80`,
+                        }}
+                      >
+                        <Icon size={16} style={{ color: style.color }} />
+                      </div>
+
+                      {/* Texto */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-bold text-slate-100 truncate">
+                            {tx.reason}
+                          </p>
+                          <span
+                            className="text-[9px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded shrink-0"
+                            style={{
+                              background: style.bg,
+                              color: style.color,
+                              border: `1px solid ${style.border}`,
+                            }}
+                          >
+                            {style.label}
+                          </span>
+                        </div>
+                        <p
+                          className="text-[10px] text-slate-500 mt-0.5"
+                          title={formatFullDate(tx.createdAt)}
+                        >
+                          {relativeTime(tx.createdAt)}
+                          <span className="text-slate-700 mx-1.5">·</span>
+                          <span className="text-slate-600">{formatFullDate(tx.createdAt)}</span>
+                        </p>
+                      </div>
+
+                      {/* Valor */}
+                      <div className="shrink-0 text-right">
+                        <span
+                          className="inline-flex items-center gap-1 text-base font-black tabular-nums leading-none"
+                          style={{ color: isPositive ? '#34d399' : '#fb7185' }}
+                        >
+                          {isPositive ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
+                          {isPositive ? '+' : '−'}
+                          {Math.abs(tx.amount).toLocaleString('pt-BR')}
+                        </span>
+                        <div className="flex items-center justify-end gap-0.5 mt-1">
+                          <Gem size={9} className="text-fuchsia-400/70" />
+                          <span className="text-[9px] uppercase tracking-widest font-bold text-slate-500">
+                            cristais
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-3 border-t border-white/5 flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-slate-600">
+                  {transactions.length} {transactions.length === 1 ? 'movimentação' : 'movimentações'}
+                </p>
+                <span className="text-[10px] text-slate-600 font-bold">
+                  Histórico recente
+                </span>
+              </div>
+            </section>
+          );
+        })()}
       </main>
     </div>
   );
