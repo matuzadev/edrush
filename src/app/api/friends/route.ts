@@ -3,12 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { friendships, users } from '@/db/schema';
-<<<<<<< HEAD
-import { and, eq, or } from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
-=======
 import { eq, inArray, or } from 'drizzle-orm';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -44,17 +39,6 @@ export async function GET() {
     r.requester_id === currentUserId ? r.receiver_id : r.requester_id
   ))];
 
-<<<<<<< HEAD
-  // Buscar dados dos outros usuários via SQL raw para compatibilidade com SQLite
-  const otherUsersRaw = await db.run(
-    sql.raw(
-      `SELECT id, nome, username, avatar_id FROM users WHERE id IN (${otherIds.map(id => `'${id}'`).join(', ')})`
-    )
-  );
-
-  const userMap = new Map<string, { id: string; nome: string | null; username: string | null; avatar_id: number | null }>();
-  for (const row of otherUsersRaw.rows as any[]) {
-=======
   // Buscar dados dos outros usuários via Drizzle inArray (parametrizado).
   const otherUsers = await db
     .select({
@@ -68,7 +52,6 @@ export async function GET() {
 
   const userMap = new Map<string, { id: string; nome: string | null; username: string | null; avatar_id: number | null }>();
   for (const row of otherUsers) {
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     userMap.set(row.id, {
       id: row.id,
       nome: row.nome,

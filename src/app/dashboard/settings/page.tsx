@@ -4,10 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-<<<<<<< HEAD
-import { NotificationBell } from '@/components/NotificationBell';
-import { Settings, Bell, Lock, Download, Trash2, LogOut, Save, Mail, User } from 'lucide-react';
-=======
 import { useTheme } from '@/contexts/ThemeContext';
 import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
@@ -30,7 +26,6 @@ import {
   Target,
   ChevronLeft,
 } from 'lucide-react';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 interface UserSettings {
   displayName: string;
@@ -247,32 +242,6 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Navbar */}
-<<<<<<< HEAD
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/dashboard" className="text-xl font-bold text-white hover:text-emerald-400 transition">
-                Foco Federal
-              </Link>
-              <div className="hidden md:flex items-center gap-6">
-                <Link href="/dashboard" className="text-slate-400 hover:text-white transition">Dashboard</Link>
-                <Link href="/dashboard/spreadsheet" className="text-slate-400 hover:text-white transition">Planilha</Link>
-                <Link href="/dashboard/analytics" className="text-slate-400 hover:text-white transition">Análises</Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <NotificationBell />
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Sair</span>
-              </button>
-            </div>
-          </div>
-=======
       <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-4 sm:px-6 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <Link href="/dashboard" className="text-slate-400 hover:text-white transition">
@@ -285,7 +254,6 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <NotificationBell />
           <UserMenu onLogout={handleLogout} />
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         </div>
       </nav>
 

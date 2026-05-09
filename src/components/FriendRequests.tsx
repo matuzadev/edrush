@@ -1,12 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-<<<<<<< HEAD
-import { UserCheck, UserX, Users, Loader } from 'lucide-react';
-=======
 import { UserCheck, UserX, Loader } from 'lucide-react';
 import { getAvatar } from '@/data/avatars';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 interface FriendEntry {
   friendshipId: number;
@@ -17,23 +13,11 @@ interface FriendEntry {
   since: string;
 }
 
-<<<<<<< HEAD
-function getAvatarLabel(avatarId: number): string {
-  const avatars: Record<number, string> = {
-    1: '🧑', 2: '👩', 3: '👨‍💼', 4: '👩‍🎓', 5: '🧒',
-    6: '👴', 7: '👩‍🏫', 8: '🦸', 9: '🧙', 10: '🥷',
-  };
-  return avatars[avatarId] ?? '🧑';
-}
-
-export function FriendRequests() {
-=======
 interface FriendRequestsProps {
   onViewProfile?: (username: string) => void;
 }
 
 export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const [friends, setFriends] = useState<FriendEntry[]>([]);
   const [pendingReceived, setPendingReceived] = useState<FriendEntry[]>([]);
   const [pendingSent, setPendingSent] = useState<FriendEntry[]>([]);
@@ -117,22 +101,6 @@ export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
     );
   }
 
-<<<<<<< HEAD
-  function UserCard({ entry, actions }: { entry: FriendEntry; actions?: React.ReactNode }) {
-    return (
-      <div className="flex items-center justify-between p-3 bg-slate-800/50 border border-white/5 rounded-lg">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-base">
-            {getAvatarLabel(entry.avatar_id)}
-          </div>
-          <div>
-            <p className="text-white font-medium text-sm">
-              {entry.username ?? entry.nome ?? 'Concurseiro'}
-            </p>
-          </div>
-        </div>
-        {actions}
-=======
   function UserCard({ entry, actions, clickable }: { entry: FriendEntry; actions?: React.ReactNode; clickable?: boolean }) {
     const avatar = getAvatar(entry.avatar_id);
     const displayName = entry.username ?? entry.nome ?? 'Concurseiro';
@@ -163,7 +131,6 @@ export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
           </div>
         </div>
         {actions && <div onClick={(e) => e.stopPropagation()}>{actions}</div>}
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       </div>
     );
   }
@@ -222,10 +189,7 @@ export function FriendRequests({ onViewProfile }: FriendRequestsProps = {}) {
               <UserCard
                 key={entry.friendshipId}
                 entry={entry}
-<<<<<<< HEAD
-=======
                 clickable
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
                 actions={
                   <button
                     onClick={() => handleRemoveFriend(entry.friendshipId)}

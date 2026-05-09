@@ -30,18 +30,6 @@ function SelectAreaContent() {
       return;
     }
     if (status === 'authenticated' && concursoId) {
-<<<<<<< HEAD
-      fetchAreas();
-    }
-  }, [status, concursoId, router]);
-
-  async function fetchAreas() {
-    try {
-      const res = await fetch(`/api/onboarding/areas?concursoId=${concursoId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setAreas(data.areas ?? []);
-=======
       fetchAreasAndSelection();
     }
   }, [status, concursoId, router]);
@@ -81,7 +69,6 @@ function SelectAreaContent() {
             setSelected(areasList.map((a) => a.slug));
           }
         }
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       }
     } catch {
       setError('Erro ao carregar matérias.');

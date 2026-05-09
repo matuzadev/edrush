@@ -1,12 +1,11 @@
 @import "tailwindcss";
+
 /* =========================================================
    THEME EXTENSIONS / BASE STYLES
    Keep @tailwind directives at the top-level so PostCSS +
    Tailwind can process them correctly in all environments.
 ========================================================= */
 
-<<<<<<< HEAD
-=======
 /* ── CSS Theme Variables ───────────────────────────────── */
 :root {
   --bg: #020617;
@@ -127,7 +126,6 @@ html.light {
   }
 }
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 @layer base {
   *,
   *::before,
@@ -141,13 +139,8 @@ html.light {
 
   body {
     min-height: 100vh;
-<<<<<<< HEAD
-    background-color: theme("colors.slate.900");
-    color: theme("colors.slate.50");
-=======
     background-color: var(--bg);
     color: var(--fg);
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     font-family: theme("fontFamily.sans");
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;

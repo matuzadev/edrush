@@ -23,14 +23,9 @@ function StudyPageContent() {
   const searchParams = useSearchParams();
   const { user, signOut, isLoading } = useAuth();
   const { profile, addCorrectAnswer, addIncorrectAnswer, completeChapter, saveStudySession } = usUserProfile();
-<<<<<<< HEAD
-  
-  // Pegar Matéria da URL (ex: ?subject=portugues)
-=======
 
   // Modo bloco rápido (vindo do BlockSetupModal): tem ?disciplina=... + ?quantidade=...
   // Modo legacy: tem só ?subject=... e usa localStorage
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const subject = searchParams.get('subject');
   const disciplina = searchParams.get('disciplina');
   const quantidade = searchParams.get('quantidade');
@@ -156,8 +151,6 @@ function StudyPageContent() {
       addIncorrectAnswer();
     }
 
-<<<<<<< HEAD
-=======
     // Persistir resposta individual no banco (fire-and-forget)
     const tempo_resposta_ms = Date.now() - questionStartRef.current;
     const currentQ = sessionQuestions[currentQuestionIndex];
@@ -176,17 +169,12 @@ function StudyPageContent() {
       }),
     }).catch(err => console.error('Falha ao salvar resposta:', err));
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     setTimeout(async () => {
       if (currentQuestionIndex < sessionQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
         completeChapter();
         setIsFinished(true);
-<<<<<<< HEAD
-        // Persistir sessão no banco — fire-and-forget (não bloquear UI)
-=======
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         await saveStudySession({
           questionsAnswered: sessionQuestions.length,
           correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,

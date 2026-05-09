@@ -53,8 +53,6 @@ export const users = sqliteTable(
     birthday: text('birthday'), // YYYY-MM-DD
     location: text('location'),
     avatar_id: integer('avatar_id').default(1),
-<<<<<<< HEAD
-=======
     xp: integer('xp').default(0),
     level: integer('level').default(1),
     referral_code: text('referral_code').unique(),
@@ -64,7 +62,6 @@ export const users = sqliteTable(
     crystals: integer('crystals').notNull().default(0),
     expBuffMultiplier: real('exp_buff_multiplier').notNull().default(1.0),
     expBuffExpiresAt: text('exp_buff_expires_at'),
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
@@ -106,8 +103,6 @@ export const concursos = sqliteTable(
     fonte_scrape: text('fonte_scrape'), // gov.br, PC, IADES, etc
     logo_url: text('logo_url'), // URL da logo do órgão (ex: /logos/orgaos/pf.png)
     slug: text('slug'), // slug para URL amigável
-<<<<<<< HEAD
-=======
     // Colunas enriquecidas (adicionadas via ALTER TABLE idempotente)
     cargo: text('cargo'), // cargo específico (ex.: "Perito Criminal Federal")
     area_especialidade: text('area_especialidade'), // área dentro do cargo (ex.: "Informática Forense")
@@ -117,7 +112,6 @@ export const concursos = sqliteTable(
     url_inscricao: text('url_inscricao'),
     requisitos: text('requisitos'), // JSON array de strings
     destaque: integer('destaque').default(0), // 1 = destacado na UI
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   },
   (table) => [
     index('idx_concursos_status').on(table.status),
@@ -184,15 +178,12 @@ export const questions = sqliteTable(
     fonte: text('fonte'), // CESPE, FCC, FGV, etc
     concurso_id: integer('concurso_id').references(() => concursos.id),
     ano: integer('ano'), // Ano da prova
-<<<<<<< HEAD
-=======
     // Material de estudos por questão
     material_resumo: text('material_resumo'), // 2-4 frases sobre o conceito testado
     material_topicos: text('material_topicos'), // JSON array de strings (chips)
     material_estrategia: text('material_estrategia'), // como atacar esse tipo de questão
     material_referencias: text('material_referencias'), // JSON array de {title, type, author}
     material_conteudo: text('material_conteudo'), // Markdown completo 200-500 palavras
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
     atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
   },
@@ -210,12 +201,6 @@ export const user_responses = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     user_id: text('user_id').notNull().references(() => users.id),
-<<<<<<< HEAD
-    question_id: integer('question_id').notNull().references(() => questions.id),
-    resposta_dada: text('resposta_dada').notNull(),
-    acertou: integer('acertou').notNull(), // 0 = errado, 1 = correto
-    tempo_resposta_ms: integer('tempo_resposta_ms'), // Em milissegundos
-=======
     question_id: integer('question_id').notNull(), // 0 quando externo (questão local/mock)
     external_id: text('external_id'), // id da questão quando vier de fonte externa (localStorage/mock)
     resposta_dada: text('resposta_dada').notNull(),
@@ -225,7 +210,6 @@ export const user_responses = sqliteTable(
     capitulo: text('capitulo'),
     subject: text('subject'), // slug da matéria (ex.: "portugues")
     origem: text('origem'), // 'study' | 'simulado'
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     respondida_em: text('respondida_em').default(new Date().toISOString()).notNull(),
   },
   (table) => [
@@ -247,20 +231,14 @@ export const study_sessions = sqliteTable(
     questions_answered: integer('questions_answered').notNull().default(0),
     correct_answers: integer('correct_answers').notNull().default(0),
     concurso_slug: text('concurso_slug'),
-<<<<<<< HEAD
-    subject: text('subject'), // matéria/disciplina da sessão
-=======
     subject: text('subject'), // matéria/disciplina da sessão (URL slug, ex.: "portugues")
     chapter_id: integer('chapter_id'), // id do capítulo em subjects.json (1, 2, 3...)
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     criado_em: text('criado_em').notNull(),
   },
   (table) => [
     index('idx_study_sessions_user_id').on(table.user_id),
     index('idx_study_sessions_date').on(table.session_date),
     index('idx_study_sessions_user_date').on(table.user_id, table.session_date),
-<<<<<<< HEAD
-=======
     index('idx_study_sessions_subject_chapter').on(table.subject, table.chapter_id),
   ]
 );
@@ -284,7 +262,6 @@ export const referrals = sqliteTable(
     index('idx_referrals_referred_id').on(table.referred_id),
     index('idx_referrals_code').on(table.referral_code),
     index('idx_referrals_status').on(table.status),
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   ]
 );
 
@@ -306,8 +283,6 @@ export const friendships = sqliteTable(
   ]
 );
 
-<<<<<<< HEAD
-=======
 // Tabela de Bordas Desbloqueadas pelo Usuário (catálogo das bordas vive no client em data/borders.ts)
 export const user_borders = sqliteTable(
   'user_borders',
@@ -392,7 +367,6 @@ export const simulado_attempts = sqliteTable(
   ]
 );
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 // Tabela de Notificações
 export const notifications = sqliteTable(
   'notifications',
@@ -413,8 +387,6 @@ export const notifications = sqliteTable(
   ]
 );
 
-<<<<<<< HEAD
-=======
 // Tabela de Capítulos/Blocos (módulos de estudo com 10+ questões por dificuldade)
 export const chapters = sqliteTable(
   'chapters',
@@ -550,7 +522,6 @@ export const userProfileLoadout = sqliteTable(
   }
 );
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 // Relações
 export const ufsRelations = relations(ufs, ({ many }) => ({
   cidades: many(cidades),
@@ -647,22 +618,17 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
   }),
 }));
 
-<<<<<<< HEAD
-=======
 export const referralsRelations = relations(referrals, ({ one }) => ({
   referrer: one(users, { fields: [referrals.referrer_id], references: [users.id] }),
   referred: one(users, { fields: [referrals.referred_id], references: [users.id] }),
 }));
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
     fields: [notifications.user_id],
     references: [users.id],
   }),
 }));
-<<<<<<< HEAD
-=======
 
 export const chaptersRelations = relations(chapters, ({ many }) => ({
   user_progress: many(user_chapter_progress),
@@ -693,4 +659,3 @@ export const chapter_unlocksRelations = relations(chapter_unlocks, ({ one }) => 
     relationName: 'unlocks_para',
   }),
 }));
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9

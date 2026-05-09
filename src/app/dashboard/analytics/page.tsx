@@ -4,12 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-<<<<<<< HEAD
-import { NotificationBell } from '@/components/NotificationBell';
-import { TrendingUp, Calendar, Award, Target, LogOut } from 'lucide-react';
-=======
 import { SubscriptionGuard } from '@/components/SubscriptionGuard';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 interface DisciplinaStats {
   disciplina: string;
@@ -202,18 +197,6 @@ function AnalyticsContent() {
                 </div>
               ))}
             </div>
-<<<<<<< HEAD
-            <div className="flex items-center gap-4">
-              <NotificationBell />
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Sair</span>
-              </button>
-            </div>
-=======
           </section>
         )}
 
@@ -288,7 +271,6 @@ function AnalyticsContent() {
             >
               Começar a estudar
             </Link>
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
           </div>
         )}
       </main>
