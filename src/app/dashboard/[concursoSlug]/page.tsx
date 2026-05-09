@@ -14,9 +14,11 @@ import {
   CheckCheck,
   BookOpen,
   ChevronRight,
+  Zap,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
+import { BlockSetupModal } from '@/components/study/BlockSetupModal';
 import subjects from '@/data/subjects.json';
 
 interface UserSession {
@@ -55,6 +57,8 @@ export default function PersonalizedDashboardPage() {
   // Alimentado por /api/user/chapter-completion. Usado para liberar o próximo
   // capítulo na trilha (estilo Duolingo).
   const [completedSet, setCompletedSet] = useState<Set<string>>(new Set());
+  // Modal de "iniciar bloco rápido"
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
 
   const user = session?.user as UserSession | undefined;
 
@@ -530,11 +534,26 @@ export default function PersonalizedDashboardPage() {
             {/* Trilha de capítulos */}
             {activeSubjectData && (
               <div className="mt-8 mb-4">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-1.5 h-5 rounded-full bg-emerald-500" />
-                  <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest">
-                    {activeSubjectData.title}
-                  </h2>
+                <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-5 rounded-full bg-emerald-500" />
+                    <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest">
+                      {activeSubjectData.title}
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => setBlockModalOpen(true)}
+                    className="group inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black text-emerald-300 transition-all hover:-translate-y-0.5"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(16,185,129,0.14), rgba(6,182,212,0.06))',
+                      border: '1px solid rgba(16,185,129,0.35)',
+                      boxShadow: '0 0 14px -4px rgba(16,185,129,0.40)',
+                    }}
+                    title="Estudar bloco com filtros personalizados"
+                  >
+                    <Zap size={12} className="group-hover:text-emerald-200 transition" fill="currentColor" />
+                    Bloco rápido
+                  </button>
                 </div>
               </div>
             )}
@@ -593,6 +612,17 @@ export default function PersonalizedDashboardPage() {
           </>
         )}
       </main>
+
+      {/* Modal: iniciar bloco rápido com filtros */}
+      {activeSubjectData && (
+        <BlockSetupModal
+          isOpen={blockModalOpen}
+          onClose={() => setBlockModalOpen(false)}
+          disciplina={activeSubjectData.title}
+          subjectSlug={activeSubject}
+          concursoSlug={slug}
+        />
+      )}
     </div>
   );
 }

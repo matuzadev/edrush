@@ -33,14 +33,38 @@ from pathlib import Path
 script_dir = Path(__file__).parent
 sys.path.insert(0, str(script_dir))
 
-# Importar os módulos de questões
-from questions_data import direito_constitucional
-from questions_data import direito_administrativo
-from questions_data import raciocinio_logico
-from questions_data import matematica
-from questions_data import administracao_publica
-from questions_data import atualidades
-from questions_data import portugues_avancado
+# Importar os módulos de questões — auto-discovery dos novos módulos gerados
+import importlib
+
+QUESTION_MODULE_NAMES = [
+    # Originais
+    'direito_constitucional',
+    'direito_administrativo',
+    'raciocinio_logico',
+    'matematica',
+    'administracao_publica',
+    'atualidades',
+    'portugues_avancado',
+    # Novos (gerados pelos agentes — adicionar aqui conforme criados)
+    'direito_constitucional_principios',
+    'direito_constitucional_organizacao',
+    'direito_administrativo_atos',
+    'portugues_sintaxe',
+    'portugues_interpretacao',
+    'raciocinio_tabelas',
+    'raciocinio_combinatoria',
+    'informatica_seguranca',
+    'direito_penal_administracao',
+    'matematica_financeira',
+]
+
+# Carrega só os módulos que existem (tolerante a módulos ainda não gerados)
+question_modules: dict[str, object] = {}
+for name in QUESTION_MODULE_NAMES:
+    try:
+        question_modules[name] = importlib.import_module(f'questions_data.{name}')
+    except ImportError:
+        print(f"  Pulando módulo inexistente: {name}")
 
 # Tentar importar libsql_client
 try:
@@ -87,15 +111,34 @@ if not DATABASE_URL:
 
 # Cada entrada: (nome_disciplina, modulo, usar_como_nova_disciplina)
 # Se usar_como_nova_disciplina=False, a disciplina já existe no banco — só adiciona questões
-MODULOS = [
-    ("Português", portugues_avancado, False),
-    ("Direito Constitucional", direito_constitucional, True),
-    ("Direito Administrativo", direito_administrativo, True),
-    ("Raciocínio Lógico", raciocinio_logico, True),
-    ("Matemática", matematica, True),
-    ("Administração Pública", administracao_publica, True),
-    ("Atualidades", atualidades, True),
+def _m(name: str):
+    """Helper: retorna o módulo carregado ou None se não existir."""
+    return question_modules.get(name)
+
+MODULOS_RAW = [
+    # Originais
+    ("Português",                _m('portugues_avancado'),               False),
+    ("Direito Constitucional",   _m('direito_constitucional'),            True),
+    ("Direito Administrativo",   _m('direito_administrativo'),            True),
+    ("Raciocínio Lógico",        _m('raciocinio_logico'),                 True),
+    ("Matemática",               _m('matematica'),                        True),
+    ("Administração Pública",    _m('administracao_publica'),             True),
+    ("Atualidades",              _m('atualidades'),                       True),
+    # Novos (gerados via agentes / scripts/generate_questions_ai.py)
+    ("Direito Constitucional",   _m('direito_constitucional_principios'), True),
+    ("Direito Constitucional",   _m('direito_constitucional_organizacao'),True),
+    ("Direito Administrativo",   _m('direito_administrativo_atos'),       True),
+    ("Português",                _m('portugues_sintaxe'),                 False),
+    ("Português",                _m('portugues_interpretacao'),           False),
+    ("Raciocínio Lógico",        _m('raciocinio_tabelas'),                True),
+    ("Raciocínio Lógico",        _m('raciocinio_combinatoria'),           True),
+    ("Informática Básica",       _m('informatica_seguranca'),             True),
+    ("Direito Penal",            _m('direito_penal_administracao'),       True),
+    ("Matemática Financeira",    _m('matematica_financeira'),             True),
 ]
+
+# Filtra só os que carregaram com sucesso
+MODULOS = [(n, m, t) for (n, m, t) in MODULOS_RAW if m is not None]
 
 # ──────────────────────────────────────────────
 # FUNÇÕES AUXILIARES
@@ -253,11 +296,26 @@ async def main():
         total_preparado = len(todas_questoes)
         print(f"\n  Total preparado: {total_preparado} questões")
 
-        # ── 4. Inserir em lotes de 50 ─────────────────────────
+        # ── 4. Pré-carregar enunciados existentes para deduplicação ────
+        print("\n[3.5/4] Carregando enunciados existentes (dedup)...")
+        existing_enunciados = set()
+        try:
+            r = await client.execute("SELECT enunciado FROM questions")
+            for row in r.rows:
+                # Normalize: strip + lowercase + first 200 chars
+                e = (row[0] or '').strip().lower()[:200]
+                if e:
+                    existing_enunciados.add(e)
+            print(f"  {len(existing_enunciados)} enunciados já presentes — serão pulados")
+        except Exception as e:
+            print(f"  Aviso: não foi possível carregar dedup ({e})")
+
+        # ── 5. Inserir em lotes de 50 (com dedup) ─────────────────────
         print("\n[4/4] Inserindo questões no Turso (lotes de 50)...")
         batch_size = 50
         inseridos = 0
         erros = 0
+        pulados_dup = 0
 
         for i in range(0, len(todas_questoes), batch_size):
             lote = todas_questoes[i:i + batch_size]
@@ -265,6 +323,13 @@ async def main():
             total_lotes = (len(todas_questoes) + batch_size - 1) // batch_size
 
             for q in lote:
+                # Dedup: pula se enunciado já existe
+                key = (q['enunciado'] or '').strip().lower()[:200]
+                if key in existing_enunciados:
+                    pulados_dup += 1
+                    continue
+                existing_enunciados.add(key)  # evita dup interna no mesmo run
+
                 try:
                     await client.execute(
                         """INSERT INTO questions
@@ -296,7 +361,7 @@ async def main():
 
             # Progress
             pct = (lote_num / total_lotes) * 100
-            print(f"  Lote {lote_num:3d}/{total_lotes} ({pct:.0f}%) — {inseridos} inseridas, {erros} erros")
+            print(f"  Lote {lote_num:3d}/{total_lotes} ({pct:.0f}%) — {inseridos} inseridas, {pulados_dup} duplicadas (puladas), {erros} erros")
 
         # ── Resultado final ────────────────────────────────────
         try:
