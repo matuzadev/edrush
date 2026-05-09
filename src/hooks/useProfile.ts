@@ -1,11 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 
+<<<<<<< HEAD
 export interface Achievement {
   id: string;
   label: string;
   description: string;
   unlocked: boolean;
 }
+=======
+import type { Medal } from '@/lib/levels';
+import type { StoreItemLite } from '@/components/store/StoreItemPreview';
+
+export type Achievement = Medal;
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 export interface ActivityDay {
   date: string;
@@ -21,10 +28,28 @@ export interface UserProfile {
   nome: string | null;
   foto_url: string | null;
   avatar_id: number;
+<<<<<<< HEAD
+=======
+  equippedBorder: string;
+  concursoSlug: string | null;
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   birthday?: string | null;
   location?: string | null;
   bio?: string | null;
   criado_em: string;
+<<<<<<< HEAD
+=======
+  // XP & Level
+  xp: number;
+  level: number;
+  levelName: string;
+  levelColor: string;
+  levelBg: string;
+  levelBorder: string;
+  xpIntoLevel: number;
+  xpNeeded: number;
+  xpProgressPct: number;
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   // Stats
   totalQuestionsAnswered: number;
   totalQuestionsCorrect: number;
@@ -32,8 +57,15 @@ export interface UserProfile {
   accuracy: number;
   streak: number;
   medals: number;
+<<<<<<< HEAD
   achievements: Achievement[];
   activityLog: ActivityDay[];
+=======
+  totalMedals: number;
+  achievements: Achievement[];
+  activityLog: ActivityDay[];
+  equippedBadges?: StoreItemLite[];
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -43,15 +75,37 @@ const DEFAULT_PROFILE: UserProfile = {
   nome: null,
   foto_url: null,
   avatar_id: 1,
+<<<<<<< HEAD
   criado_em: new Date().toISOString(),
+=======
+  equippedBorder: 'recruta',
+  concursoSlug: null,
+  criado_em: new Date().toISOString(),
+  xp: 0,
+  level: 1,
+  levelName: 'Recruta',
+  levelColor: 'text-slate-400',
+  levelBg: 'bg-slate-500/15',
+  levelBorder: 'border-slate-500/40',
+  xpIntoLevel: 0,
+  xpNeeded: 150,
+  xpProgressPct: 0,
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   totalQuestionsAnswered: 0,
   totalQuestionsCorrect: 0,
   totalSessions: 0,
   accuracy: 0,
   streak: 0,
   medals: 0,
+<<<<<<< HEAD
   achievements: [],
   activityLog: [],
+=======
+  totalMedals: 21,
+  achievements: [],
+  activityLog: [],
+  equippedBadges: [],
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 };
 
 export const usUserProfile = () => {

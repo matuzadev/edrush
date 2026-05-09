@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+<<<<<<< HEAD
 import { AlertCircle, Clock, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+=======
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 interface SubscriptionInfo {
   status: string;
@@ -13,6 +16,10 @@ interface SubscriptionInfo {
   isPaid: boolean;
   trialDaysRemaining: number;
   expiresAt: string | null;
+<<<<<<< HEAD
+=======
+  isAdmin?: boolean;
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 }
 
 export function SubscriptionGuard({ children }: { children: React.ReactNode }) {
@@ -29,6 +36,7 @@ export function SubscriptionGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
+<<<<<<< HEAD
     const checkSubscription = async () => {
       try {
         const res = await fetch('/api/user/subscription');
@@ -56,10 +64,36 @@ export function SubscriptionGuard({ children }: { children: React.ReactNode }) {
           <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Carregando...</p>
         </div>
+=======
+    fetch('/api/user/subscription')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setSubscription(data);
+        else setSubscription({ status: 'free', hasAccess: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
+      })
+      .catch(() => {
+        setSubscription({ status: 'free', hasAccess: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
+      })
+      .finally(() => setHasChecked(true));
+  }, [user, isLoading, router]);
+
+  // Redirect to paywall if no access
+  useEffect(() => {
+    if (hasChecked && subscription && !subscription.hasAccess) {
+      router.push('/assinar');
+    }
+  }, [hasChecked, subscription, router]);
+
+  if (isLoading || !hasChecked || (hasChecked && subscription && !subscription.hasAccess)) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       </div>
     );
   }
 
+<<<<<<< HEAD
   // Sem acesso — trial expirado e sem plano pago
   if (subscription && !subscription.hasAccess) {
     return (
@@ -134,4 +168,7 @@ export function SubscriptionGuard({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
+=======
+  return <>{children}</>;
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 }

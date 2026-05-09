@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+<<<<<<< HEAD
+=======
+    "ignoreDeprecations": "6.0",
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": [
@@ -17,7 +21,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+<<<<<<< HEAD
     "jsx": "react-jsx",
+=======
+    "jsx": "preserve",
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
@@ -34,6 +42,10 @@
     ]
   },
   "include": [
+<<<<<<< HEAD
+=======
+    "next-env.d.ts",
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     "src/**/*",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"

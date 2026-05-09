@@ -53,6 +53,18 @@ export const users = sqliteTable(
     birthday: text('birthday'), // YYYY-MM-DD
     location: text('location'),
     avatar_id: integer('avatar_id').default(1),
+<<<<<<< HEAD
+=======
+    xp: integer('xp').default(0),
+    level: integer('level').default(1),
+    referral_code: text('referral_code').unique(),
+    referred_by_code: text('referred_by_code'),
+    equipped_border: text('equipped_border').default('recruta'), // slug da borda equipada
+    // Economia de cristais + buffs
+    crystals: integer('crystals').notNull().default(0),
+    expBuffMultiplier: real('exp_buff_multiplier').notNull().default(1.0),
+    expBuffExpiresAt: text('exp_buff_expires_at'),
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     criado_em: text('criado_em').notNull(),
     atualizado_em: text('atualizado_em').notNull(),
   },
@@ -94,6 +106,18 @@ export const concursos = sqliteTable(
     fonte_scrape: text('fonte_scrape'), // gov.br, PC, IADES, etc
     logo_url: text('logo_url'), // URL da logo do órgão (ex: /logos/orgaos/pf.png)
     slug: text('slug'), // slug para URL amigável
+<<<<<<< HEAD
+=======
+    // Colunas enriquecidas (adicionadas via ALTER TABLE idempotente)
+    cargo: text('cargo'), // cargo específico (ex.: "Perito Criminal Federal")
+    area_especialidade: text('area_especialidade'), // área dentro do cargo (ex.: "Informática Forense")
+    edital_numero: text('edital_numero'), // número do edital (ex.: "Ed_1_PF_25_Abertura")
+    edital_ano: integer('edital_ano'),
+    vagas_cargo: integer('vagas_cargo'), // vagas só para este cargo/especialidade
+    url_inscricao: text('url_inscricao'),
+    requisitos: text('requisitos'), // JSON array de strings
+    destaque: integer('destaque').default(0), // 1 = destacado na UI
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   },
   (table) => [
     index('idx_concursos_status').on(table.status),
@@ -160,6 +184,15 @@ export const questions = sqliteTable(
     fonte: text('fonte'), // CESPE, FCC, FGV, etc
     concurso_id: integer('concurso_id').references(() => concursos.id),
     ano: integer('ano'), // Ano da prova
+<<<<<<< HEAD
+=======
+    // Material de estudos por questão
+    material_resumo: text('material_resumo'), // 2-4 frases sobre o conceito testado
+    material_topicos: text('material_topicos'), // JSON array de strings (chips)
+    material_estrategia: text('material_estrategia'), // como atacar esse tipo de questão
+    material_referencias: text('material_referencias'), // JSON array de {title, type, author}
+    material_conteudo: text('material_conteudo'), // Markdown completo 200-500 palavras
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
     atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
   },
@@ -177,10 +210,22 @@ export const user_responses = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     user_id: text('user_id').notNull().references(() => users.id),
+<<<<<<< HEAD
     question_id: integer('question_id').notNull().references(() => questions.id),
     resposta_dada: text('resposta_dada').notNull(),
     acertou: integer('acertou').notNull(), // 0 = errado, 1 = correto
     tempo_resposta_ms: integer('tempo_resposta_ms'), // Em milissegundos
+=======
+    question_id: integer('question_id').notNull(), // 0 quando externo (questão local/mock)
+    external_id: text('external_id'), // id da questão quando vier de fonte externa (localStorage/mock)
+    resposta_dada: text('resposta_dada').notNull(),
+    acertou: integer('acertou').notNull(), // 0 = errado, 1 = correto
+    tempo_resposta_ms: integer('tempo_resposta_ms'), // Em milissegundos
+    disciplina: text('disciplina'),
+    capitulo: text('capitulo'),
+    subject: text('subject'), // slug da matéria (ex.: "portugues")
+    origem: text('origem'), // 'study' | 'simulado'
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     respondida_em: text('respondida_em').default(new Date().toISOString()).notNull(),
   },
   (table) => [
@@ -202,13 +247,44 @@ export const study_sessions = sqliteTable(
     questions_answered: integer('questions_answered').notNull().default(0),
     correct_answers: integer('correct_answers').notNull().default(0),
     concurso_slug: text('concurso_slug'),
+<<<<<<< HEAD
     subject: text('subject'), // matéria/disciplina da sessão
+=======
+    subject: text('subject'), // matéria/disciplina da sessão (URL slug, ex.: "portugues")
+    chapter_id: integer('chapter_id'), // id do capítulo em subjects.json (1, 2, 3...)
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     criado_em: text('criado_em').notNull(),
   },
   (table) => [
     index('idx_study_sessions_user_id').on(table.user_id),
     index('idx_study_sessions_date').on(table.session_date),
     index('idx_study_sessions_user_date').on(table.user_id, table.session_date),
+<<<<<<< HEAD
+=======
+    index('idx_study_sessions_subject_chapter').on(table.subject, table.chapter_id),
+  ]
+);
+
+// Tabela de Indicações (Referral)
+export const referrals = sqliteTable(
+  'referrals',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    referrer_id: text('referrer_id').notNull().references(() => users.id),
+    referred_id: text('referred_id').references(() => users.id),
+    referral_code: text('referral_code').notNull(),
+    referred_email: text('referred_email'),
+    status: text('status').notNull().default('registered'), // registered | subscribed | rewarded
+    reward_granted_at: text('reward_granted_at'),
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  },
+  (table) => [
+    index('idx_referrals_referrer_id').on(table.referrer_id),
+    index('idx_referrals_referred_id').on(table.referred_id),
+    index('idx_referrals_code').on(table.referral_code),
+    index('idx_referrals_status').on(table.status),
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   ]
 );
 
@@ -230,6 +306,93 @@ export const friendships = sqliteTable(
   ]
 );
 
+<<<<<<< HEAD
+=======
+// Tabela de Bordas Desbloqueadas pelo Usuário (catálogo das bordas vive no client em data/borders.ts)
+export const user_borders = sqliteTable(
+  'user_borders',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    border_slug: text('border_slug').notNull(),
+    unlocked_at: text('unlocked_at').notNull(),
+  },
+  (table) => [
+    index('idx_user_borders_user').on(table.user_id),
+    index('idx_user_borders_slug').on(table.border_slug),
+    index('idx_user_borders_pair').on(table.user_id, table.border_slug),
+  ]
+);
+
+// Tabela de Mensagens (chat entre amigos)
+export const messages = sqliteTable(
+  'messages',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    sender_id: text('sender_id').notNull().references(() => users.id),
+    receiver_id: text('receiver_id').notNull().references(() => users.id),
+    type: text('type').notNull().default('text'), // 'text' | 'result'
+    content: text('content').notNull(),
+    payload: text('payload'), // JSON: { accuracy, total, correct, subject, ... } quando type='result'
+    read: integer('read').notNull().default(0),
+    criado_em: text('criado_em').notNull(),
+  },
+  (table) => [
+    index('idx_messages_sender').on(table.sender_id),
+    index('idx_messages_receiver').on(table.receiver_id),
+    index('idx_messages_pair').on(table.sender_id, table.receiver_id),
+    index('idx_messages_read').on(table.read),
+    index('idx_messages_criado').on(table.criado_em),
+  ]
+);
+
+// Tabela de Preferências do Usuário
+export const user_settings = sqliteTable(
+  'user_settings',
+  {
+    user_id: text('user_id').primaryKey().references(() => users.id),
+    display_name: text('display_name'),
+    notif_email: integer('notif_email').notNull().default(1),
+    notif_milestones: integer('notif_milestones').notNull().default(1),
+    notif_weekly: integer('notif_weekly').notNull().default(1),
+    pref_theme: text('pref_theme').notNull().default('dark'), // dark | light
+    pref_language: text('pref_language').notNull().default('pt'), // pt | en
+    pref_daily_goal: integer('pref_daily_goal').notNull().default(20),
+    sound_enabled: integer('sound_enabled').notNull().default(1),
+    // Novas preferências de UX do quiz
+    auto_play: integer('auto_play').notNull().default(0),        // avança auto após 3s de feedback
+    show_timer: integer('show_timer').notNull().default(1),      // exibe cronômetro no quiz
+    hard_mode: integer('hard_mode').notNull().default(0),        // perde 2 vidas em vez de 1
+    compact_ui: integer('compact_ui').notNull().default(0),      // UI compacta (~30% menos padding)
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  }
+);
+
+// Tabela de Tentativas de Simulado
+export const simulado_attempts = sqliteTable(
+  'simulado_attempts',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    discipline: text('discipline').notNull(),
+    total_questions: integer('total_questions').notNull(),
+    correct_answers: integer('correct_answers').notNull(),
+    skipped: integer('skipped').notNull().default(0),
+    accuracy: integer('accuracy').notNull().default(0), // 0-100
+    duration_ms: integer('duration_ms'),
+    started_at: text('started_at').notNull(),
+    finished_at: text('finished_at').notNull(),
+    criado_em: text('criado_em').notNull(),
+  },
+  (table) => [
+    index('idx_simulado_attempts_user').on(table.user_id),
+    index('idx_simulado_attempts_discipline').on(table.discipline),
+    index('idx_simulado_attempts_finished').on(table.finished_at),
+  ]
+);
+
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 // Tabela de Notificações
 export const notifications = sqliteTable(
   'notifications',
@@ -250,6 +413,144 @@ export const notifications = sqliteTable(
   ]
 );
 
+<<<<<<< HEAD
+=======
+// Tabela de Capítulos/Blocos (módulos de estudo com 10+ questões por dificuldade)
+export const chapters = sqliteTable(
+  'chapters',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    disciplina: text('disciplina').notNull(), // Direito Penal, Português, etc
+    numero: integer('numero').notNull(), // 1, 2, 3, etc.
+    titulo: text('titulo').notNull(), // Nome do bloco (ex: "Conceitos Básicos")
+    descricao: text('descricao'), // Descrição do conteúdo
+    ordem: integer('ordem').notNull().default(0), // Ordem de exibição
+    is_primeiro: integer('is_primeiro').default(0), // 0 = false, 1 = true (primeiro é sempre desbloqueado)
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_chapters_disciplina').on(table.disciplina),
+    index('idx_chapters_numero').on(table.numero),
+    index('idx_chapters_ordem').on(table.ordem),
+  ]
+);
+
+// Tabela de Progresso do Usuário nos Capítulos
+export const user_chapter_progress = sqliteTable(
+  'user_chapter_progress',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    chapter_id: integer('chapter_id').notNull().references(() => chapters.id),
+    is_unlocked: integer('is_unlocked').default(0), // 0 = locked, 1 = unlocked
+    is_completed: integer('is_completed').default(0), // 0 = false, 1 = true (quando termina com sucesso)
+    acertos_total: integer('acertos_total').default(0),
+    questoes_respondidas: integer('questoes_respondidas').default(0),
+    percentual_acerto: real('percentual_acerto').default(0),
+    tempo_estudo_ms: integer('tempo_estudo_ms').default(0), // Total de tempo em ms
+    iniciado_em: text('iniciado_em'),
+    completado_em: text('completado_em'),
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+    atualizado_em: text('atualizado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_user_chprog_user_id').on(table.user_id),
+    index('idx_user_chprog_chapter_id').on(table.chapter_id),
+    index('idx_user_chprog_user_chapter').on(table.user_id, table.chapter_id),
+    index('idx_user_chprog_unlocked').on(table.is_unlocked),
+  ]
+);
+
+// Tabela de Desbloqueios (qual capítulo desbloqueia qual)
+export const chapter_unlocks = sqliteTable(
+  'chapter_unlocks',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    chapter_id_origem: integer('chapter_id_origem').notNull().references(() => chapters.id),
+    chapter_id_destino: integer('chapter_id_destino').notNull().references(() => chapters.id),
+    percentual_necessario: real('percentual_necessario').default(80), // % de acerto necessário
+    criado_em: text('criado_em').default(new Date().toISOString()).notNull(),
+  },
+  (table) => [
+    index('idx_unlocks_origem').on(table.chapter_id_origem),
+    index('idx_unlocks_destino').on(table.chapter_id_destino),
+    primaryKey({ columns: [table.chapter_id_origem, table.chapter_id_destino] }),
+  ]
+);
+
+// Tabela de transações de cristais (auditoria)
+export const crystalTransactions = sqliteTable(
+  'crystal_transactions',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    amount: integer('amount').notNull(), // positivo = ganho, negativo = gasto
+    type: text('type').notNull(), // earn_question | earn_chapter | earn_streak | spend_store | admin_grant | refund | other
+    reason: text('reason').notNull(),
+    referenceId: text('reference_id'),
+    createdAt: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_crystal_tx_user').on(table.userId, table.createdAt),
+    index('idx_crystal_tx_type').on(table.type),
+  ]
+);
+
+// Catálogo de itens da loja
+export const storeItems = sqliteTable(
+  'store_items',
+  {
+    id: text('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+    category: text('category').notNull(), // avatar_orgao | avatar_vitoria | borda_perfil | mini_logo_badge | exp_buff | plataforma_trial
+    priceCrystals: integer('price_crystals').notNull(),
+    rarity: text('rarity').notNull(), // common | rare | epic | legendary | mythic
+    imageUrl: text('image_url'),
+    metadata: text('metadata'), // JSON
+    isActive: integer('is_active').notNull().default(1),
+    stock: integer('stock'), // null = ilimitado
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    index('idx_store_active').on(table.category, table.isActive),
+    index('idx_store_rarity').on(table.rarity),
+  ]
+);
+
+// Inventário do usuário
+export const userInventory = sqliteTable(
+  'user_inventory',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    storeItemId: text('store_item_id').notNull().references(() => storeItems.id),
+    acquiredAt: text('acquired_at').notNull(),
+    expiresAt: text('expires_at'),
+    isEquipped: integer('is_equipped').notNull().default(0),
+  },
+  (table) => [
+    index('idx_user_inv_user').on(table.userId),
+    index('idx_user_inv_item').on(table.storeItemId),
+    index('idx_user_inv_equipped').on(table.userId, table.isEquipped),
+  ]
+);
+
+// Loadout do perfil (vitrine)
+export const userProfileLoadout = sqliteTable(
+  'user_profile_loadout',
+  {
+    userId: text('user_id').primaryKey().references(() => users.id),
+    borderItemId: text('border_item_id'),
+    avatarItemId: text('avatar_item_id'),
+    equippedBadgeIds: text('equipped_badge_ids'), // JSON array max 3
+    updatedAt: text('updated_at').notNull(),
+  }
+);
+
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 // Relações
 export const ufsRelations = relations(ufs, ({ many }) => ({
   cidades: many(cidades),
@@ -346,9 +647,50 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
   }),
 }));
 
+<<<<<<< HEAD
+=======
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  referrer: one(users, { fields: [referrals.referrer_id], references: [users.id] }),
+  referred: one(users, { fields: [referrals.referred_id], references: [users.id] }),
+}));
+
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
     fields: [notifications.user_id],
     references: [users.id],
   }),
 }));
+<<<<<<< HEAD
+=======
+
+export const chaptersRelations = relations(chapters, ({ many }) => ({
+  user_progress: many(user_chapter_progress),
+  unlocks_de: many(chapter_unlocks, { relationName: 'unlocks_de' }),
+  unlocks_para: many(chapter_unlocks, { relationName: 'unlocks_para' }),
+}));
+
+export const user_chapter_progressRelations = relations(user_chapter_progress, ({ one }) => ({
+  user: one(users, {
+    fields: [user_chapter_progress.user_id],
+    references: [users.id],
+  }),
+  chapter: one(chapters, {
+    fields: [user_chapter_progress.chapter_id],
+    references: [chapters.id],
+  }),
+}));
+
+export const chapter_unlocksRelations = relations(chapter_unlocks, ({ one }) => ({
+  chapter_origem: one(chapters, {
+    fields: [chapter_unlocks.chapter_id_origem],
+    references: [chapters.id],
+    relationName: 'unlocks_de',
+  }),
+  chapter_destino: one(chapters, {
+    fields: [chapter_unlocks.chapter_id_destino],
+    references: [chapters.id],
+    relationName: 'unlocks_para',
+  }),
+}));
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9

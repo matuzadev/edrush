@@ -27,6 +27,17 @@ export async function GET() {
       nome: user.nome,
       email: user.email,
       foto_url: user.foto_url,
+<<<<<<< HEAD
+=======
+      username: user.username ?? null,
+      bio: user.bio ?? null,
+      birthday: user.birthday ?? null,
+      location: user.location ?? null,
+      avatar_id: user.avatar_id ?? 1,
+      xp: user.xp ?? 0,
+      level: user.level ?? 1,
+      equippedBorder: user.equipped_border ?? 'recruta',
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       onboardingCompleted: (user.onboarding_completed ?? 0) === 1,
       selectedConcursoId: user.selected_concurso_id,
       selectedConcursoSlug: user.selected_concurso_slug,

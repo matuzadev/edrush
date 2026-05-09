@@ -3,9 +3,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { notifications, users } from '@/db/schema';
+<<<<<<< HEAD
 import { eq, desc } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import { createNotification } from '@/lib/notifications';
+=======
+import { eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
+import { createNotification } from '@/lib/notifications';
+import { isAdminSession } from '@/lib/admin';
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -34,6 +41,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
   }
 
+<<<<<<< HEAD
   const currentUserId = (session.user as any).id as string;
 
   // Verificar se é admin (subscription_status = 'admin' ou checar por email)
@@ -42,6 +50,11 @@ export async function POST(req: NextRequest) {
   });
 
   if (!currentUser || currentUser.subscription_status !== 'admin') {
+=======
+  // Admin é definido por ADMIN_EMAILS env var (não por subscription_status,
+  // que é mutável pelo webhook Stripe).
+  if (!isAdminSession(session)) {
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
   }
 

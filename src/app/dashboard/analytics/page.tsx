@@ -4,87 +4,205 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+<<<<<<< HEAD
 import { NotificationBell } from '@/components/NotificationBell';
 import { TrendingUp, Calendar, Award, Target, LogOut } from 'lucide-react';
+=======
+import { SubscriptionGuard } from '@/components/SubscriptionGuard';
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
-interface AnalyticsData {
-  weeklyProgress: { day: string; answered: number }[];
-  topicPerformance: { topic: string; score: number }[];
-  streakDays: number;
-  totalHours: number;
-  goalCompletion: number;
+interface DisciplinaStats {
+  disciplina: string;
+  answered: number;
+  correct: number;
+  accuracy: number;
+}
+
+interface WeekDay {
+  day: string;
+  date: string;
+  answered: number;
+  correct: number;
+}
+
+interface Achievement {
+  id: string;
+  label: string;
+  description: string;
+  unlocked: boolean;
+}
+
+interface StatsData {
+  totalQuestionsAnswered: number;
+  totalQuestionsCorrect: number;
+  totalSessions: number;
+  accuracy: number;
+  streak: number;
+  medals: number;
+  achievements: Achievement[];
+  byDisciplina: DisciplinaStats[];
+  weeklyProgress: WeekDay[];
+  activityLog: { date: string; completed: boolean; questionsAnswered: number }[];
 }
 
 export default function AnalyticsPage() {
+  return (
+    <SubscriptionGuard>
+      <AnalyticsContent />
+    </SubscriptionGuard>
+  );
+}
+
+function AnalyticsContent() {
   const router = useRouter();
-  const { user, signOut, isLoading } = useAuth();
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const { user, isLoading } = useAuth();
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/auth/login');
-    }
+    if (!isLoading && !user) router.push('/auth/login');
+  }, [user, isLoading, router]);
 
-    // Mock data
-    const mockData: AnalyticsData = {
-      weeklyProgress: [
-        { day: 'Seg', answered: 12 },
-        { day: 'Ter', answered: 18 },
-        { day: 'Qua', answered: 15 },
-        { day: 'Qui', answered: 22 },
-        { day: 'Sex', answered: 19 },
-        { day: 'Sab', answered: 25 },
-        { day: 'Dom', answered: 14 },
-      ],
-      topicPerformance: [
-        { topic: 'Criptografia', score: 92 },
-        { topic: 'Redes', score: 88 },
-        { topic: 'Forense Digital', score: 85 },
-        { topic: 'SO Linux', score: 91 },
-        { topic: 'Análise de Malware', score: 79 },
-      ],
-      streakDays: 15,
-      totalHours: 48,
-      goalCompletion: 72,
-    };
-    setAnalytics(mockData);
-  }, [isLoading, user, router]);
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/user/stats')
+      .then(r => r.json())
+      .then(data => setStats(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user]);
 
-  const handleLogout = async () => {
-    await signOut();
-    router.push('/');
-  };
-
-  if (isLoading || !user || !analytics) {
+  if (isLoading || loading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-400">Carregando análises...</p>
-        </div>
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  const maxScore = Math.max(...analytics.topicPerformance.map(t => t.score));
-  const maxAnswered = Math.max(...analytics.weeklyProgress.map(w => w.answered));
+  if (!stats) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center text-slate-400">
+        Erro ao carregar dados.
+      </div>
+    );
+  }
+
+  const maxWeekly = Math.max(...stats.weeklyProgress.map(d => d.answered), 1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617]">
-      {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/dashboard" className="text-xl font-bold text-white hover:text-emerald-400 transition">
-                Foco Federal
-              </Link>
-              <div className="hidden md:flex items-center gap-6">
-                <Link href="/dashboard" className="text-slate-400 hover:text-white transition">Dashboard</Link>
-                <Link href="/dashboard/spreadsheet" className="text-slate-400 hover:text-white transition">Planilha</Link>
-                <Link href="/dashboard/analytics" className="text-emerald-400 font-semibold">Análises</Link>
+    <div className="min-h-screen bg-[#020617] text-slate-200">
+      {/* Header */}
+      <div className="border-b border-white/5 bg-[#020617]/80 sticky top-0 z-10 backdrop-blur">
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-4">
+          <Link href="/dashboard" className="text-slate-500 hover:text-slate-300 transition text-sm">
+            ← Dashboard
+          </Link>
+          <span className="text-slate-700">/</span>
+          <span className="text-white font-semibold text-sm">Análises</span>
+        </div>
+      </div>
+
+      <main className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <KpiCard
+            label="Questões respondidas"
+            value={stats.totalQuestionsAnswered.toLocaleString('pt-BR')}
+            sub={`${stats.totalQuestionsCorrect} acertos`}
+            color="emerald"
+            icon="📝"
+          />
+          <KpiCard
+            label="Taxa de acerto"
+            value={`${stats.accuracy}%`}
+            sub={stats.accuracy >= 80 ? 'Excelente!' : stats.accuracy >= 60 ? 'Bom trabalho' : 'Continue praticando'}
+            color={stats.accuracy >= 80 ? 'emerald' : stats.accuracy >= 60 ? 'yellow' : 'red'}
+            icon="🎯"
+          />
+          <KpiCard
+            label="Sequência atual"
+            value={`${stats.streak}d`}
+            sub={stats.streak >= 7 ? 'Incrível! 🔥' : stats.streak >= 3 ? 'Boa sequência!' : 'Continue hoje'}
+            color="orange"
+            icon="🔥"
+          />
+          <KpiCard
+            label="Conquistas"
+            value={`${stats.medals}`}
+            sub={`de ${stats.achievements.length} total`}
+            color="purple"
+            icon="🏅"
+          />
+        </div>
+
+        {/* Progresso semanal */}
+        <section className="bg-slate-900 border border-white/8 rounded-2xl p-5">
+          <h2 className="font-bold text-white mb-4 text-sm uppercase tracking-widest text-slate-400">
+            Últimos 7 dias
+          </h2>
+          <div className="space-y-3">
+            {stats.weeklyProgress.map(d => (
+              <div key={d.date} className="flex items-center gap-3">
+                <span className="w-8 text-xs font-semibold text-slate-500 text-right shrink-0">{d.day}</span>
+                <div className="flex-1 h-7 bg-slate-800 rounded-lg overflow-hidden relative">
+                  <div
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-lg transition-all duration-700"
+                    style={{ width: `${d.answered > 0 ? Math.max(4, (d.answered / maxWeekly) * 100) : 0}%` }}
+                  />
+                  {d.answered > 0 && (
+                    <span className="absolute inset-y-0 left-3 flex items-center text-xs font-bold text-slate-900 z-10">
+                      {d.answered} questões
+                    </span>
+                  )}
+                </div>
+                <span className={`w-14 text-xs font-bold text-right shrink-0 ${d.answered > 0 ? 'text-emerald-400' : 'text-slate-700'}`}>
+                  {d.answered > 0 ? `${d.answered > 0 ? Math.round((d.correct / d.answered) * 100) : 0}%` : '—'}
+                </span>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Por disciplina */}
+        {stats.byDisciplina.length > 0 && (
+          <section className="bg-slate-900 border border-white/8 rounded-2xl p-5">
+            <h2 className="font-bold text-white mb-4 text-sm uppercase tracking-widest text-slate-400">
+              Desempenho por disciplina
+            </h2>
+            <div className="space-y-4">
+              {stats.byDisciplina.map(d => (
+                <div key={d.disciplina}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm text-slate-300 font-medium capitalize truncate max-w-[60%]">
+                      {d.disciplina.replace(/-/g, ' ')}
+                    </span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-xs text-slate-500">{d.correct}/{d.answered}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                        d.accuracy >= 80 ? 'bg-emerald-500/15 text-emerald-400' :
+                        d.accuracy >= 60 ? 'bg-yellow-500/15 text-yellow-400' :
+                        'bg-red-500/15 text-red-400'
+                      }`}>
+                        {d.accuracy}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ${
+                        d.accuracy >= 80 ? 'bg-emerald-500' :
+                        d.accuracy >= 60 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                      }`}
+                      style={{ width: `${d.accuracy}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
+<<<<<<< HEAD
             <div className="flex items-center gap-4">
               <NotificationBell />
               <button
@@ -95,122 +213,128 @@ export default function AnalyticsPage() {
                 <span className="hidden sm:inline">Sair</span>
               </button>
             </div>
-          </div>
-        </div>
-      </nav>
+=======
+          </section>
+        )}
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Suas Análises</h1>
-          <p className="text-slate-400">Visualize seu desempenho e progresso em tempo real</p>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {/* Streak */}
-          <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-lg p-6 hover:border-emerald-500/40 transition">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-slate-300 font-semibold">Sequência</h3>
-              <Award className="w-5 h-5 text-emerald-400" />
-            </div>
-            <p className="text-4xl font-bold text-emerald-400">{analytics.streakDays}</p>
-            <p className="text-sm text-slate-400 mt-2">dias consecutivos</p>
-          </div>
-
-          {/* Total Hours */}
-          <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-lg p-6 hover:border-blue-500/40 transition">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-slate-300 font-semibold">Tempo</h3>
-              <Calendar className="w-5 h-5 text-blue-400" />
-            </div>
-            <p className="text-4xl font-bold text-blue-400">{analytics.totalHours}</p>
-            <p className="text-sm text-slate-400 mt-2">horas estudadas</p>
-          </div>
-
-          {/* Goal */}
-          <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-lg p-6 hover:border-purple-500/40 transition">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-slate-300 font-semibold">Meta</h3>
-              <Target className="w-5 h-5 text-purple-400" />
-            </div>
-            <p className="text-4xl font-bold text-purple-400">{analytics.goalCompletion}%</p>
-            <p className="text-sm text-slate-400 mt-2">conclusão da meta</p>
-          </div>
-
-          {/* Trend */}
-          <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 rounded-lg p-6 hover:border-yellow-500/40 transition">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-slate-300 font-semibold">Tendência</h3>
-              <TrendingUp className="w-5 h-5 text-yellow-400" />
-            </div>
-            <p className="text-4xl font-bold text-yellow-400">+12%</p>
-            <p className="text-sm text-slate-400 mt-2">vs semana anterior</p>
-          </div>
-        </div>
-
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Weekly Progress */}
-          <div className="bg-[#0f172a] border border-white/5 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-white mb-6">Progresso Semanal</h2>
-            <div className="space-y-4">
-              {analytics.weeklyProgress.map((day) => (
-                <div key={day.day} className="flex items-center gap-4">
-                  <span className="w-12 text-sm font-semibold text-slate-400">{day.day}</span>
-                  <div className="flex-1 h-8 bg-slate-900/50 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all"
-                      style={{ width: `${(day.answered / maxAnswered) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="w-12 text-sm font-semibold text-emerald-400 text-right">{day.answered}</span>
+        {/* Conquistas */}
+        <section className="bg-slate-900 border border-white/8 rounded-2xl p-5">
+          <h2 className="font-bold text-white mb-4 text-sm uppercase tracking-widest text-slate-400">
+            Conquistas
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {stats.achievements.map(a => (
+              <div
+                key={a.id}
+                className={`flex items-center gap-3 rounded-xl border p-3 transition-all ${
+                  a.unlocked
+                    ? 'bg-emerald-500/8 border-emerald-500/30'
+                    : 'bg-slate-800/40 border-slate-700/50 opacity-50'
+                }`}
+              >
+                <span className={`text-xl shrink-0 ${a.unlocked ? '' : 'grayscale'}`}>
+                  {getAchievementIcon(a.id)}
+                </span>
+                <div className="min-w-0">
+                  <p className={`text-sm font-bold truncate ${a.unlocked ? 'text-white' : 'text-slate-500'}`}>
+                    {a.label}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">{a.description}</p>
                 </div>
-              ))}
-            </div>
+                {a.unlocked && <span className="ml-auto text-emerald-400 text-sm shrink-0">✓</span>}
+              </div>
+            ))}
           </div>
+        </section>
 
-          {/* Topic Performance */}
-          <div className="bg-[#0f172a] border border-white/5 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-white mb-6">Desempenho por Tópico</h2>
-            <div className="space-y-4">
-              {analytics.topicPerformance.map((topic) => (
-                <div key={topic.topic} className="flex items-center gap-4">
-                  <span className="flex-1 text-sm text-slate-300">{topic.topic}</span>
-                  <div className="w-24 h-2 bg-slate-900/50 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full transition-all"
-                      style={{ width: `${(topic.score / maxScore) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="w-12 text-sm font-semibold text-blue-400 text-right">{topic.score}%</span>
-                </div>
-              ))}
-            </div>
+        {/* Calendário de atividade — últimos 30 dias */}
+        <section className="bg-slate-900 border border-white/8 rounded-2xl p-5">
+          <h2 className="font-bold text-white mb-4 text-sm uppercase tracking-widest text-slate-400">
+            Calendário de atividade (30 dias)
+          </h2>
+          <div className="flex flex-wrap gap-1.5">
+            {stats.activityLog.map(d => (
+              <div
+                key={d.date}
+                title={`${d.date}: ${d.questionsAnswered} questões`}
+                className={`w-6 h-6 rounded-md transition-all cursor-default ${
+                  d.questionsAnswered >= 20 ? 'bg-emerald-400' :
+                  d.questionsAnswered >= 10 ? 'bg-emerald-500/70' :
+                  d.questionsAnswered >= 1  ? 'bg-emerald-700/70' :
+                  'bg-slate-800'
+                }`}
+              />
+            ))}
           </div>
-        </div>
+          <div className="flex items-center gap-2 mt-3 text-xs text-slate-600">
+            <span>Menos</span>
+            <div className="w-4 h-4 rounded bg-slate-800" />
+            <div className="w-4 h-4 rounded bg-emerald-700/70" />
+            <div className="w-4 h-4 rounded bg-emerald-500/70" />
+            <div className="w-4 h-4 rounded bg-emerald-400" />
+            <span>Mais</span>
+          </div>
+        </section>
 
-        {/* Goal Section */}
-        <div className="mt-8 bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-lg p-8">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-2">Meta de Estudo</h2>
-              <p className="text-slate-400">Continue com a sequência para manter o progresso</p>
-            </div>
-            <Target className="w-8 h-8 text-emerald-400 flex-shrink-0" />
+        {/* Sem dados ainda */}
+        {stats.totalQuestionsAnswered === 0 && (
+          <div className="text-center py-12 text-slate-500">
+            <p className="text-4xl mb-3">📚</p>
+            <p className="font-semibold text-slate-400">Nenhuma questão respondida ainda.</p>
+            <p className="text-sm mt-1">Comece a estudar para ver suas análises aqui!</p>
+            <Link
+              href="/dashboard"
+              className="inline-block mt-4 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition text-sm"
+            >
+              Começar a estudar
+            </Link>
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
           </div>
-          <div className="w-full h-4 bg-slate-900/50 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all"
-              style={{ width: `${analytics.goalCompletion}%` }}
-            ></div>
-          </div>
-          <p className="text-sm text-slate-400 mt-4">
-            {analytics.goalCompletion}% completado - {100 - analytics.goalCompletion}% para atingir sua meta
-          </p>
-        </div>
+        )}
       </main>
     </div>
   );
+}
+
+function KpiCard({ label, value, sub, color, icon }: {
+  label: string;
+  value: string;
+  sub: string;
+  color: string;
+  icon: string;
+}) {
+  const clr = {
+    emerald: 'text-emerald-400 bg-emerald-500/8 border-emerald-500/25',
+    yellow:  'text-yellow-400  bg-yellow-500/8  border-yellow-500/25',
+    red:     'text-red-400     bg-red-500/8     border-red-500/25',
+    orange:  'text-orange-400  bg-orange-500/8  border-orange-500/25',
+    purple:  'text-purple-400  bg-purple-500/8  border-purple-500/25',
+  }[color] ?? 'text-slate-400 bg-slate-800 border-slate-700';
+
+  return (
+    <div className={`rounded-2xl border p-4 ${clr}`}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-lg">{icon}</span>
+      </div>
+      <p className="text-2xl font-black">{value}</p>
+      <p className="text-xs opacity-60 mt-0.5 leading-snug">{sub}</p>
+      <p className="text-xs opacity-40 mt-1 uppercase tracking-wide font-semibold leading-tight">{label}</p>
+    </div>
+  );
+}
+
+function getAchievementIcon(id: string): string {
+  const map: Record<string, string> = {
+    first_question: '✏️',
+    ten_questions: '📖',
+    hundred_questions: '🏅',
+    five_hundred_questions: '🎖️',
+    first_session: '🚀',
+    ten_sessions: '💪',
+    accuracy_70: '🎯',
+    accuracy_90: '⭐',
+    streak_3: '🔥',
+    streak_7: '🏆',
+  };
+  return map[id] ?? '🏅';
 }

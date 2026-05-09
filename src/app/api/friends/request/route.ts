@@ -5,8 +5,17 @@ import { db } from '@/lib/db';
 import { users, friendships } from '@/db/schema';
 import { and, eq, or } from 'drizzle-orm';
 import { createNotification } from '@/lib/notifications';
+<<<<<<< HEAD
 
 export async function POST(req: NextRequest) {
+=======
+import { rateLimit } from '@/lib/rate-limit';
+
+export async function POST(req: NextRequest) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
+
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
