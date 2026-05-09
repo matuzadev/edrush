@@ -1,6 +1,13 @@
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
+<<<<<<< HEAD
+=======
+import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
+import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos';
+import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
+import crypto from 'crypto';
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
@@ -226,7 +233,359 @@ export async function initializeDatabase() {
       }
     }
 
+<<<<<<< HEAD
     await seedUFs();
+=======
+    // Adicionar colunas novas em users (xp, level, referral, borda equipada)
+    const newUsersColumns = [
+      `ALTER TABLE users ADD COLUMN xp INTEGER DEFAULT 0`,
+      `ALTER TABLE users ADD COLUMN level INTEGER DEFAULT 1`,
+      `ALTER TABLE users ADD COLUMN referral_code TEXT`,
+      `ALTER TABLE users ADD COLUMN referred_by_code TEXT`,
+      `ALTER TABLE users ADD COLUMN equipped_border TEXT DEFAULT 'recruta'`,
+    ];
+    for (const sql of newUsersColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
+    // Tabela de bordas desbloqueadas
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_borders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          border_slug TEXT NOT NULL,
+          unlocked_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_borders_user ON user_borders(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_borders_slug ON user_borders(border_slug)`);
+      await client.execute(`CREATE UNIQUE INDEX IF NOT EXISTS idx_user_borders_pair ON user_borders(user_id, border_slug)`);
+    } catch { /* já existe */ }
+
+    // Criar tabela de referrals
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS referrals (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          referrer_id TEXT NOT NULL,
+          referred_id TEXT,
+          referral_code TEXT NOT NULL,
+          referred_email TEXT,
+          status TEXT NOT NULL DEFAULT 'registered',
+          reward_granted_at TEXT,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (referrer_id) REFERENCES users(id),
+          FOREIGN KEY (referred_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_code ON referrals(referral_code)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_referrals_status ON referrals(status)`);
+    } catch { /* já existe */ }
+
+    // Adicionar colunas de material de estudos em questions (safe: try/catch por coluna)
+    const newQuestionMaterialColumns = [
+      `ALTER TABLE questions ADD COLUMN material_resumo TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_topicos TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_estrategia TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_referencias TEXT`,
+      `ALTER TABLE questions ADD COLUMN material_conteudo TEXT`,
+    ];
+    for (const sql of newQuestionMaterialColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
+    // Coluna chapter_id em study_sessions — para rastreamento "Duolingo-style" de
+    // qual capítulo foi completado e desbloquear o próximo automaticamente.
+    try {
+      await client.execute(`ALTER TABLE study_sessions ADD COLUMN chapter_id INTEGER`);
+    } catch { /* já existe */ }
+    try {
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_study_sessions_subject_chapter ON study_sessions(subject, chapter_id)`);
+    } catch { /* ignora */ }
+
+    // Adicionar colunas novas em user_responses (safe: try/catch por coluna)
+    const newResponseColumns = [
+      `ALTER TABLE user_responses ADD COLUMN disciplina TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN capitulo TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN external_id TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN subject TEXT`,
+      `ALTER TABLE user_responses ADD COLUMN origem TEXT`,
+    ];
+
+    for (const sql of newResponseColumns) {
+      try {
+        await client.execute(sql);
+      } catch {
+        // Coluna já existe — ignorar
+      }
+    }
+
+    // Tabela de mensagens (chat entre amigos)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS messages (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          sender_id TEXT NOT NULL,
+          receiver_id TEXT NOT NULL,
+          type TEXT NOT NULL DEFAULT 'text',
+          content TEXT NOT NULL,
+          payload TEXT,
+          read INTEGER NOT NULL DEFAULT 0,
+          criado_em TEXT NOT NULL,
+          FOREIGN KEY (sender_id) REFERENCES users(id),
+          FOREIGN KEY (receiver_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_pair ON messages(sender_id, receiver_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_read ON messages(read)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_messages_criado ON messages(criado_em)`);
+    } catch { /* já existe */ }
+
+    // Tabela de preferências do usuário (settings)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_settings (
+          user_id TEXT PRIMARY KEY,
+          display_name TEXT,
+          notif_email INTEGER NOT NULL DEFAULT 1,
+          notif_milestones INTEGER NOT NULL DEFAULT 1,
+          notif_weekly INTEGER NOT NULL DEFAULT 1,
+          pref_theme TEXT NOT NULL DEFAULT 'dark',
+          pref_language TEXT NOT NULL DEFAULT 'pt',
+          pref_daily_goal INTEGER NOT NULL DEFAULT 20,
+          sound_enabled INTEGER NOT NULL DEFAULT 1,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+    } catch { /* já existe */ }
+
+    // Adicionar novas colunas de settings (idempotente)
+    const newSettingsColumns = [
+      `ALTER TABLE user_settings ADD COLUMN auto_play INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE user_settings ADD COLUMN show_timer INTEGER NOT NULL DEFAULT 1`,
+      `ALTER TABLE user_settings ADD COLUMN hard_mode INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE user_settings ADD COLUMN compact_ui INTEGER NOT NULL DEFAULT 0`,
+    ];
+    for (const sql of newSettingsColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
+    // Tabela de tentativas de simulado
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS simulado_attempts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          discipline TEXT NOT NULL,
+          total_questions INTEGER NOT NULL,
+          correct_answers INTEGER NOT NULL,
+          skipped INTEGER NOT NULL DEFAULT 0,
+          accuracy INTEGER NOT NULL DEFAULT 0,
+          duration_ms INTEGER,
+          started_at TEXT NOT NULL,
+          finished_at TEXT NOT NULL,
+          criado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_simulado_attempts_user ON simulado_attempts(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_simulado_attempts_discipline ON simulado_attempts(discipline)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_simulado_attempts_finished ON simulado_attempts(finished_at)`);
+    } catch { /* já existe */ }
+
+    // Criar tabela de Capítulos/Blocos
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS chapters (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          disciplina TEXT NOT NULL,
+          numero INTEGER NOT NULL,
+          titulo TEXT NOT NULL,
+          descricao TEXT,
+          ordem INTEGER NOT NULL DEFAULT 0,
+          is_primeiro INTEGER DEFAULT 0,
+          criado_em TEXT NOT NULL
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_disciplina ON chapters(disciplina)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_numero ON chapters(numero)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_ordem ON chapters(ordem)`);
+    } catch { /* já existe */ }
+
+    // Criar tabela de Progresso do Usuário nos Capítulos
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_chapter_progress (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          chapter_id INTEGER NOT NULL,
+          is_unlocked INTEGER DEFAULT 0,
+          is_completed INTEGER DEFAULT 0,
+          acertos_total INTEGER DEFAULT 0,
+          questoes_respondidas INTEGER DEFAULT 0,
+          percentual_acerto REAL DEFAULT 0,
+          tempo_estudo_ms INTEGER DEFAULT 0,
+          iniciado_em TEXT,
+          completado_em TEXT,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_user_id ON user_chapter_progress(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_chapter_id ON user_chapter_progress(chapter_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_user_chapter ON user_chapter_progress(user_id, chapter_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_unlocked ON user_chapter_progress(is_unlocked)`);
+    } catch { /* já existe */ }
+
+    // Criar tabela de eventos Stripe processados (idempotência de webhook)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS processed_stripe_events (
+          event_id TEXT PRIMARY KEY,
+          event_type TEXT NOT NULL,
+          processed_at TEXT NOT NULL
+        )
+      `);
+    } catch { /* já existe */ }
+
+    // Criar tabela de Desbloqueios
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS chapter_unlocks (
+          chapter_id_origem INTEGER NOT NULL,
+          chapter_id_destino INTEGER NOT NULL,
+          percentual_necessario REAL DEFAULT 80,
+          criado_em TEXT NOT NULL,
+          PRIMARY KEY (chapter_id_origem, chapter_id_destino),
+          FOREIGN KEY (chapter_id_origem) REFERENCES chapters(id),
+          FOREIGN KEY (chapter_id_destino) REFERENCES chapters(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_unlocks_origem ON chapter_unlocks(chapter_id_origem)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_unlocks_destino ON chapter_unlocks(chapter_id_destino)`);
+    } catch { /* já existe */ }
+
+    // ── ECONOMIA DE CRISTAIS + LOJA ─────────────────────────────────────
+    // Colunas em users (idempotente)
+    const newUsersCrystalColumns = [
+      `ALTER TABLE users ADD COLUMN crystals INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE users ADD COLUMN exp_buff_multiplier REAL NOT NULL DEFAULT 1.0`,
+      `ALTER TABLE users ADD COLUMN exp_buff_expires_at TEXT`,
+    ];
+    for (const sql of newUsersCrystalColumns) {
+      try { await client.execute(sql); } catch { /* já existe */ }
+    }
+
+    // Tabela de transações de cristais
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS crystal_transactions (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          amount INTEGER NOT NULL,
+          type TEXT NOT NULL,
+          reason TEXT NOT NULL,
+          reference_id TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_crystal_tx_user ON crystal_transactions(user_id, created_at DESC)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_crystal_tx_type ON crystal_transactions(type)`);
+    } catch { /* já existe */ }
+
+    // Tabela de itens da loja
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS store_items (
+          id TEXT PRIMARY KEY,
+          slug TEXT NOT NULL UNIQUE,
+          name TEXT NOT NULL,
+          description TEXT NOT NULL,
+          category TEXT NOT NULL,
+          price_crystals INTEGER NOT NULL,
+          rarity TEXT NOT NULL,
+          image_url TEXT,
+          metadata TEXT,
+          is_active INTEGER NOT NULL DEFAULT 1,
+          stock INTEGER,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_store_active ON store_items(category, is_active)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_store_rarity ON store_items(rarity)`);
+    } catch { /* já existe */ }
+
+    // Tabela de inventário
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_inventory (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          store_item_id TEXT NOT NULL,
+          acquired_at TEXT NOT NULL,
+          expires_at TEXT,
+          is_equipped INTEGER NOT NULL DEFAULT 0,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (store_item_id) REFERENCES store_items(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_inv_user ON user_inventory(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_inv_item ON user_inventory(store_item_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_inv_equipped ON user_inventory(user_id, is_equipped)`);
+    } catch { /* já existe */ }
+
+    // Tabela de loadout (vitrine)
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS user_profile_loadout (
+          user_id TEXT PRIMARY KEY,
+          border_item_id TEXT,
+          avatar_item_id TEXT,
+          equipped_badge_ids TEXT,
+          updated_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+    } catch { /* já existe */ }
+
+    // Seed de itens da loja (idempotente: só insere se store_items vazio)
+    await seedStoreItems();
+
+    // Backfill de cristais (UMA VEZ): se nenhuma transação ainda foi registrada,
+    // dá 500 cristais a todos os usuários e logga transação admin_grant.
+    await backfillCrystals();
+
+    // Adicionar colunas enriquecidas em concursos (idempotente)
+    const newConcursosColumns = [
+      `ALTER TABLE concursos ADD COLUMN cargo TEXT`,
+      `ALTER TABLE concursos ADD COLUMN area_especialidade TEXT`,
+      `ALTER TABLE concursos ADD COLUMN edital_numero TEXT`,
+      `ALTER TABLE concursos ADD COLUMN edital_ano INTEGER`,
+      `ALTER TABLE concursos ADD COLUMN vagas_cargo INTEGER`,
+      `ALTER TABLE concursos ADD COLUMN url_inscricao TEXT`,
+      `ALTER TABLE concursos ADD COLUMN requisitos TEXT`,
+      `ALTER TABLE concursos ADD COLUMN destaque INTEGER DEFAULT 0`,
+    ];
+    for (const sql of newConcursosColumns) {
+      try { await client.execute(sql); } catch { /* coluna já existe */ }
+    }
+
+    await seedUFs();
+    await seedQuestionsBank();
+    await seedConcursosBank();
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar banco de dados:', error);
@@ -274,4 +633,261 @@ async function seedUFs() {
   }
 }
 
+<<<<<<< HEAD
+=======
+// Seed idempotente do banco de questões e dos capítulos correspondentes.
+// Por (disciplina, capítulo): só insere questões se nenhuma existe naquele par.
+// Capítulos: só insere se a tupla (disciplina, numero) ainda não existe.
+async function seedQuestionsBank() {
+  try {
+    // 1) Capítulos
+    for (const ch of SEED_CHAPTERS) {
+      const existing = await client.execute({
+        sql: 'SELECT id FROM chapters WHERE disciplina = ? AND numero = ? LIMIT 1',
+        args: [ch.disciplina, ch.numero],
+      });
+      if (existing.rows.length === 0) {
+        await client.execute({
+          sql: `INSERT INTO chapters (disciplina, numero, titulo, descricao, ordem, is_primeiro, criado_em)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            ch.disciplina,
+            ch.numero,
+            ch.titulo,
+            ch.descricao ?? null,
+            ch.numero,
+            ch.is_primeiro ? 1 : 0,
+            new Date().toISOString(),
+          ],
+        });
+      }
+    }
+
+    // 2) Questões — agrupa pelo par (disciplina, capitulo); só popula se vazio.
+    const groups = new Map<string, typeof SEED_QUESTIONS>();
+    for (const q of SEED_QUESTIONS) {
+      const key = `${q.disciplina}|${q.capitulo}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(q);
+    }
+
+    for (const [key, batch] of groups.entries()) {
+      const [disciplina, capitulo] = key.split('|');
+      const countRs = await client.execute({
+        sql: 'SELECT COUNT(*) AS n FROM questions WHERE disciplina = ? AND capitulo = ?',
+        args: [disciplina, capitulo],
+      });
+      const existingCount = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
+      if (existingCount > 0) continue; // já populado, não duplica
+
+      const now = new Date().toISOString();
+      for (const q of batch) {
+        await client.execute({
+          sql: `INSERT INTO questions
+            (titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
+             resposta_correta, dificuldade, fonte,
+             material_resumo, material_topicos, material_estrategia,
+             criado_em, atualizado_em)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            q.titulo,
+            q.disciplina,
+            q.capitulo,
+            q.tipo,
+            q.enunciado,
+            q.explicacao ?? null,
+            q.dica ?? null,
+            q.opcoes ? JSON.stringify(q.opcoes) : null,
+            q.resposta_correta,
+            q.dificuldade,
+            q.fonte ?? null,
+            q.material_resumo ?? null,
+            q.material_topicos ? JSON.stringify(q.material_topicos) : null,
+            q.material_estrategia ?? null,
+            now,
+            now,
+          ],
+        });
+      }
+      console.log(`📚 Seed: ${batch.length} questões inseridas em "${disciplina}" / "${capitulo}"`);
+    }
+  } catch (err) {
+    console.error('⚠️  Falha ao popular banco de questões (seed):', err);
+    // Não relança: app deve subir mesmo se o seed falhar.
+  }
+}
+
+// Seed idempotente do catálogo de concursos.
+// Chave de idempotência: slug. Só insere se nenhuma linha com aquele slug existir.
+// Para forçar re-seed de um concurso: DELETE FROM concursos WHERE slug=? e reinicie.
+async function seedConcursosBank() {
+  try {
+    // Limpa slugs descontinuados (ver DEPRECATED_CONCURSO_SLUGS em seed-concursos.ts).
+    // Roda em todo boot — barato e idempotente: se já não existe, o DELETE é no-op.
+    // Cascateia em tabelas-filhas (editais, concurso_candidato, questions) para
+    // evitar erro de FK silencioso.
+    for (const slug of DEPRECATED_CONCURSO_SLUGS) {
+      try {
+        const idRs = await client.execute({
+          sql: 'SELECT id FROM concursos WHERE slug = ?',
+          args: [slug],
+        });
+        const ids = idRs.rows.map((r) => Number((r as unknown as { id: number }).id));
+        for (const id of ids) {
+          await client.execute({ sql: 'DELETE FROM editais WHERE concurso_id = ?', args: [id] });
+          await client.execute({ sql: 'DELETE FROM concurso_candidato WHERE concurso_id = ?', args: [id] });
+          await client.execute({ sql: 'UPDATE questions SET concurso_id = NULL WHERE concurso_id = ?', args: [id] });
+        }
+        await client.execute({
+          sql: 'DELETE FROM concursos WHERE slug = ?',
+          args: [slug],
+        });
+      } catch (err) {
+        console.warn(`⚠️  Falha ao limpar slug deprecated "${slug}":`, err);
+      }
+    }
+
+    const now = new Date().toISOString();
+    for (const c of SEED_CONCURSOS) {
+      const existing = await client.execute({
+        sql: 'SELECT id FROM concursos WHERE slug = ? LIMIT 1',
+        args: [c.slug],
+      });
+      if (existing.rows.length > 0) continue; // já existe, não duplica
+
+      await client.execute({
+        sql: `INSERT INTO concursos (
+          titulo, organizador, orgao, descricao, slug,
+          vagas_total, vagas_por_funcao, status,
+          data_publicacao_edital, data_abertura_inscricoes, data_fechamento_inscricoes,
+          data_prova_objetiva, data_prova_discursiva, data_resultado_final,
+          url_edital, url_site_oficial, banca,
+          remuneracao_inicial, nivel_escolaridade, fonte_scrape, logo_url,
+          cargo, area_especialidade, edital_numero, edital_ano,
+          vagas_cargo, url_inscricao, requisitos, destaque,
+          criado_em, atualizado_em
+        ) VALUES (
+          ?, ?, ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?
+        )`,
+        args: [
+          c.titulo,
+          c.organizador,
+          c.orgao,
+          c.descricao,
+          c.slug,
+          c.vagas_total ?? null,
+          c.vagas_por_funcao ?? null,
+          c.status,
+          c.data_publicacao_edital ?? null,
+          c.data_abertura_inscricoes ?? null,
+          c.data_fechamento_inscricoes ?? null,
+          c.data_prova_objetiva ?? null,
+          c.data_prova_discursiva ?? null,
+          c.data_resultado_final ?? null,
+          c.url_edital ?? null,
+          c.url_site_oficial ?? null,
+          c.banca ?? null,
+          c.remuneracao_inicial ?? null,
+          c.nivel_escolaridade ?? null,
+          c.fonte_scrape ?? null,
+          c.logo_url ?? null,
+          c.cargo ?? null,
+          c.area_especialidade ?? null,
+          c.edital_numero ?? null,
+          c.edital_ano ?? null,
+          c.vagas_cargo ?? null,
+          c.url_inscricao ?? null,
+          c.requisitos ?? null,
+          c.destaque,
+          now,
+          now,
+        ],
+      });
+      console.log(`🏛️  Seed concurso: "${c.titulo}" (${c.slug})`);
+    }
+  } catch (err) {
+    console.error('⚠️  Falha ao popular banco de concursos (seed):', err);
+    // Não relança: app deve subir mesmo se o seed falhar.
+  }
+}
+
+// Seed idempotente do catálogo de itens da loja.
+// Só insere se store_items estiver vazio. Para forçar re-seed: TRUNCATE store_items.
+async function seedStoreItems() {
+  try {
+    const countRs = await client.execute('SELECT COUNT(*) AS n FROM store_items');
+    const count = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
+    if (count > 0) return;
+
+    const now = new Date().toISOString();
+    for (const item of STORE_ITEMS_SEED) {
+      await client.execute({
+        sql: `INSERT INTO store_items
+          (id, slug, name, description, category, price_crystals, rarity, image_url, metadata, is_active, stock, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          crypto.randomUUID(),
+          item.slug,
+          item.name,
+          item.description,
+          item.category,
+          item.priceCrystals,
+          item.rarity,
+          item.imageUrl ?? null,
+          item.metadata ? JSON.stringify(item.metadata) : null,
+          item.isActive === false ? 0 : 1,
+          item.stock ?? null,
+          now,
+          now,
+        ],
+      });
+    }
+    console.log(`🛒 Seed loja: ${STORE_ITEMS_SEED.length} itens inseridos`);
+  } catch (err) {
+    console.error('⚠️  Falha ao popular store_items (seed):', err);
+  }
+}
+
+// Backfill de cristais — roda só uma vez (quando crystal_transactions está vazio).
+// Concede 500 cristais de boas-vindas a todos os usuários cadastrados.
+async function backfillCrystals() {
+  try {
+    const txCountRs = await client.execute('SELECT COUNT(*) AS n FROM crystal_transactions');
+    const txCount = Number((txCountRs.rows[0] as unknown as { n: number })?.n ?? 0);
+    if (txCount > 0) return;
+
+    const usersRs = await client.execute('SELECT id FROM users');
+    if (usersRs.rows.length === 0) return;
+
+    const now = new Date().toISOString();
+    for (const row of usersRs.rows) {
+      const userId = (row as unknown as { id: string }).id;
+      // Apenas concede para users com 0 cristais (defesa contra reset)
+      const updRs = await client.execute({
+        sql: 'UPDATE users SET crystals = crystals + 500 WHERE id = ? AND crystals = 0',
+        args: [userId],
+      });
+      if (updRs.rowsAffected === 1) {
+        await client.execute({
+          sql: `INSERT INTO crystal_transactions (id, user_id, amount, type, reason, reference_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          args: [crypto.randomUUID(), userId, 500, 'admin_grant', 'Bônus de boas-vindas', null, now],
+        });
+      }
+    }
+    console.log(`💎 Backfill cristais: ${usersRs.rows.length} usuários processados`);
+  } catch (err) {
+    console.error('⚠️  Falha no backfill de cristais:', err);
+  }
+}
+
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 export default db;

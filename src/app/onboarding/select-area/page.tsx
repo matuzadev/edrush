@@ -30,6 +30,7 @@ function SelectAreaContent() {
       return;
     }
     if (status === 'authenticated' && concursoId) {
+<<<<<<< HEAD
       fetchAreas();
     }
   }, [status, concursoId, router]);
@@ -40,6 +41,47 @@ function SelectAreaContent() {
       if (res.ok) {
         const data = await res.json();
         setAreas(data.areas ?? []);
+=======
+      fetchAreasAndSelection();
+    }
+  }, [status, concursoId, router]);
+
+  async function fetchAreasAndSelection() {
+    try {
+      // Em paralelo: lista de áreas para o concurso + áreas já salvas no perfil.
+      // Pré-marca os checkboxes com a seleção persistida no Turso, permitindo
+      // que o usuário ajuste a escolha sem reabrir tudo do zero.
+      const [areasRes, profileRes] = await Promise.all([
+        fetch(`/api/onboarding/areas?concursoId=${concursoId}`),
+        fetch('/api/user/profile'),
+      ]);
+
+      if (areasRes.ok) {
+        const data = await areasRes.json();
+        const areasList = (data.areas ?? []) as Area[];
+        setAreas(areasList);
+
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          const savedAreas: string[] = Array.isArray(profile.selectedAreas)
+            ? profile.selectedAreas
+            : [];
+
+          // Filtra apenas slugs que ainda existem na lista atual de áreas
+          // (caso o currículo do concurso tenha mudado entre visitas).
+          const validSelection = savedAreas.filter((slug) =>
+            areasList.some((a) => a.slug === slug),
+          );
+
+          if (validSelection.length > 0) {
+            setSelected(validSelection);
+          } else {
+            // Se nada foi salvo ainda, pré-marca todas as áreas como sugestão
+            // (alinhado com a recomendação do edital — usuário pode desmarcar).
+            setSelected(areasList.map((a) => a.slug));
+          }
+        }
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       }
     } catch {
       setError('Erro ao carregar matérias.');

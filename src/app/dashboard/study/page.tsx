@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,9 +23,21 @@ function StudyPageContent() {
   const searchParams = useSearchParams();
   const { user, signOut, isLoading } = useAuth();
   const { profile, addCorrectAnswer, addIncorrectAnswer, completeChapter, saveStudySession } = usUserProfile();
+<<<<<<< HEAD
   
   // Pegar Matéria da URL (ex: ?subject=portugues)
+=======
+
+  // Modo bloco rápido (vindo do BlockSetupModal): tem ?disciplina=... + ?quantidade=...
+  // Modo legacy: tem só ?subject=... e usa localStorage
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const subject = searchParams.get('subject');
+  const disciplina = searchParams.get('disciplina');
+  const quantidade = searchParams.get('quantidade');
+  const moduloParam = searchParams.get('modulo');
+  const dificuldadeParam = searchParams.get('dificuldade');
+  const filtroParam = searchParams.get('filtro');
+  const isBlockMode = !!(disciplina && quantidade);
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -33,13 +45,86 @@ function StudyPageContent() {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [blockLoading, setBlockLoading] = useState<boolean>(isBlockMode);
+  const questionStartRef = useRef<number>(Date.now());
+
+  // Reset start time quando muda de questão
+  useEffect(() => {
+    questionStartRef.current = Date.now();
+  }, [currentQuestionIndex, sessionQuestions]);
 
   useEffect(() => {
     if (!isLoading && !user) router.push('/auth/login');
   }, [user, isLoading, router]);
 
-  // load questions from LocalStorage (local manager)
+  // MODO BLOCO RÁPIDO — fetch do banco respeitando filtros do modal
   useEffect(() => {
+    if (!isBlockMode) return;
+    const ctrl = new AbortController();
+    setBlockLoading(true);
+
+    const params = new URLSearchParams({ disciplina: disciplina! });
+    if (moduloParam) params.set('capitulo', moduloParam);
+    if (dificuldadeParam) {
+      // /api/questions aceita um único valor de dificuldade — para múltiplos
+      // selecionados deixamos sem filtro e cortamos no client após o fetch.
+      const arr = dificuldadeParam.split(',').filter(Boolean);
+      if (arr.length === 1) params.set('dificuldade', arr[0]);
+    }
+    // Pede 3x a quantidade pra ter folga após o filtro client-side
+    params.set('limit', String(Math.max(50, parseInt(quantidade!, 10) * 3)));
+
+    // "erradas" e "nao_vistas" são tratados client-side a partir do response
+    // (a API /api/questions já desliga o anti-farm pra revisão de erradas).
+    if (filtroParam === 'erradas') params.set('includeAnswered', '1');
+
+    fetch(`/api/questions?${params}`, { signal: ctrl.signal })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || !Array.isArray(data.questions)) {
+          setSessionQuestions([]);
+          return;
+        }
+        let qs: Question[] = data.questions;
+
+        // Filtro client-side por múltiplas dificuldades (se selecionou 2)
+        if (dificuldadeParam) {
+          const set = new Set(
+            dificuldadeParam.split(',').map((d) => d.trim().toLowerCase()),
+          );
+          if (set.size > 0 && set.size < 3) {
+            const norm = (s: string | undefined): string =>
+              (s ?? '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[̀-ͯ]/g, '');
+            qs = qs.filter((q) => set.has(norm(q.difficulty as string)));
+          }
+        }
+
+        // Embaralha e corta na quantidade pedida
+        const desired = parseInt(quantidade!, 10) || 20;
+        for (let i = qs.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [qs[i], qs[j]] = [qs[j], qs[i]];
+        }
+        qs = qs.slice(0, desired);
+        setSessionQuestions(qs);
+        setCurrentQuestionIndex(0);
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError') return;
+        console.error('Falha ao carregar bloco rápido:', err);
+        setSessionQuestions([]);
+      })
+      .finally(() => setBlockLoading(false));
+
+    return () => ctrl.abort();
+  }, [isBlockMode, disciplina, moduloParam, dificuldadeParam, filtroParam, quantidade]);
+
+  // MODO LEGACY — load questions from LocalStorage
+  useEffect(() => {
+    if (isBlockMode) return; // pulando no modo bloco
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('local_questions_v1') : null;
       if (raw) {
@@ -51,33 +136,57 @@ function StudyPageContent() {
       console.error('Failed to load local questions for study', e);
       setAllQuestions(MOCK_QUESTIONS);
     }
-  }, []);
+  }, [isBlockMode]);
 
-  // Filtrar questões baseadas na Matéria Escolhida
+  // MODO LEGACY — filtrar questões pela matéria escolhida
   useEffect(() => {
+    if (isBlockMode) return;
     const filtered = allQuestions.filter(q => q.subject === subject);
     setSessionQuestions(filtered);
     setCurrentQuestionIndex(0);
-  }, [subject, allQuestions]);
+  }, [isBlockMode, subject, allQuestions]);
 
   const handleQuestionSubmit = async (questionId: string, userAnswer: string, isCorrect: boolean, quality: number) => {
     setIsSubmitting(true);
-    
+
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      // Adicionar a questão acertada ao perfil
       addCorrectAnswer(questionId);
     } else {
       addIncorrectAnswer();
     }
 
+<<<<<<< HEAD
+=======
+    // Persistir resposta individual no banco (fire-and-forget)
+    const tempo_resposta_ms = Date.now() - questionStartRef.current;
+    const currentQ = sessionQuestions[currentQuestionIndex];
+    fetch('/api/questions/answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionId,
+        resposta_dada: userAnswer,
+        acertou: isCorrect,
+        tempo_resposta_ms,
+        disciplina: currentQ?.subject ?? subject ?? null,
+        capitulo: currentQ?.chapter != null ? String(currentQ.chapter) : null,
+        subject: subject ?? null,
+        origem: 'study',
+      }),
+    }).catch(err => console.error('Falha ao salvar resposta:', err));
+
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     setTimeout(async () => {
       if (currentQuestionIndex < sessionQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
         completeChapter();
         setIsFinished(true);
+<<<<<<< HEAD
         // Persistir sessão no banco — fire-and-forget (não bloquear UI)
+=======
+>>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         await saveStudySession({
           questionsAnswered: sessionQuestions.length,
           correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,
@@ -88,10 +197,50 @@ function StudyPageContent() {
     }, 400);
   };
 
-  if (isLoading || !user || sessionQuestions.length === 0) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-emerald-500"></div>
+      </div>
+    );
+  }
+
+  if (isBlockMode && blockLoading) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-emerald-500 mx-auto mb-4" />
+          <p className="text-slate-300 font-bold">Preparando seu bloco</p>
+          <p className="text-slate-500 text-sm mt-1">{disciplina} · {quantidade} questões</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (sessionQuestions.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-7 h-7 text-slate-500" />
+          </div>
+          <p className="text-white font-black text-lg">Nenhuma questão encontrada</p>
+          <p className="text-slate-400 text-sm mt-1">
+            {isBlockMode
+              ? 'Tente reabrir o seletor e ajustar os filtros do bloco.'
+              : 'Não há questões cadastradas para esta matéria ainda.'}
+          </p>
+          <button
+            onClick={() => router.back()}
+            className="mt-5 px-5 py-2.5 rounded-xl text-sm font-black text-emerald-300 transition"
+            style={{
+              background: 'rgba(16,185,129,0.10)',
+              border: '1px solid rgba(16,185,129,0.30)',
+            }}
+          >
+            Voltar
+          </button>
+        </div>
       </div>
     );
   }
@@ -155,7 +304,7 @@ function StudyPageContent() {
                 <p className="text-slate-500 text-xs uppercase font-bold">Precisão</p>
               </div>
               <div className="bg-slate-900 p-6 rounded-2xl border border-white/5">
-                <p className="text-blue-400 text-3xl font-black">+{sessionQuestions.length * 10}</p>
+                <p className="text-blue-400 text-3xl font-black">+{sessionQuestions.length * 20}</p>
                 <p className="text-slate-500 text-xs uppercase font-bold">XP Ganho</p>
               </div>
             </div>
