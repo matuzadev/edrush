@@ -10,8 +10,6 @@ export default function AuthCallback() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-<<<<<<< HEAD
-=======
       // Register referral from localStorage (set during signup with ?ref= param)
       const ref = localStorage.getItem('ff_ref');
       if (ref) {
@@ -21,7 +19,6 @@ export default function AuthCallback() {
           body: JSON.stringify({ referralCode: ref }),
         }).then(() => localStorage.removeItem('ff_ref')).catch(() => {});
       }
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       router.push('/dashboard');
     } else if (status === 'unauthenticated') {
       router.push('/auth/login');

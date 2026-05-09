@@ -1,13 +1,10 @@
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
-<<<<<<< HEAD
-=======
 import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
 import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos';
 import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
 import crypto from 'crypto';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
@@ -233,9 +230,6 @@ export async function initializeDatabase() {
       }
     }
 
-<<<<<<< HEAD
-    await seedUFs();
-=======
     // Adicionar colunas novas em users (xp, level, referral, borda equipada)
     const newUsersColumns = [
       `ALTER TABLE users ADD COLUMN xp INTEGER DEFAULT 0`,
@@ -585,7 +579,6 @@ export async function initializeDatabase() {
     await seedUFs();
     await seedQuestionsBank();
     await seedConcursosBank();
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     console.log('✅ Banco de dados inicializado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar banco de dados:', error);
@@ -633,8 +626,6 @@ async function seedUFs() {
   }
 }
 
-<<<<<<< HEAD
-=======
 // Seed idempotente do banco de questões e dos capítulos correspondentes.
 // Por (disciplina, capítulo): só insere questões se nenhuma existe naquele par.
 // Capítulos: só insere se a tupla (disciplina, numero) ainda não existe.
@@ -889,5 +880,4 @@ async function backfillCrystals() {
   }
 }
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 export default db;

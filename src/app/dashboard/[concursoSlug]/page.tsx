@@ -5,21 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
-<<<<<<< HEAD
-  LogOut,
-  User,
-  Star,
-  RefreshCw,
-  CheckCircle,
-  Lock,
-  PlayCircle,
-  BookOpen,
-  Target,
-  TrendingUp,
-  Loader2,
-} from 'lucide-react';
-import { NotificationBell } from '@/components/NotificationBell';
-=======
   Crown,
   Lock,
   PlayCircle,
@@ -34,7 +19,6 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
 import { BlockSetupModal } from '@/components/study/BlockSetupModal';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 import subjects from '@/data/subjects.json';
 
 interface UserSession {
@@ -49,29 +33,18 @@ interface ProgressStats {
   totalAnswered: number;
   totalCorrect: number;
   accuracy: number;
-<<<<<<< HEAD
-=======
   subjectsDone: number;
   loaded: boolean;
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 }
 
 export default function PersonalizedDashboardPage() {
   const params = useParams();
   const router = useRouter();
-<<<<<<< HEAD
-  const { data: session, status, update } = useSession();
-=======
   const { data: session, status } = useSession();
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const slug = params.concursoSlug as string;
 
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [activeSubject, setActiveSubject] = useState<string>('');
-<<<<<<< HEAD
-  const [stats, setStats] = useState<ProgressStats>({ totalAnswered: 0, totalCorrect: 0, accuracy: 0 });
-  const [isResetting, setIsResetting] = useState(false);
-=======
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [stats, setStats] = useState<ProgressStats>({
     totalAnswered: 0,
@@ -86,7 +59,6 @@ export default function PersonalizedDashboardPage() {
   const [completedSet, setCompletedSet] = useState<Set<string>>(new Set());
   // Modal de "iniciar bloco rápido"
   const [blockModalOpen, setBlockModalOpen] = useState(false);
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
   const user = session?.user as UserSession | undefined;
 
@@ -108,18 +80,6 @@ export default function PersonalizedDashboardPage() {
 
   async function loadUserData() {
     try {
-<<<<<<< HEAD
-      // Carregar áreas selecionadas do perfil via session (já armazenadas no DB)
-      // e buscar progresso
-      const [profileRes, subRes] = await Promise.all([
-        fetch('/api/user/profile'),
-        fetch('/api/user/subscription'),
-      ]);
-
-      if (profileRes.ok) {
-        const profile = await profileRes.json();
-        const areas: string[] = profile.selectedAreas ?? [];
-=======
       const [profileRes, statsRes, completionRes] = await Promise.all([
         fetch('/api/user/profile'),
         fetch('/api/user/stats'),
@@ -136,31 +96,10 @@ export default function PersonalizedDashboardPage() {
       if (profileRes.ok) {
         const profile = await profileRes.json();
         areas = profile.selectedAreas ?? [];
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         setSelectedAreas(areas);
         if (areas.length > 0) setActiveSubject(areas[0]);
         else setActiveSubject(Object.keys(subjects)[0]);
       }
-<<<<<<< HEAD
-    } catch {
-      // fallback: usar todas as matérias do subjects.json
-      const allSlugs = Object.keys(subjects);
-      setSelectedAreas(allSlugs);
-      setActiveSubject(allSlugs[0]);
-    }
-  }
-
-  async function handleChangeConcurso() {
-    setIsResetting(true);
-    try {
-      const res = await fetch('/api/onboarding/reset', { method: 'POST' });
-      if (res.ok) {
-        await update(); // Atualizar JWT
-        router.push('/onboarding/select-concurso');
-      }
-    } catch {
-      setIsResetting(false);
-=======
       setProfileLoaded(true);
 
       if (statsRes.ok) {
@@ -183,7 +122,6 @@ export default function PersonalizedDashboardPage() {
       setActiveSubject(allSlugs[0]);
       setStats((prev) => ({ ...prev, loaded: true }));
       setProfileLoaded(true);
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     }
   }
 
@@ -203,18 +141,12 @@ export default function PersonalizedDashboardPage() {
     );
   }
 
-<<<<<<< HEAD
-  // Determinar matérias a exibir: apenas as selecionadas no onboarding
-  const displaySubjects =
-    selectedAreas.length > 0
-=======
   // Determinar matérias a exibir: apenas as selecionadas no onboarding.
   // Enquanto o perfil não carrega, retorna [] para evitar flash de TODAS as
   // matérias do subjects.json (Perito + ESFCEX + …) misturadas.
   const displaySubjects = !profileLoaded
     ? []
     : selectedAreas.length > 0
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       ? selectedAreas.filter((s) => (subjects as any)[s])
       : Object.keys(subjects);
 
@@ -234,11 +166,7 @@ export default function PersonalizedDashboardPage() {
       <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <Link
-<<<<<<< HEAD
-            href="/"
-=======
             href="/dashboard"
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
             className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
           >
             FOCO FEDERAL
@@ -248,37 +176,6 @@ export default function PersonalizedDashboardPage() {
             {concursoDisplayName}
           </span>
         </div>
-<<<<<<< HEAD
-
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <Link href="/dashboard/profile" className="text-slate-400 hover:text-emerald-400 transition">
-            <User className="w-5 h-5" />
-          </Link>
-          <div className="hidden md:flex bg-slate-900 rounded-full px-3 py-1 border border-white/5 items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-            <span className="text-xs font-bold text-white">PRO</span>
-          </div>
-          <button
-            onClick={handleChangeConcurso}
-            disabled={isResetting}
-            className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-400 transition border border-white/10 hover:border-emerald-500/30 rounded-lg px-2.5 py-1.5"
-            title="Trocar concurso"
-          >
-            {isResetting ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <RefreshCw size={12} />
-            )}
-            <span>Trocar concurso</span>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-slate-400 hover:text-red-400 transition"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-=======
         
         <div className="flex items-center gap-3">
           <NotificationBell />
@@ -344,40 +241,11 @@ export default function PersonalizedDashboardPage() {
               }
             `}</style>
           </div>
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         </div>
       </nav>
 
       <main className="max-w-4xl mx-auto px-4 py-10">
         {/* Cabeçalho personalizado */}
-<<<<<<< HEAD
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Target size={16} className="text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
-              Seu painel personalizado
-            </span>
-          </div>
-          <h1 className="text-3xl font-black text-white mb-1">{concursoDisplayName}</h1>
-          <p className="text-slate-400 text-sm">
-            {displaySubjects.length} matéria{displaySubjects.length !== 1 ? 's' : ''} selecionada
-            {displaySubjects.length !== 1 ? 's' : ''}
-          </p>
-        </div>
-
-        {/* Cards de métricas */}
-        <div className="grid grid-cols-3 gap-4 mb-10">
-          {[
-            { icon: BookOpen, label: 'Matérias', value: displaySubjects.length, color: 'emerald' },
-            { icon: TrendingUp, label: 'Respondidas', value: stats.totalAnswered, color: 'blue' },
-            {
-              icon: Target,
-              label: 'Acertos',
-              value: stats.totalAnswered > 0 ? `${stats.accuracy}%` : '-',
-              color: 'violet',
-            },
-          ].map((metric) => {
-=======
         <div className="mb-6 relative overflow-hidden rounded-2xl bg-slate-900/80 border border-white/8 p-6">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 via-transparent to-cyan-500/5 pointer-events-none" />
           <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none" />
@@ -471,22 +339,10 @@ export default function PersonalizedDashboardPage() {
               progress: stats.totalAnswered > 0 ? stats.accuracy : 0,
             },
           ] as const).map((metric) => {
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
             const Icon = metric.icon;
             return (
               <div
                 key={metric.label}
-<<<<<<< HEAD
-                className="bg-slate-900/60 border border-white/5 rounded-2xl p-4 text-center"
-              >
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2 bg-${metric.color}-500/10`}
-                >
-                  <Icon size={18} className={`text-${metric.color}-400`} />
-                </div>
-                <div className="text-2xl font-black text-white">{metric.value}</div>
-                <div className="text-xs text-slate-500 mt-0.5">{metric.label}</div>
-=======
                 className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5 group transition-all hover:border-white/20 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
               >
                 {/* glow superior */}
@@ -533,7 +389,6 @@ export default function PersonalizedDashboardPage() {
                     </div>
                   )}
                 </div>
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
               </div>
             );
           })}
@@ -543,43 +398,6 @@ export default function PersonalizedDashboardPage() {
         <div className="flex gap-3 mb-10 flex-wrap">
           <Link
             href="/questions"
-<<<<<<< HEAD
-            className="px-5 py-2 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 rounded-full text-sm font-semibold transition"
-          >
-            Ir para Questões
-          </Link>
-          <button
-            onClick={handleChangeConcurso}
-            disabled={isResetting}
-            className="sm:hidden flex items-center gap-1.5 px-5 py-2 bg-slate-800 border border-white/10 hover:border-emerald-500/30 text-slate-300 hover:text-emerald-400 rounded-full text-sm font-semibold transition"
-          >
-            {isResetting ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-            Trocar concurso
-          </button>
-        </div>
-
-        {/* Seletor de matérias */}
-        {displaySubjects.length > 0 && (
-          <>
-            <div className="flex gap-3 mb-10 overflow-x-auto pb-2 scrollbar-hide">
-              {displaySubjects.map((subjectSlug) => (
-                <button
-                  key={subjectSlug}
-                  onClick={() => setActiveSubject(subjectSlug)}
-                  className={`px-5 py-2 rounded-full font-semibold transition-all whitespace-nowrap text-sm ${
-                    activeSubject === subjectSlug
-                      ? 'bg-emerald-500 text-[#020617] shadow-[0_0_20px_rgba(16,185,129,0.3)]'
-                      : 'bg-slate-900 text-slate-400 border border-white/5 hover:border-emerald-500/50'
-                  }`}
-                >
-                  {(subjects as any)[subjectSlug]?.title ?? subjectSlug}
-                </button>
-              ))}
-            </div>
-
-            {/* Trilha de capítulos */}
-            {activeSubjectData && (
-=======
             className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-[#020617] rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_28px_rgba(16,185,129,0.35)]"
           >
             Ir para simulado aplicado
@@ -740,17 +558,10 @@ export default function PersonalizedDashboardPage() {
               </div>
             )}
             {activeSubjectData && (
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
               <div className="relative flex flex-col items-center gap-8">
                 <div className="absolute top-0 bottom-0 w-1.5 bg-slate-800 -z-0" />
 
                 {activeSubjectData.chapters.map((chapter: any, index: number) => {
-<<<<<<< HEAD
-                  const isLocked = index > 0;
-
-                  return (
-                    <div key={chapter.id} className="relative z-10 flex flex-col items-center group">
-=======
                   // Duolingo-style: capítulo desbloqueia se for o primeiro OU se
                   // o anterior já foi completado (≥80% em ≥1 sessão).
                   const prev = index > 0 ? activeSubjectData.chapters[index - 1] : null;
@@ -764,7 +575,6 @@ export default function PersonalizedDashboardPage() {
                       className="relative z-10 flex flex-col items-center group"
                       style={{ transform: `translateX(${index % 2 === 0 ? -40 : 40}px)` }}
                     >
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
                       <Link
                         href={isLocked ? '#' : `/dashboard/chapter/${activeSubject}/${chapter.id}`}
                         className={`
@@ -772,14 +582,6 @@ export default function PersonalizedDashboardPage() {
                           ${
                             isLocked
                               ? 'bg-slate-800 border-slate-900 cursor-not-allowed opacity-80'
-<<<<<<< HEAD
-                              : 'bg-emerald-500 border-emerald-700 animate-pulse-ring'
-                          }
-                        `}
-                      >
-                        {isLocked ? (
-                          <Lock className="w-8 h-8 text-slate-500" />
-=======
                               : isCompleted
                                 ? 'bg-cyan-500 border-cyan-700'
                                 : 'bg-emerald-500 border-emerald-700 animate-pulse-ring'
@@ -791,7 +593,6 @@ export default function PersonalizedDashboardPage() {
                           <Lock className="w-8 h-8 text-slate-500" />
                         ) : isCompleted ? (
                           <CheckCheck className="w-9 h-9 text-white" />
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
                         ) : (
                           <PlayCircle className="w-10 h-10 text-white fill-emerald-600/30" />
                         )}
@@ -803,14 +604,6 @@ export default function PersonalizedDashboardPage() {
                         </span>
                         <h3 className="text-white font-medium text-center">{chapter.title}</h3>
                       </div>
-<<<<<<< HEAD
-
-                      <style jsx>{`
-                        div:nth-child(even) { transform: translateX(40px); }
-                        div:nth-child(odd) { transform: translateX(-40px); }
-                      `}</style>
-=======
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
                     </div>
                   );
                 })}
@@ -819,8 +612,6 @@ export default function PersonalizedDashboardPage() {
           </>
         )}
       </main>
-<<<<<<< HEAD
-=======
 
       {/* Modal: iniciar bloco rápido com filtros */}
       {activeSubjectData && (
@@ -832,7 +623,6 @@ export default function PersonalizedDashboardPage() {
           concursoSlug={slug}
         />
       )}
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     </div>
   );
 }

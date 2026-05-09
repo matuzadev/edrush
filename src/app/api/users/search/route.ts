@@ -3,11 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { users, friendships } from '@/db/schema';
-<<<<<<< HEAD
-import { and, eq, like, ne, or, sql } from 'drizzle-orm';
-
-export async function GET(req: NextRequest) {
-=======
 import { and, eq, inArray, like, ne, or } from 'drizzle-orm';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -15,7 +10,6 @@ export async function GET(req: NextRequest) {
   const limited = rateLimit(req);
   if (limited) return limited;
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -54,24 +48,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ users: [] });
   }
 
-<<<<<<< HEAD
-  // Buscar relacionamentos existentes com esses usuários
-  const targetIds = results.map(u => u.id);
-
-  // SQLite não tem suporte nativo a IN com Drizzle em batch, fazendo via raw SQL
-  const placeholders = targetIds.map(() => '?').join(', ');
-  const existingRaw = await db.run(
-    sql.raw(
-      `SELECT id, requester_id, receiver_id, status FROM friendships
-       WHERE (requester_id = '${currentUserId}' AND receiver_id IN (${targetIds.map(id => `'${id}'`).join(', ')}))
-          OR (receiver_id = '${currentUserId}' AND requester_id IN (${targetIds.map(id => `'${id}'`).join(', ')}))`
-    )
-  );
-
-  // Mapear relacionamentos por userId do outro lado
-  const relationshipMap = new Map<string, { id: number; status: string; iAmRequester: boolean }>();
-  for (const row of existingRaw.rows as any[]) {
-=======
   // Buscar relacionamentos existentes com esses usuários — query parametrizada
   // via Drizzle inArray (placeholders, sem interpolação de string).
   const targetIds = results.map(u => u.id);
@@ -94,7 +70,6 @@ export async function GET(req: NextRequest) {
   // Mapear relacionamentos por userId do outro lado
   const relationshipMap = new Map<string, { id: number; status: string; iAmRequester: boolean }>();
   for (const row of existingRels) {
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     const otherId = row.requester_id === currentUserId ? row.receiver_id : row.requester_id;
     relationshipMap.set(otherId, {
       id: row.id,

@@ -6,8 +6,6 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-<<<<<<< HEAD
-=======
 import { DUMMY_BCRYPT_HASH, maskEmail } from '@/lib/sanitize';
 
 // Mensagem genérica para erros de autenticação. Não diferenciar
@@ -27,7 +25,6 @@ function assertNextAuthSecretSafe(): void {
     );
   }
 }
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 // Inicializar banco ao carregar (async, fire-and-forget na inicialização do módulo)
 initializeDatabase().catch(console.error);
@@ -45,27 +42,6 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Senha', type: 'password' },
       },
       async authorize(credentials) {
-<<<<<<< HEAD
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email e senha são obrigatórios');
-        }
-
-        const result = await db.query.users.findFirst({
-          where: eq(users.email, credentials.email as string),
-        });
-
-        if (!result) {
-          throw new Error('Usuário não encontrado');
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          result.senha_hash || ''
-        );
-
-        if (!isPasswordValid) {
-          throw new Error('Senha incorreta');
-=======
         assertNextAuthSecretSafe();
         if (!credentials?.email || !credentials?.password) {
           throw new Error(AUTH_ERROR_GENERIC);
@@ -86,7 +62,6 @@ export const authOptions: NextAuthOptions = {
 
         if (!result || !isPasswordValid || !result.senha_hash) {
           throw new Error(AUTH_ERROR_GENERIC);
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         }
 
         return {
@@ -121,12 +96,8 @@ export const authOptions: NextAuthOptions = {
             });
           }
         } catch (error) {
-<<<<<<< HEAD
-          console.error('Erro ao criar usuário Google:', error);
-=======
           // Não logar `user`/`profile` — contém e-mail.
           console.error('Erro ao criar usuário Google (email mascarado):', maskEmail(user.email), error);
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
           return false;
         }
       }
@@ -170,14 +141,6 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-<<<<<<< HEAD
-    maxAge: 30 * 24 * 60 * 60,
-  },
-};
-
-export async function hashPassword(password: string): Promise<string> {
-  const salt = await bcrypt.genSalt(10);
-=======
     // 14 dias é o sweet spot — JWT comprometido não fica 30d ativo, e o
     // usuário não precisa logar toda semana. Considerar revogação stateful
     // (tabela revoked_jwt) se precisar invalidar antes do TTL.
@@ -206,7 +169,6 @@ const BCRYPT_COST = 12;
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(BCRYPT_COST);
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   return bcrypt.hash(password, salt);
 }
 

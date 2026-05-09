@@ -129,11 +129,7 @@ export default function Offer() {
 
                 {/* CTA */}
                 <Link
-<<<<<<< HEAD
-                  href="/checkout?plan=starter"
-=======
                   href="/assinar"
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
                   className="block w-full text-center py-4 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base uppercase tracking-wide transition-all hover:scale-[1.02] hover:shadow-[0_10px_40px_rgba(16,185,129,0.4)] no-underline"
                 >
                   GARANTIR MEU ACESSO AGORA

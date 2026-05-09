@@ -2,10 +2,6 @@
   "portugues": {
     "title": "Português",
     "chapters": [
-<<<<<<< HEAD
-      { "id": 1, "title": "Ortografia e Acentuação" },
-      { "id": 2, "title": "Morfologia: Classes de Palavras" }
-=======
       { "id": 1,  "title": "Ortografia e Acentuação" },
       { "id": 2,  "title": "Morfologia: Classes de Palavras" },
       { "id": 3,  "title": "Sintaxe: Análise do Período" },
@@ -18,7 +14,6 @@
       { "id": 10, "title": "Semântica e Significação de Palavras" },
       { "id": 11, "title": "Coesão e Coerência Textual" },
       { "id": 12, "title": "Redação Oficial" }
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     ]
   },
   "redes-de-computadores": {

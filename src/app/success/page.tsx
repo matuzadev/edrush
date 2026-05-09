@@ -5,11 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-<<<<<<< HEAD
-import { CheckCircle2 } from 'lucide-react';
-=======
 import { CheckCircle2, ArrowRight, Zap, BookOpen, BarChart2, Target, Loader2 } from 'lucide-react';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 interface SubscriptionInfo {
   status: string;
@@ -20,11 +16,7 @@ interface SubscriptionInfo {
 
 export default function SuccessPage() {
   const router = useRouter();
-<<<<<<< HEAD
-  const { user, signOut, isLoading: authLoading } = useAuth();
-=======
   const { user, isLoading: authLoading } = useAuth();
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,15 +24,8 @@ export default function SuccessPage() {
     if (!authLoading && !user) { router.push('/auth/login'); return; }
     if (user) {
       fetch('/api/user/subscription')
-<<<<<<< HEAD
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data) setSubscription(data);
-        })
-=======
         .then(res => res.ok ? res.json() : null)
         .then(data => { if (data) setSubscription(data); })
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
         .catch(console.error)
         .finally(() => setLoading(false));
     }
@@ -55,57 +40,6 @@ export default function SuccessPage() {
   }
 
   if (!user) return null;
-<<<<<<< HEAD
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617]">
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-xl font-bold text-white hover:text-emerald-400 transition">
-              Foco Federal
-            </Link>
-            <button
-              onClick={() => signOut()}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition text-sm"
-            >
-              Sair
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-            <CheckCircle2 className="w-12 h-12 text-emerald-400" />
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-3">Pagamento Confirmado!</h1>
-          <p className="text-xl text-slate-400">
-            Bem-vindo à plataforma Foco Federal. Sua assinatura está ativa!
-          </p>
-        </div>
-
-        <div className="bg-[#0f172a] border border-emerald-500/20 rounded-2xl p-8 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Detalhes da Assinatura</h2>
-
-          <div className="space-y-4 mb-8">
-            <div className="flex justify-between items-center pb-4 border-b border-white/10">
-              <span className="text-slate-400">Status:</span>
-              <span className="flex items-center gap-2 text-emerald-400">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
-                {subscription?.isPaid ? 'Ativo' : 'Processando...'}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center pb-4 border-b border-white/10">
-              <span className="text-slate-400">Válido até:</span>
-              <span className="text-white font-semibold">
-                {subscription?.expiresAt
-                  ? new Date(subscription.expiresAt).toLocaleDateString('pt-BR')
-                  : 'Processando...'}
-              </span>
-=======
 
   const nextBilling = subscription?.expiresAt
     ? new Date(subscription.expiresAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
@@ -161,7 +95,6 @@ export default function SuccessPage() {
             <div className="flex justify-between items-center pb-4 border-b border-white/6">
               <span className="text-slate-400 text-sm">Plano</span>
               <span className="text-white font-semibold text-sm">Foco Federal — R$9,90/mês</span>
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm">Email</span>
@@ -193,17 +126,6 @@ export default function SuccessPage() {
           </div>
         </div>
 
-<<<<<<< HEAD
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-300 mb-3">Próximos Passos</h3>
-          <ul className="text-blue-200 space-y-2 text-sm">
-            <li>✓ Acesse o dashboard para começar seus estudos</li>
-            <li>✓ Explore questões de todos os concursos disponíveis</li>
-            <li>✓ Configure suas metas e comece o Active Recall</li>
-            <li>✓ Acompanhe seu progresso em tempo real</li>
-          </ul>
-        </div>
-=======
         {/* CTA */}
         <Link
           href="/dashboard"
@@ -215,7 +137,6 @@ export default function SuccessPage() {
         <Link href="/" className="block text-center text-slate-500 hover:text-slate-400 text-sm mt-4 transition">
           Voltar para a página inicial
         </Link>
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       </main>
     </div>
   );

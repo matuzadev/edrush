@@ -1,32 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, initializeDatabase } from '@/lib/db';
 import { users } from '@/db/schema';
-<<<<<<< HEAD
-import { eq } from 'drizzle-orm';
-import { hashPassword } from '@/auth';
-=======
 import { eq, or } from 'drizzle-orm';
 import { hashPassword } from '@/auth';
 import { registerReferral } from '@/lib/referral';
 import { strictRateLimit } from '@/lib/rate-limit';
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 import crypto from 'crypto';
 
 initializeDatabase();
 
-<<<<<<< HEAD
-export async function POST(req: NextRequest) {
-  try {
-    const { email, password, name } = await req.json();
-
-    if (!email || !password || !name) {
-      return NextResponse.json(
-        { error: 'Email, senha e nome são obrigatórios' },
-        { status: 400 }
-      );
-    }
-
-=======
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
 
 export async function POST(req: NextRequest) {
@@ -43,34 +25,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     if (password.length < 8) {
       return NextResponse.json(
         { error: 'Senha deve ter pelo menos 8 caracteres' },
         { status: 400 }
       );
     }
-<<<<<<< HEAD
-
-    const existing = await db.query.users.findFirst({
-      where: eq(users.email, email.toLowerCase().trim()),
-    });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Este email já está cadastrado' },
-        { status: 409 }
-      );
-    }
-
-    const senha_hash = await hashPassword(password);
-    const now = new Date().toISOString();
-
-    await db.insert(users).values({
-      id: crypto.randomUUID(),
-      email: email.toLowerCase().trim(),
-      nome: name.trim(),
-=======
     if (username && !USERNAME_RE.test(username)) {
       return NextResponse.json(
         { error: 'Username inválido. Use 3-30 caracteres: letras, números ou _' },
@@ -108,7 +68,6 @@ export async function POST(req: NextRequest) {
       username: cleanUsername || null,
       birthday: birthday || null,
       location: location?.trim() || null,
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       senha_hash,
       provider: 'email',
       subscription_status: 'free',
@@ -116,8 +75,6 @@ export async function POST(req: NextRequest) {
       atualizado_em: now,
     });
 
-<<<<<<< HEAD
-=======
     // ── referral ──────────────────────────────────────────────────────────────
     if (referralCode && typeof referralCode === 'string') {
       await registerReferral({
@@ -127,7 +84,6 @@ export async function POST(req: NextRequest) {
       }).catch(() => {});
     }
 
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Erro ao registrar usuário:', error);
@@ -136,8 +92,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9

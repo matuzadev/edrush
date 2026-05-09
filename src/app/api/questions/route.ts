@@ -1,9 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD
-import { db } from '@/lib/db';
-import { questions } from '@/db/schema';
-import { eq, and, like, SQL } from 'drizzle-orm';
-=======
 import { createClient } from '@libsql/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
@@ -14,39 +9,16 @@ const rawClient = createClient({
   url: dbUrl,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const disciplina = searchParams.get('disciplina');
-<<<<<<< HEAD
-=======
     const capitulo = searchParams.get('capitulo');
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     const dificuldade = searchParams.get('dificuldade');
     const concursoId = searchParams.get('concurso_id');
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') ?? '100');
-<<<<<<< HEAD
-
-    const where: SQL[] = [];
-    if (disciplina) where.push(eq(questions.disciplina, disciplina));
-    if (dificuldade) where.push(eq(questions.dificuldade, dificuldade));
-    if (concursoId) where.push(eq(questions.concurso_id, parseInt(concursoId)));
-    if (search) where.push(like(questions.enunciado, `%${search}%`));
-
-    const resultado = await db.query.questions.findMany({
-      where: where.length > 0 ? and(...where) : undefined,
-      limit,
-      with: { concurso: { columns: { titulo: true, organizador: true } } },
-    });
-
-    return NextResponse.json(resultado);
-  } catch (error) {
-    console.error('Erro ao buscar questões:', error);
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
-=======
     // Anti-farm: por padrão, exclui questões que o usuário já acertou.
     // Pode ser desligado via ?includeAnswered=1 (preview, admin, manage-questions).
     const includeAnswered = searchParams.get('includeAnswered') === '1';
@@ -222,6 +194,5 @@ export async function GET(request: NextRequest) {
       error: 'Erro ao buscar questões',
       message: error instanceof Error ? error.message : 'Erro interno'
     }, { status: 500 });
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   }
 }

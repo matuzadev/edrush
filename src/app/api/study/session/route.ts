@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
-<<<<<<< HEAD
-import { study_sessions } from '@/db/schema';
-=======
 import {
   study_sessions, users, notifications,
   chapters, user_chapter_progress, chapter_unlocks,
@@ -27,7 +24,6 @@ function crystalsForSession(correct: number, total: number): number {
   if (correct > 10) amount += correct - 10;
   return amount;
 }
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -37,9 +33,6 @@ export async function POST(req: NextRequest) {
 
   const userId = (session.user as any).id as string;
 
-<<<<<<< HEAD
-  let body: { questionsAnswered: number; correctAnswers: number; concursoSlug?: string; subject?: string };
-=======
   let body: {
     questionsAnswered: number;
     correctAnswers: number;
@@ -50,18 +43,13 @@ export async function POST(req: NextRequest) {
     disciplina?: string;     // ex.: 'lingua-portuguesa' (usado como fallback)
     chapter?: string;        // título do capítulo
   };
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Body inválido' }, { status: 400 });
   }
 
-<<<<<<< HEAD
-  const { questionsAnswered, correctAnswers, concursoSlug, subject } = body;
-=======
   const { questionsAnswered, correctAnswers, concursoSlug, subject, chapterId, disciplina, chapter } = body;
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 
   if (
     typeof questionsAnswered !== 'number' ||
@@ -74,11 +62,6 @@ export async function POST(req: NextRequest) {
   }
 
   const now = new Date();
-<<<<<<< HEAD
-  const sessionDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
-
-  try {
-=======
   const sessionDate = now.toISOString().split('T')[0];
   const baseEarned = xpForSession(correctAnswers, questionsAnswered);
   // O buff é resolvido depois (precisamos ler o usuário). Mantemos `earned`
@@ -87,7 +70,6 @@ export async function POST(req: NextRequest) {
 
   try {
     // Insert session
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
     await db.insert(study_sessions).values({
       user_id: userId,
       session_date: sessionDate,
@@ -95,12 +77,6 @@ export async function POST(req: NextRequest) {
       correct_answers: correctAnswers,
       concurso_slug: concursoSlug ?? null,
       subject: subject ?? null,
-<<<<<<< HEAD
-      criado_em: now.toISOString(),
-    });
-
-    return NextResponse.json({ ok: true });
-=======
       chapter_id: typeof chapterId === 'number' ? chapterId : null,
       criado_em: now.toISOString(),
     });
@@ -312,7 +288,6 @@ export async function POST(req: NextRequest) {
       crystalsBalance,
       buffApplied,
     });
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
   } catch (error) {
     console.error('Erro ao salvar sessão de estudo:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

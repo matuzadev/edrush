@@ -11,10 +11,6 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-<<<<<<< HEAD
-// Mantém compatibilidade com imports existentes que usam `stripe` diretamente
-=======
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
 export const stripe = new Proxy({} as Stripe, {
   get(_target, prop) {
     return (getStripe() as any)[prop];

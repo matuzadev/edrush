@@ -12,22 +12,6 @@ export interface ConcursoAreaMap {
 export const CONCURSO_AREAS: ConcursoAreaMap[] = [
   // ─── POLÍCIA FEDERAL ───────────────────────────────────────────────────────
   {
-<<<<<<< HEAD
-    // Baseado na Planilha PF & EsFCEX.xlsx — aba "Concurso PF"
-    match: ['perito criminal federal', 'perito digital'],
-    areas: [
-      // Conhecimentos Básicos
-      'lingua-portuguesa',
-      'informatica-basica',
-      'direito-penal',
-      'criminalistica',
-      // Conhecimentos Específicos
-      'fundamentos-computacao',
-      'bancos-de-dados',
-      'engenharia-reversa-malware',
-      'linguagens-programacao',
-      'estrutura-dados-algoritmos',
-=======
     // Baseado no edital Ed_1_PF_25_Abertura (CEBRASPE) para Perito Criminal Federal
     // — Área 3: Informática Forense. Currículo confere com o conteúdo programático
     // dos cargos da PF (Conhecimentos Básicos + Específicos da especialidade).
@@ -53,7 +37,6 @@ export const CONCURSO_AREAS: ConcursoAreaMap[] = [
       'teoria-sistemas',            // Sistemas abertos/fechados, integração
       'extras-esfcex',              // Criptografia, LGPD, forense digital, Git
       // ── Produção textual e estratégia de prova ──────────────────────────
->>>>>>> c0f05f4d6084f1210efa389d9dad642f1327a8d9
       'prova-discursiva',
       'banca-analise',
     ],
