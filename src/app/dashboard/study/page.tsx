@@ -8,7 +8,8 @@ import { SubscriptionGuard } from '@/components/SubscriptionGuard';
 import { Question, MOCK_QUESTIONS } from '@/lib/questions';
 import { QuestionModal } from '@/components/QuestionModal';
 import { usUserProfile } from '@/hooks/useProfile';
-import { LogOut, ChevronLeft, Trophy, Target, BookOpen, X } from 'lucide-react';
+import { LogOut, ChevronLeft, Trophy, Target, BookOpen, X, Share2 } from 'lucide-react';
+import { ShareResultModal } from '@/components/community/ShareResultModal';
 
 export default function StudyPage() {
   return (
@@ -41,6 +42,8 @@ function StudyPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [blockLoading, setBlockLoading] = useState<boolean>(isBlockMode);
+  const [shareOpen, setShareOpen] = useState(false);
+  const sessionStartRef = useRef<number>(Date.now());
   const questionStartRef = useRef<number>(Date.now());
 
   // Reset start time quando muda de questão
@@ -297,7 +300,21 @@ function StudyPageContent() {
               </div>
             </div>
 
-            <Link 
+            {/* CTA: Compartilhar resultado no feed */}
+            <button
+              onClick={() => setShareOpen(true)}
+              className="inline-flex items-center justify-center gap-2 w-full max-w-sm py-3 rounded-2xl text-sm font-black text-emerald-200 transition-all hover:-translate-y-0.5"
+              style={{
+                background: 'linear-gradient(135deg, rgba(16,185,129,0.14), rgba(6,182,212,0.06))',
+                border: '1px solid rgba(16,185,129,0.40)',
+                boxShadow: '0 0 14px -4px rgba(16,185,129,0.40)',
+              }}
+            >
+              <Share2 size={14} />
+              Compartilhar no Feed
+            </button>
+
+            <Link
               href="/dashboard/trilha"
               className="inline-block w-full max-w-sm py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl shadow-[0_4px_0_rgb(16,185,129)] active:shadow-none active:translate-y-1 transition-all"
             >
@@ -306,6 +323,26 @@ function StudyPageContent() {
           </div>
         )}
       </main>
+
+      {/* Modal: Compartilhar resultado no feed */}
+      {isFinished && (
+        <ShareResultModal
+          isOpen={shareOpen}
+          onClose={() => setShareOpen(false)}
+          result={{
+            acertos: correctAnswers,
+            total: sessionQuestions.length,
+            disciplina: disciplina ?? subject ?? undefined,
+            capitulo: moduloParam ?? undefined,
+            accuracy:
+              sessionQuestions.length > 0
+                ? Math.round((correctAnswers / sessionQuestions.length) * 100)
+                : 0,
+            tempoSegundos: Math.round((Date.now() - sessionStartRef.current) / 1000),
+          }}
+          myAvatarId={(profile as unknown as { avatar_id?: number })?.avatar_id ?? 1}
+        />
+      )}
     </div>
   );
 }

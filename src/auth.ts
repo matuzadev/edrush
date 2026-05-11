@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { db, initializeDatabase } from '@/lib/db';
+import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
@@ -25,9 +25,6 @@ function assertNextAuthSecretSafe(): void {
     );
   }
 }
-
-// Inicializar banco ao carregar (async, fire-and-forget na inicialização do módulo)
-initializeDatabase().catch(console.error);
 
 export const authOptions: NextAuthOptions = {
   providers: [

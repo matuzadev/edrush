@@ -37,6 +37,7 @@ import {
   Crown,
   AlertCircle,
   Sparkles,
+  Layers,
   X,
 } from 'lucide-react';
 
@@ -563,14 +564,21 @@ export default function ProfilePage() {
             </div>
 
             {/* ── Stats principais ── */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
               {([
                 {
                   icon: BookOpen,
                   label: 'Respondidas',
-                  hint: profile.totalQuestionsCorrect > 0 ? `${profile.totalQuestionsCorrect} corretas` : 'comece agora',
+                  hint: profile.totalPlatformQuestions
+                    ? `de ${profile.totalPlatformQuestions.toLocaleString('pt-BR')} no banco`
+                    : profile.totalQuestionsCorrect > 0
+                      ? `${profile.totalQuestionsCorrect} corretas`
+                      : 'comece agora',
                   value: profile.totalQuestionsAnswered.toLocaleString('pt-BR'),
                   accent: '#10b981',
+                  progress: profile.totalPlatformQuestions
+                    ? Math.min(100, Math.round((profile.totalQuestionsAnswered / profile.totalPlatformQuestions) * 100))
+                    : undefined,
                 },
                 {
                   icon: Target,
@@ -596,6 +604,18 @@ export default function ProfilePage() {
                   progress: profile.totalMedals > 0
                     ? Math.round((profile.medals / profile.totalMedals) * 100)
                     : 0,
+                },
+                {
+                  icon: Layers,
+                  label: 'Banco',
+                  hint: profile.coveragePct != null
+                    ? `${profile.coveragePct.toFixed(1)}% explorado`
+                    : 'questões cadastradas',
+                  value: profile.totalPlatformQuestions
+                    ? profile.totalPlatformQuestions.toLocaleString('pt-BR')
+                    : '—',
+                  accent: '#a855f7',
+                  progress: profile.coveragePct ?? 0,
                 },
               ] as const).map((metric) => {
                 const Icon = metric.icon;

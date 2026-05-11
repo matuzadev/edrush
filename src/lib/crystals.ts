@@ -1,13 +1,10 @@
-import { createClient } from '@libsql/client';
+import { lsClient as client } from '@/lib/db';
 import crypto from 'crypto';
 
-// Cliente direto do libsql para garantir atomicidade via UPDATE com cláusula
-// "WHERE crystals >= ?" e checagem de rowsAffected. Drizzle abstrai demais
-// para esse caso (precisamos saber se o UPDATE realmente afetou a linha).
-const client = createClient({
-  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+// Usamos o cliente raw libsql (singleton em @/lib/db) para garantir atomicidade
+// via UPDATE com cláusula "WHERE crystals >= ?" e checagem de rowsAffected.
+// Drizzle abstrai demais para esse caso (precisamos saber se o UPDATE realmente
+// afetou a linha).
 
 export type CrystalTxType =
   | 'earn_question'

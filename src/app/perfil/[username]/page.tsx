@@ -1,11 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';
-import { ConcursoBadge } from '@/components/ConcursoBadge';
 import { CeoBrasao } from '@/components/profile/CeoBrasao';
-import { ProfileShowcase } from '@/components/profile/ProfileShowcase';
 import { StoreItemPreview } from '@/components/store/StoreItemPreview';
+import { PerfilTabs } from './PerfilTabs';
 
 const RARITY_GLOW: Record<string, string> = {
   common:    'rgba(100,116,139,0.45)',
@@ -25,6 +23,7 @@ interface ItemRef {
 }
 
 interface ProfileData {
+  id: string;
   username: string;
   nome: string | null;
   avatar_id: number;
@@ -90,15 +89,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const avatar = AVATARS[(p.avatar_id - 1) % AVATARS.length] ?? '🎯';
   const joinYear = new Date(p.criado_em).getFullYear();
 
-  const medalsByCategory = MEDAL_CATEGORIES.map(cat => ({
-    category: cat,
-    medals: p.achievements.filter(m => m.category === cat),
-  })).filter(g => g.medals.length > 0);
-
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Top bar */}
-      <div className="border-b border-white/5 bg-[#020617]/80 sticky top-0 z-10 backdrop-blur">
+      <div className="border-b border-white/5 bg-[#020617]/80 sticky top-0 z-20 backdrop-blur">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="text-lg font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             FOCO FEDERAL
@@ -179,102 +173,26 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           </div>
         </div>
 
-        {/* Concurso em estudo */}
-        {p.concursoSlug && (
-          <ConcursoBadge slug={p.concursoSlug} variant="card" />
-        )}
-
-        {/* Vitrine de itens (loadout + inventário comprado) */}
-        {(p.loadout || (p.inventory && p.inventory.length > 0) || p.expBuff) && (
-          <ProfileShowcase
-            loadout={p.loadout ?? { border: null, avatar: null, badges: [] }}
-            inventory={p.inventory ?? []}
-            expBuff={p.expBuff ?? null}
-          />
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: 'Questões',  value: p.totalQuestionsAnswered.toLocaleString('pt-BR'), icon: '📝', color: 'text-emerald-400' },
-            { label: 'Precisão',  value: `${p.accuracy}%`,           icon: '🎯', color: p.accuracy >= 80 ? 'text-emerald-400' : p.accuracy >= 60 ? 'text-yellow-400' : 'text-red-400' },
-            { label: 'Sequência', value: `${p.streak}d`,             icon: '🔥', color: 'text-orange-400' },
-            { label: 'Medalhas',  value: `${p.medals}/${p.totalMedals}`, icon: '🏅', color: 'text-yellow-400' },
-          ].map(s => (
-            <div key={s.label} className="bg-slate-900 border border-white/8 rounded-2xl p-4">
-              <span className="text-xl">{s.icon}</span>
-              <p className={`text-2xl font-black mt-1 ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-slate-600 uppercase tracking-wide mt-0.5 font-semibold">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Medals by category */}
-        <div className="space-y-5">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">Medalhas</h2>
-          {medalsByCategory.map(({ category, medals }) => (
-            <div key={category} className="bg-slate-900 border border-white/8 rounded-2xl p-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">{category}</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {medals.map(m => {
-                  const ts = TIER_STYLE[m.tier];
-                  return (
-                    <div
-                      key={m.id}
-                      className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-all ${
-                        m.unlocked ? `${ts.bg} ${ts.border} shadow-sm ${ts.glow}` : 'bg-slate-800/40 border-slate-700/50 opacity-40'
-                      }`}
-                    >
-                      <span className={`text-xl shrink-0 ${m.unlocked ? '' : 'grayscale'}`}>{m.icon}</span>
-                      <div className="min-w-0">
-                        <p className={`text-xs font-bold truncate ${m.unlocked ? ts.text : 'text-slate-600'}`}>{m.label}</p>
-                        <p className="text-xs text-slate-600 truncate capitalize">{ts.label}</p>
-                      </div>
-                      {m.unlocked && <span className={`ml-auto text-xs font-bold shrink-0 ${ts.text}`}>✓</span>}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Activity calendar */}
-        <div className="bg-slate-900 border border-white/8 rounded-2xl p-5">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">Atividade (30 dias)</h2>
-          <div className="flex flex-wrap gap-1.5">
-            {p.activityLog.map(d => (
-              <div
-                key={d.date}
-                title={`${d.date}: ${d.questionsAnswered} questões`}
-                className={`w-6 h-6 rounded-md cursor-default ${
-                  d.questionsAnswered >= 20 ? 'bg-emerald-400' :
-                  d.questionsAnswered >= 10 ? 'bg-emerald-500/70' :
-                  d.questionsAnswered >= 1  ? 'bg-emerald-700/70' :
-                  'bg-slate-800'
-                }`}
-              />
-            ))}
-          </div>
-          <div className="flex items-center gap-2 mt-3 text-xs text-slate-600">
-            <span>Menos</span>
-            {['bg-slate-800','bg-emerald-700/70','bg-emerald-500/70','bg-emerald-400'].map(c => (
-              <div key={c} className={`w-4 h-4 rounded ${c}`} />
-            ))}
-            <span>Mais</span>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="text-center py-4">
-          <p className="text-slate-500 text-sm mb-3">Quer competir com {p.username}?</p>
-          <Link
-            href="/auth/signup"
-            className="inline-block px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl transition active:scale-95 shadow-lg shadow-emerald-500/20"
-          >
-            Criar minha conta grátis
-          </Link>
-        </div>
+        {/* Tabs + content */}
+        <PerfilTabs
+          data={{
+            id: p.id,
+            username: p.username,
+            totalQuestionsAnswered: p.totalQuestionsAnswered,
+            totalQuestionsCorrect: p.totalQuestionsCorrect,
+            totalSessions: p.totalSessions,
+            accuracy: p.accuracy,
+            streak: p.streak,
+            medals: p.medals,
+            totalMedals: p.totalMedals,
+            achievements: p.achievements,
+            activityLog: p.activityLog,
+            concursoSlug: p.concursoSlug,
+            loadout: p.loadout,
+            inventory: p.inventory,
+            expBuff: p.expBuff,
+          }}
+        />
       </main>
     </div>
   );

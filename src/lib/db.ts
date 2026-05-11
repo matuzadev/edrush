@@ -6,15 +6,25 @@ import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos
 import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
 import crypto from 'crypto';
 
-const client = createClient({
+export const client = createClient({
   url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
+// Alias for code that needs the raw libsql client. Prefer importing `client`
+// or `db` (drizzle) directly — never `createClient(...)` again.
+export const lsClient = client;
+
 export const db = drizzle(client, { schema });
 
+let _initialized = false;
+let _initPromise: Promise<void> | null = null;
+
 export async function initializeDatabase() {
-  try {
+  if (_initialized) return;
+  if (_initPromise) return _initPromise;
+  _initPromise = (async () => {
+    try {
     // Criar tabelas em lotes para evitar timeouts
     await client.batch(
       [
@@ -229,6 +239,11 @@ export async function initializeDatabase() {
         // Coluna já existe — ignorar
       }
     }
+
+    // Índices em users.username (case-sensitive + expression index para LOWER).
+    // Sem o expression index, lookups por username com LOWER(?) fazem full scan.
+    try { await client.execute(`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`); } catch {}
+    try { await client.execute(`CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username))`); } catch {}
 
     // Adicionar colunas novas em users (xp, level, referral, borda equipada)
     const newUsersColumns = [
@@ -554,6 +569,165 @@ export async function initializeDatabase() {
       `);
     } catch { /* já existe */ }
 
+    // ──────────────── COMUNIDADE ────────────────
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS posts (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          content TEXT NOT NULL,
+          post_type TEXT NOT NULL DEFAULT 'text',
+          group_id TEXT,
+          target_type TEXT,
+          target_id TEXT,
+          image_url TEXT,
+          metadata TEXT,
+          likes_count INTEGER NOT NULL DEFAULT 0,
+          comments_count INTEGER NOT NULL DEFAULT 0,
+          is_pinned INTEGER NOT NULL DEFAULT 0,
+          deleted_at TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_posts_feed ON posts(group_id, created_at DESC)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_posts_user ON posts(user_id, created_at DESC)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_posts_target ON posts(target_type, target_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_posts_type ON posts(post_type, created_at DESC)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS comments (
+          id TEXT PRIMARY KEY,
+          post_id TEXT NOT NULL,
+          user_id TEXT NOT NULL,
+          parent_id TEXT,
+          content TEXT NOT NULL,
+          likes_count INTEGER NOT NULL DEFAULT 0,
+          deleted_at TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (post_id) REFERENCES posts(id),
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id, created_at ASC)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_comments_parent ON comments(parent_id)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS likes (
+          user_id TEXT NOT NULL,
+          target_id TEXT NOT NULL,
+          target_type TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          PRIMARY KEY (user_id, target_id, target_type)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_likes_target ON likes(target_id, target_type)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS study_groups (
+          id TEXT PRIMARY KEY,
+          owner_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          slug TEXT NOT NULL UNIQUE,
+          description TEXT,
+          concurso_slug TEXT,
+          is_private INTEGER NOT NULL DEFAULT 0,
+          member_count INTEGER NOT NULL DEFAULT 1,
+          icon TEXT,
+          accent_color TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (owner_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_groups_concurso ON study_groups(concurso_slug)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_groups_member_count ON study_groups(member_count DESC)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS study_group_members (
+          group_id TEXT NOT NULL,
+          user_id TEXT NOT NULL,
+          role TEXT NOT NULL DEFAULT 'member',
+          joined_at TEXT NOT NULL,
+          PRIMARY KEY (group_id, user_id),
+          FOREIGN KEY (group_id) REFERENCES study_groups(id),
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_group_members_user ON study_group_members(user_id)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS reports (
+          id TEXT PRIMARY KEY,
+          reporter_id TEXT NOT NULL,
+          target_id TEXT NOT NULL,
+          target_type TEXT NOT NULL,
+          reason TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'pending',
+          resolved_by TEXT,
+          resolved_at TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (reporter_id) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_reports_pending ON reports(status, created_at)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`);
+    } catch { /* já existe */ }
+
+    // ── MATERIAIS DE ESTUDO (PDFs por disciplina/concurso) ────────────────
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS study_materials (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          concurso_slug TEXT NOT NULL,
+          disciplina TEXT NOT NULL,
+          content_json TEXT,
+          blob_url TEXT,
+          source_hash TEXT,
+          page_count INTEGER,
+          file_size INTEGER,
+          status TEXT NOT NULL DEFAULT 'draft',
+          error_msg TEXT,
+          generated_at TEXT,
+          published_at TEXT,
+          published_by TEXT,
+          criado_em TEXT NOT NULL,
+          atualizado_em TEXT NOT NULL,
+          FOREIGN KEY (published_by) REFERENCES users(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_sm_concurso_disc ON study_materials(concurso_slug, disciplina)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_sm_status ON study_materials(status)`);
+      await client.execute(`CREATE UNIQUE INDEX IF NOT EXISTS idx_sm_unique ON study_materials(concurso_slug, disciplina)`);
+    } catch { /* já existe */ }
+
+    try {
+      await client.execute(`
+        CREATE TABLE IF NOT EXISTS study_material_downloads (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id TEXT NOT NULL,
+          material_id INTEGER NOT NULL,
+          downloaded_at TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (material_id) REFERENCES study_materials(id)
+        )
+      `);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_smd_user ON study_material_downloads(user_id)`);
+      await client.execute(`CREATE INDEX IF NOT EXISTS idx_smd_material ON study_material_downloads(material_id)`);
+    } catch { /* já existe */ }
+
     // Seed de itens da loja (idempotente: só insere se store_items vazio)
     await seedStoreItems();
 
@@ -580,10 +754,14 @@ export async function initializeDatabase() {
     await seedQuestionsBank();
     await seedConcursosBank();
     console.log('✅ Banco de dados inicializado com sucesso');
-  } catch (error) {
-    console.error('❌ Erro ao inicializar banco de dados:', error);
-    throw error;
-  }
+    } catch (error) {
+      console.error('❌ Erro ao inicializar banco de dados:', error);
+      _initPromise = null;
+      throw error;
+    }
+  })();
+  await _initPromise;
+  _initialized = true;
 }
 
 async function seedUFs() {
