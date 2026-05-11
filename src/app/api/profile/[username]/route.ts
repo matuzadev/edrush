@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, lsClient } from '@/lib/db';
 import { users, study_sessions, user_responses } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
-import { createClient } from '@libsql/client';
-
-// Cliente libsql direto para queries de loadout/inventory (não temos
-// query builder Drizzle gerado para essas tabelas em cada select).
-const lsClient = createClient({
-  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
 
 interface ItemRef {
   id: string;
@@ -51,12 +43,28 @@ async function fetchProfileShowcase(userId: string): Promise<{
   inventory: Array<{ category: string; items: ItemRef[] }>;
   expBuff: { multiplier: number; expiresAt: string } | null;
 }> {
-  // Loadout (pode não existir)
-  const loadoutRs = await lsClient.execute({
-    sql: `SELECT border_item_id, avatar_item_id, equipped_badge_ids
-          FROM user_profile_loadout WHERE user_id = ?`,
-    args: [userId],
-  });
+  // 3 queries independentes — antes eram sequenciais (3 round-trips).
+  const now = new Date().toISOString();
+  const [loadoutRs, invRs, buffRs] = await Promise.all([
+    lsClient.execute({
+      sql: `SELECT border_item_id, avatar_item_id, equipped_badge_ids
+            FROM user_profile_loadout WHERE user_id = ?`,
+      args: [userId],
+    }),
+    lsClient.execute({
+      sql: `SELECT si.id, si.slug, si.name, si.rarity, si.category, si.metadata, ui.expires_at
+            FROM user_inventory ui
+            JOIN store_items si ON si.id = ui.store_item_id
+            WHERE ui.user_id = ?
+              AND (ui.expires_at IS NULL OR ui.expires_at > ?)
+            ORDER BY si.category, si.rarity DESC`,
+      args: [userId, now],
+    }),
+    lsClient.execute({
+      sql: 'SELECT exp_buff_multiplier, exp_buff_expires_at FROM users WHERE id = ?',
+      args: [userId],
+    }),
+  ]);
 
   let borderId: string | null = null;
   let avatarId: string | null = null;
@@ -77,22 +85,9 @@ async function fetchProfileShowcase(userId: string): Promise<{
     }
   }
 
-  // Inventário ativo (não-expirado)
-  const now = new Date().toISOString();
-  const invRs = await lsClient.execute({
-    sql: `SELECT si.id, si.slug, si.name, si.rarity, si.category, si.metadata, ui.expires_at
-          FROM user_inventory ui
-          JOIN store_items si ON si.id = ui.store_item_id
-          WHERE ui.user_id = ?
-            AND (ui.expires_at IS NULL OR ui.expires_at > ?)
-          ORDER BY si.category, si.rarity DESC`,
-    args: [userId, now],
-  });
-
   const allItems: ItemRef[] = (invRs.rows as unknown as InventoryRow[]).map(rowToItemRef);
   const itemsById = new Map(allItems.map((it) => [it.id, it]));
 
-  // Agrupa inventário por categoria (vitrine)
   const grouped = new Map<string, ItemRef[]>();
   for (const it of allItems) {
     const arr = grouped.get(it.category) ?? [];
@@ -101,16 +96,10 @@ async function fetchProfileShowcase(userId: string): Promise<{
   }
   const inventory = [...grouped.entries()].map(([category, items]) => ({ category, items }));
 
-  // Resolve loadout para refs reais; se item não está mais no inventário, vira null
   const border = borderId ? itemsById.get(borderId) ?? null : null;
   const avatar = avatarId ? itemsById.get(avatarId) ?? null : null;
   const badges = badgeIds.map((id) => itemsById.get(id)).filter((b): b is ItemRef => !!b);
 
-  // Buff de EXP (só retorna se ainda estiver ativo)
-  const buffRs = await lsClient.execute({
-    sql: 'SELECT exp_buff_multiplier, exp_buff_expires_at FROM users WHERE id = ?',
-    args: [userId],
-  });
   let expBuff: { multiplier: number; expiresAt: string } | null = null;
   if (buffRs.rows.length > 0) {
     const b = buffRs.rows[0] as unknown as {
@@ -166,30 +155,49 @@ export async function GET(
 
     if (!user) return NextResponse.json({ error: 'Perfil não encontrado' }, { status: 404 });
 
-    // Aggregate stats
-    const statsRes = await db
-      .select({
-        totalAnswered: sql<number>`COALESCE(SUM(questions_answered), 0)`,
-        totalCorrect:  sql<number>`COALESCE(SUM(correct_answers), 0)`,
-        totalSessions: sql<number>`COUNT(*)`,
-      })
-      .from(study_sessions)
-      .where(eq(study_sessions.user_id, user.id));
+    const ninetyAgo = new Date(); ninetyAgo.setDate(ninetyAgo.getDate() - 90);
+    const ninetyAgoStr = ninetyAgo.toISOString().split('T')[0];
+
+    // Todas as queries dependentes do user.id em paralelo (antes eram sequenciais).
+    const [statsRes, sessions, byDisciplinaRaw, showcase] = await Promise.all([
+      db
+        .select({
+          totalAnswered: sql<number>`COALESCE(SUM(questions_answered), 0)`,
+          totalCorrect:  sql<number>`COALESCE(SUM(correct_answers), 0)`,
+          totalSessions: sql<number>`COUNT(*)`,
+        })
+        .from(study_sessions)
+        .where(eq(study_sessions.user_id, user.id)),
+      db
+        .select({ session_date: study_sessions.session_date, questions_answered: study_sessions.questions_answered, correct_answers: study_sessions.correct_answers })
+        .from(study_sessions)
+        .where(sql`${study_sessions.user_id} = ${user.id} AND ${study_sessions.session_date} >= ${ninetyAgoStr}`),
+      db
+        .select({
+          disciplina: user_responses.disciplina,
+          answered:   sql<number>`COUNT(*)`,
+          correct:    sql<number>`SUM(${user_responses.acertou})`,
+        })
+        .from(user_responses)
+        .where(sql`${user_responses.user_id} = ${user.id} AND ${user_responses.disciplina} IS NOT NULL`)
+        .groupBy(user_responses.disciplina)
+        .orderBy(sql`COUNT(*) DESC`)
+        .limit(6),
+      fetchProfileShowcase(user.id).catch((err) => {
+        console.warn('Falha ao buscar vitrine do perfil (silenciado):', err);
+        return {
+          loadout: { border: null as ItemRef | null, avatar: null as ItemRef | null, badges: [] as ItemRef[] },
+          inventory: [] as Array<{ category: string; items: ItemRef[] }>,
+          expBuff: null as { multiplier: number; expiresAt: string } | null,
+        };
+      }),
+    ]);
 
     const stats = statsRes[0] ?? { totalAnswered: 0, totalCorrect: 0, totalSessions: 0 };
     const totalAnswered = Number(stats.totalAnswered);
     const totalCorrect  = Number(stats.totalCorrect);
     const totalSessions = Number(stats.totalSessions);
     const accuracy      = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-
-    // Sessions last 90d for streak + activity
-    const ninetyAgo = new Date(); ninetyAgo.setDate(ninetyAgo.getDate() - 90);
-    const ninetyAgoStr = ninetyAgo.toISOString().split('T')[0];
-
-    const sessions = await db
-      .select({ session_date: study_sessions.session_date, questions_answered: study_sessions.questions_answered, correct_answers: study_sessions.correct_answers })
-      .from(study_sessions)
-      .where(sql`${study_sessions.user_id} = ${user.id} AND ${study_sessions.session_date} >= ${ninetyAgoStr}`);
 
     const activityMap = new Map<string, { answered: number; correct: number }>();
     for (const s of sessions) {
@@ -223,19 +231,6 @@ export async function GET(
       });
     }
 
-    // Top disciplinas (até 6) — fonte: user_responses
-    const byDisciplinaRaw = await db
-      .select({
-        disciplina: user_responses.disciplina,
-        answered:   sql<number>`COUNT(*)`,
-        correct:    sql<number>`SUM(${user_responses.acertou})`,
-      })
-      .from(user_responses)
-      .where(sql`${user_responses.user_id} = ${user.id} AND ${user_responses.disciplina} IS NOT NULL`)
-      .groupBy(user_responses.disciplina)
-      .orderBy(sql`COUNT(*) DESC`)
-      .limit(6);
-
     const byDisciplina = byDisciplinaRaw.map(r => ({
       disciplina: r.disciplina ?? 'Outros',
       answered: Number(r.answered),
@@ -252,23 +247,8 @@ export async function GET(
 
     const isCeo = user.email === 'matheus@gmail.com';
 
-    // Vitrine + loadout + buff (com fallback seguro caso falhe)
-    let showcase: {
-      loadout: { border: ItemRef | null; avatar: ItemRef | null; badges: ItemRef[] };
-      inventory: Array<{ category: string; items: ItemRef[] }>;
-      expBuff: { multiplier: number; expiresAt: string } | null;
-    } = {
-      loadout: { border: null, avatar: null, badges: [] },
-      inventory: [],
-      expBuff: null,
-    };
-    try {
-      showcase = await fetchProfileShowcase(user.id);
-    } catch (err) {
-      console.warn('Falha ao buscar vitrine do perfil (silenciado):', err);
-    }
-
     return NextResponse.json({
+      id: user.id,
       username: user.username ?? user.nome ?? 'Concurseiro',
       nome: user.nome,
       avatar_id: user.avatar_id ?? 1,

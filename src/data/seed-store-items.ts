@@ -270,6 +270,36 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="founderGrad"><stop offset="0%" style="stop-color:%23FFFF00;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23founderGrad)"/><circle cx="50" cy="50" r="35" fill="%23FF1493"/><path d="M50 30 L58 45 L75 45 L62 56 L70 70 L50 60 L30 70 L38 56 L25 45 L42 45 Z" fill="%23FFD700"/></svg>',
     metadata: { kind: 'founder' },
   },
+  {
+    slug: 'badge-perito',
+    name: 'Selo Perito',
+    description: 'Para os mestres da precisão — alta acurácia em alto volume.',
+    category: 'mini_logo_badge',
+    priceCrystals: 4500,
+    rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%230891b2"/><circle cx="50" cy="50" r="28" fill="none" stroke="%23fde047" stroke-width="3"/><circle cx="50" cy="50" r="14" fill="none" stroke="%23fde047" stroke-width="2"/><circle cx="50" cy="50" r="4" fill="%23fde047"/><path d="M50 18 L50 28 M50 72 L50 82 M18 50 L28 50 M72 50 L82 50" stroke="%23fde047" stroke-width="2"/></svg>',
+    metadata: { kind: 'perito' },
+  },
+  {
+    slug: 'badge-maratonista',
+    name: 'Selo Maratonista',
+    description: 'Quem mantém constância acima de tudo — milhas e milhas estudadas.',
+    category: 'mini_logo_badge',
+    priceCrystals: 6000,
+    rarity: 'epic',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ea580c"/><path d="M30 60 L42 48 L52 56 L70 38" stroke="%23fef3c7" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="70" cy="38" r="5" fill="%23fde047"/><circle cx="42" cy="48" r="3" fill="%23fef3c7"/><circle cx="52" cy="56" r="3" fill="%23fef3c7"/></svg>',
+    metadata: { kind: 'maratonista' },
+  },
+  {
+    slug: 'badge-aprovado',
+    name: 'Selo Aprovado',
+    description: 'Honraria suprema — concedido a quem foi aprovado em concurso.',
+    category: 'mini_logo_badge',
+    priceCrystals: 12000,
+    rarity: 'legendary',
+    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="aprov" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%23fde047"/><stop offset="1" stop-color="%23ca8a04"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23aprov)"/><path d="M28 52 L44 68 L72 32" stroke="%23052e16" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="45" fill="none" stroke="%23052e16" stroke-width="2" stroke-dasharray="3 4"/></svg>',
+    metadata: { kind: 'aprovado' },
+  },
 
   // ── 3 EXP BUFFS ───────────────────────────────────────────────────
   {

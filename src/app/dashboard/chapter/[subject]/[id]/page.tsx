@@ -365,6 +365,40 @@ export default function ChapterPage({
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest truncate">{subjectTitle}</p>
             <p className="text-white font-bold text-sm truncate">{chapterTitle}</p>
           </div>
+          <a
+            href="/dashboard/materiais"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-emerald-300 transition"
+            style={{
+              background: 'rgba(15,23,42,0.85)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+            title="Material completo da disciplina (PDF)"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <polyline points="9 15 12 18 15 15"/>
+            </svg>
+            <span>PDF da matéria</span>
+          </a>
+          <a
+            href="/dashboard/materiais"
+            className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-emerald-300 transition"
+            style={{
+              background: 'rgba(15,23,42,0.85)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+            title="Material PDF"
+            aria-label="Baixar material PDF da disciplina"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <polyline points="9 15 12 18 15 15"/>
+            </svg>
+          </a>
         </div>
 
         <div className="flex-1 max-w-xl mx-auto w-full px-4 py-6 flex flex-col gap-6">

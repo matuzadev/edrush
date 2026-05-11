@@ -241,6 +241,56 @@ function BadgePreview({ kind, size }: { kind: string; size: number }) {
           <text x="32" y="38" textAnchor="middle" fontWeight="900" fontFamily="Arial" fontSize="14" fill="#451a03">F</text>
         </svg>
       );
+    case 'perito':
+      return (
+        <svg width={s} height={s} viewBox="0 0 64 64" fill="none">
+          <defs>
+            <radialGradient id="prt" cx="0.5" cy="0.5" r="0.6">
+              <stop offset="0%" stopColor="#22d3ee" />
+              <stop offset="100%" stopColor="#0e7490" />
+            </radialGradient>
+          </defs>
+          <circle cx="32" cy="32" r="28" fill="url(#prt)" stroke="#67e8f9" strokeWidth="2" />
+          <circle cx="32" cy="32" r="18" fill="none" stroke="#fde047" strokeWidth="2" />
+          <circle cx="32" cy="32" r="9" fill="none" stroke="#fde047" strokeWidth="1.5" />
+          <circle cx="32" cy="32" r="2.5" fill="#fde047" />
+          <line x1="32" y1="9" x2="32" y2="16" stroke="#fde047" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="32" y1="48" x2="32" y2="55" stroke="#fde047" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="9" y1="32" x2="16" y2="32" stroke="#fde047" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="48" y1="32" x2="55" y2="32" stroke="#fde047" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      );
+    case 'maratonista':
+      return (
+        <svg width={s} height={s} viewBox="0 0 64 64" fill="none">
+          <defs>
+            <linearGradient id="mrt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fb923c" />
+              <stop offset="100%" stopColor="#9a3412" />
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="28" fill="url(#mrt)" stroke="#fed7aa" strokeWidth="2" />
+          <path d="M16 40 L26 30 L34 36 L48 22" stroke="#fef3c7" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="48" cy="22" r="3.5" fill="#fde047" stroke="#fef3c7" strokeWidth="0.8" />
+          <circle cx="26" cy="30" r="2" fill="#fef3c7" />
+          <circle cx="34" cy="36" r="2" fill="#fef3c7" />
+          <circle cx="16" cy="40" r="2" fill="#fef3c7" />
+        </svg>
+      );
+    case 'aprovado':
+      return (
+        <svg width={s} height={s} viewBox="0 0 64 64" fill="none">
+          <defs>
+            <linearGradient id="apv" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fde047" />
+              <stop offset="100%" stopColor="#ca8a04" />
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="28" fill="url(#apv)" stroke="#052e16" strokeWidth="1.5" />
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#052e16" strokeWidth="1" strokeDasharray="2.5 3" />
+          <path d="M19 33 L28 43 L46 22" stroke="#052e16" strokeWidth="4.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
   }
   return (
     <svg width={s} height={s} viewBox="0 0 64 64" fill="none">

@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@libsql/client';
+import { lsClient as rawClient } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
-import path from 'path';
-
-const dbUrl = process.env.TURSO_DATABASE_URL ?? `file:${path.resolve(process.cwd(), 'data/foco-federal.db')}`;
-const rawClient = createClient({
-  url: dbUrl,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
 
 // Variantes de dificuldade (com/sem acento) para casar com o que tá no banco
 const DIFF_VARIANTS: Record<string, string[]> = {

@@ -1,14 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
-import { createClient } from '@libsql/client';
-import path from 'path';
-
-const dbUrl = process.env.TURSO_DATABASE_URL ?? `file:${path.resolve(process.cwd(), 'data/foco-federal.db')}`;
-const rawClient = createClient({
-  url: dbUrl,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+import { lsClient as rawClient } from '@/lib/db';
 
 // Limiar mínimo de acerto para considerar um capítulo "completado". Match com
 // /api/study/session — quando muda lá, mude aqui.

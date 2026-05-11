@@ -86,6 +86,10 @@ interface StatsInput {
   totalSessions: number;
   streak: number;
   level: number;
+  /** Quantas disciplinas distintas o usuário já tocou (para medalhas de polymath). */
+  distinctSubjectsTouched?: number;
+  /** Acurácia já calculada (%). Repassada para evitar recálculo. */
+  accuracy?: number;
 }
 
 type MedalDef = Omit<Medal, 'unlocked'> & { check: (s: StatsInput) => boolean };
@@ -116,6 +120,19 @@ const MEDAL_DEFS: MedalDef[] = [
   { id: 'level_5',           label: 'Consolidado',         description: 'Atingiu o Nível 5',                  icon: '🌿',  tier: 'silver',   category: 'Nível',      xpReward: 0,   check: s => s.level >= 5 },
   { id: 'level_7',           label: 'Experiente',          description: 'Atingiu o Nível 7',                  icon: '🌳',  tier: 'gold',     category: 'Nível',      xpReward: 0,   check: s => s.level >= 7 },
   { id: 'level_10',          label: 'Lendário',            description: 'Atingiu o Nível 10',                 icon: '👑',  tier: 'platinum', category: 'Nível',      xpReward: 0,   check: s => s.level >= 10 },
+  // ─── Volume estendido (alta intensidade) ────────────────────────────
+  { id: 'two_thousand',      label: 'Hardcore',            description: 'Respondeu 2.000 questões',           icon: '🛡️', tier: 'platinum', category: 'Volume',     xpReward: 1000,check: s => s.totalAnswered >= 2000 },
+  { id: 'five_thousand',     label: 'Inabalável',          description: 'Respondeu 5.000 questões',           icon: '⚔️',  tier: 'platinum', category: 'Volume',     xpReward: 2500,check: s => s.totalAnswered >= 5000 },
+  { id: 'ten_thousand',      label: 'Lenda Viva',          description: 'Respondeu 10.000 questões',          icon: '🌟',  tier: 'platinum', category: 'Volume',     xpReward: 5000,check: s => s.totalAnswered >= 10000 },
+  // ─── Sequência estendida ──────────────────────────────────────────
+  { id: 'streak_60',         label: 'Disciplina de Aço',   description: '60 dias seguidos estudando',         icon: '🔱',  tier: 'platinum', category: 'Sequência',  xpReward: 1000,check: s => s.streak >= 60 },
+  { id: 'streak_100',        label: 'Centena de Foco',     description: '100 dias seguidos estudando',        icon: '🌌',  tier: 'platinum', category: 'Sequência',  xpReward: 2000,check: s => s.streak >= 100 },
+  // ─── Multi-disciplina (Polymath) — categoria nova ────────────────
+  { id: 'polymath_3',        label: 'Aprendiz Versátil',   description: 'Estudou em 3 disciplinas diferentes',icon: '🧭',  tier: 'bronze',   category: 'Versatilidade', xpReward: 50,  check: s => (s.distinctSubjectsTouched ?? 0) >= 3 },
+  { id: 'polymath_5',        label: 'Generalista',         description: 'Estudou em 5 disciplinas diferentes',icon: '🗺️', tier: 'silver',   category: 'Versatilidade', xpReward: 120, check: s => (s.distinctSubjectsTouched ?? 0) >= 5 },
+  { id: 'polymath_10',       label: 'Polímata',            description: 'Estudou em 10 disciplinas diferentes',icon: '🎭', tier: 'gold',     category: 'Versatilidade', xpReward: 300, check: s => (s.distinctSubjectsTouched ?? 0) >= 10 },
+  // ─── Sessões estendido ────────────────────────────────────────────
+  { id: 'hundred_sessions',  label: 'Rotina Forjada',      description: 'Completou 100 sessões de estudo',    icon: '⚒️', tier: 'platinum', category: 'Sessões',    xpReward: 600, check: s => s.totalSessions >= 100 },
 ];
 
 export function computeMedals(stats: StatsInput): Medal[] {
@@ -125,4 +142,4 @@ export function computeMedals(stats: StatsInput): Medal[] {
   }));
 }
 
-export const MEDAL_CATEGORIES = ['Início', 'Volume', 'Precisão', 'Sequência', 'Sessões', 'Nível'];
+export const MEDAL_CATEGORIES = ['Início', 'Volume', 'Precisão', 'Sequência', 'Versatilidade', 'Sessões', 'Nível'];

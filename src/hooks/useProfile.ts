@@ -35,12 +35,19 @@ export interface UserProfile {
   xpIntoLevel: number;
   xpNeeded: number;
   xpProgressPct: number;
-  // Stats
+  // Stats do usuário
   totalQuestionsAnswered: number;
   totalQuestionsCorrect: number;
   totalSessions: number;
   accuracy: number;
   streak: number;
+  distinctSubjectsTouched?: number;
+  // Stats da plataforma (banco inteiro)
+  totalPlatformQuestions?: number;
+  platformQuestionsByDisciplina?: { disciplina: string; total: number }[];
+  /** % de questões da plataforma que o usuário já respondeu (1 casa decimal). */
+  coveragePct?: number;
+  // Medalhas e atividade
   medals: number;
   totalMedals: number;
   achievements: Achievement[];
@@ -79,18 +86,54 @@ const DEFAULT_PROFILE: UserProfile = {
   equippedBadges: [],
 };
 
+// Cache de módulo: deduplica fetches concorrentes (vários componentes
+// chamando useProfile() ao mesmo tempo) e revalida só após TTL.
+// Sem isso, cada componente que monta useProfile dispara um GET /api/user/stats
+// separado, que serializa 7+ queries no Turso.
+const PROFILE_TTL_MS = 30_000;
+let _profileCache: { data: UserProfile; at: number } | null = null;
+let _profileInFlight: Promise<UserProfile> | null = null;
+const _profileSubscribers = new Set<(p: UserProfile) => void>();
+
+async function loadProfile(force = false): Promise<UserProfile> {
+  const now = Date.now();
+  if (!force && _profileCache && now - _profileCache.at < PROFILE_TTL_MS) {
+    return _profileCache.data;
+  }
+  if (_profileInFlight) return _profileInFlight;
+  _profileInFlight = (async () => {
+    try {
+      const res = await fetch('/api/user/stats');
+      if (!res.ok) throw new Error('Falha ao buscar perfil');
+      const data = (await res.json()) as UserProfile;
+      _profileCache = { data, at: Date.now() };
+      _profileSubscribers.forEach((cb) => cb(data));
+      return data;
+    } finally {
+      _profileInFlight = null;
+    }
+  })();
+  return _profileInFlight;
+}
+
+function patchProfileCache(updater: (p: UserProfile) => UserProfile) {
+  if (!_profileCache) return;
+  const next = updater(_profileCache.data);
+  _profileCache = { data: next, at: _profileCache.at };
+  _profileSubscribers.forEach((cb) => cb(next));
+}
+
 export const usUserProfile = () => {
-  const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
-  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile>(
+    () => _profileCache?.data ?? DEFAULT_PROFILE
+  );
+  const [isLoading, setIsLoading] = useState(() => !_profileCache);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
     try {
-      setIsLoading(true);
-      const res = await fetch('/api/user/stats');
-      if (!res.ok) throw new Error('Falha ao buscar perfil');
-      const data = await res.json();
-      setProfile(data as UserProfile);
+      const data = await loadProfile(true);
+      setProfile(data);
       setError(null);
     } catch (err) {
       console.error('useProfile fetch error:', err);
@@ -101,8 +144,25 @@ export const usUserProfile = () => {
   }, []);
 
   useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+    const sub = (p: UserProfile) => setProfile(p);
+    _profileSubscribers.add(sub);
+
+    if (_profileCache) {
+      setProfile(_profileCache.data);
+      setIsLoading(false);
+      // Revalidar em background se passou do TTL
+      if (Date.now() - _profileCache.at >= PROFILE_TTL_MS) {
+        loadProfile(false).catch(() => {});
+      }
+    } else {
+      loadProfile(false)
+        .then((data) => { setProfile(data); setError(null); })
+        .catch((err) => { console.error('useProfile fetch error:', err); setError('Não foi possível carregar o perfil'); })
+        .finally(() => setIsLoading(false));
+    }
+
+    return () => { _profileSubscribers.delete(sub); };
+  }, []);
 
   const updateProfile = async (updates: {
     username?: string;
@@ -121,8 +181,8 @@ export const usUserProfile = () => {
         const data = await res.json();
         throw new Error(data.error ?? 'Erro ao salvar');
       }
-      // Atualizar estado local otimisticamente
-      setProfile(prev => ({ ...prev, ...updates }));
+      // Atualizar cache de módulo (todos os subscribers veem o update)
+      patchProfileCache((prev) => ({ ...prev, ...updates }));
     } catch (err) {
       console.error('updateProfile error:', err);
       throw err;
@@ -142,8 +202,7 @@ export const usUserProfile = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(opts),
       });
-      // Atualizar stats localmente (otimista, sem refetch completo)
-      setProfile(prev => {
+      patchProfileCache((prev) => {
         const newTotal = prev.totalQuestionsAnswered + opts.questionsAnswered;
         const newCorrect = prev.totalQuestionsCorrect + opts.correctAnswers;
         const today = new Date().toISOString().split('T')[0];
@@ -174,7 +233,7 @@ export const usUserProfile = () => {
 
   // Mantidos para compatibilidade com study/page.tsx enquanto migração não termina
   const addCorrectAnswer = (_questionId: string) => {
-    setProfile(prev => ({
+    patchProfileCache((prev) => ({
       ...prev,
       totalQuestionsAnswered: prev.totalQuestionsAnswered + 1,
       totalQuestionsCorrect: prev.totalQuestionsCorrect + 1,
@@ -182,7 +241,7 @@ export const usUserProfile = () => {
   };
 
   const addIncorrectAnswer = () => {
-    setProfile(prev => ({
+    patchProfileCache((prev) => ({
       ...prev,
       totalQuestionsAnswered: prev.totalQuestionsAnswered + 1,
     }));
