@@ -1054,7 +1054,7 @@ async function backfillCrystals() {
     }
     console.log(`💎 Backfill cristais: ${usersRs.rows.length} usuários processados`);
   } catch (err) {
-    console.error('⚠️  Falha no backfill de cristais:', err);
+    console.error('⚠️  Falha no backfill de crisais:', err);
   }
 }
 
