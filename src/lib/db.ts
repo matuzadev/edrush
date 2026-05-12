@@ -7,7 +7,7 @@ import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
 import crypto from 'crypto';
 
 export const client = createClient({
-  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
+  url: process.env.TURSO_DB_URL ?? process.env.TURSO_DATABASE_URL ?? process.env.NEXT_PUBLIC_TURSO_CONNECTION_URL ?? 'file:data/foco-federal.db',
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
