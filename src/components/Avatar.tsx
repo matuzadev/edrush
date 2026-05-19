@@ -14,7 +14,7 @@
    alt?: string;
  }
 
-export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 0.12 }: Props) {
+export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 0.18 }: Props) {
    const innerSize = Math.round(size);
 
    // Prefer URL (user uploaded or image asset). Use next/image for optimization.
@@ -36,7 +36,9 @@ export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 
    }, []);
 
    if (src) {
-    const requestedSize = Math.max(1, Math.round(innerSize * dpr));
+  // Request a larger source image that matches the visual zoom so the
+  // browser receives enough pixels after we scale the image up slightly.
+  const requestedSize = Math.max(1, Math.round(innerSize * dpr * (1 + Math.max(0, zoom))));
      // next/image will create srcset entries based on the requested width/height
      // and the `sizes` attribute. We keep the displayed CSS size = innerSize so
      // the browser picks the higher-res resource for crisp rendering on HiDPI.
@@ -50,6 +52,7 @@ export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 
           justifyContent: 'center',
           borderRadius: '9999px',
           overflow: 'hidden',
+          position: 'relative',
         }}
         className={className}
       >
@@ -64,11 +67,25 @@ export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 
             objectPosition: 'center',
             transform: `scale(${1 + Math.max(0, zoom)})`,
             transition: 'transform 160ms ease-out',
+            willChange: 'transform',
           }}
           sizes={`${innerSize}px`}
-          quality={80}
+          quality={85}
           priority={false}
           loading="lazy"
+        />
+
+        {/* inner ring / border to match the design and hide edge artifacts */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '9999px',
+            boxShadow: '0 6px 18px rgba(2,6,23,0.45)',
+            border: '3px solid rgba(3,7,18,0.6)',
+            pointerEvents: 'none',
+          }}
         />
       </div>
      );
