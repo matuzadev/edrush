@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { getAvatar, CHARACTER_AVATARS, ORGAO_AVATARS, type AvatarDef } from '@/data/avatars';
+import Avatar from './Avatar';
 
 // Mantido para compatibilidade retroativa com código que importe AVATAR_OPTIONS
 export const AVATAR_OPTIONS = [
@@ -33,10 +34,7 @@ function AvatarCircle({ avatar, size }: { avatar: AvatarDef; size: number }) {
         flexShrink: 0,
       }}
     >
-      <div
-        style={{ width: size * 0.78, height: size * 0.78 }}
-        dangerouslySetInnerHTML={{ __html: avatar.svg }}
-      />
+      <Avatar avatar={avatar} size={Math.round(size * 0.78)} />
     </div>
   );
 }
@@ -112,10 +110,7 @@ export function AvatarSelector({ selectedId = 1, onSelect, size = 'md' }: Avatar
                   transition: 'all 0.15s ease',
                 }}
               >
-                <div
-                  style={{ width: 40, height: 40 }}
-                  dangerouslySetInnerHTML={{ __html: option.svg }}
-                />
+                <Avatar avatar={option} size={40} />
               </div>
               <span
                 className="text-[9px] text-center leading-tight max-w-[52px] line-clamp-2 transition-colors"

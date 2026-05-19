@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Avatar from './Avatar';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Settings, User, LogOut, ChevronDown, RefreshCw, Loader2, ShoppingBag, Package, Newspaper, BookOpen } from 'lucide-react';
@@ -114,20 +115,8 @@ export function UserMenu({ onLogout }: UserMenuProps) {
           >
             {isLoading ? (
               <div className="w-full h-full bg-slate-700 animate-pulse" />
-            ) : profile.foto_url ? (
-              <Image
-                src={profile.foto_url}
-                alt={displayName}
-                width={36}
-                height={36}
-                className="w-full h-full object-cover"
-                sizes="36px"
-              />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center"
-                dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
-              />
+              <Avatar avatar={avatarDef} url={profile.foto_url ?? null} size={36} alt={displayName} />
             )}
           </div>
 
@@ -166,21 +155,7 @@ export function UserMenu({ onLogout }: UserMenuProps) {
                   background: `linear-gradient(135deg, ${avatarDef.colors.primary}22, ${avatarDef.colors.accent}11)`,
                 }}
               >
-                {profile.foto_url ? (
-                  <Image
-                    src={profile.foto_url}
-                    alt={displayName}
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-cover"
-                    sizes="40px"
-                  />
-                ) : (
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
-                  />
-                )}
+                <Avatar avatar={avatarDef} url={profile.foto_url ?? null} size={40} alt={displayName} />
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-white truncate">{displayName}</p>
