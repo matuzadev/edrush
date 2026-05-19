@@ -39,7 +39,7 @@ export function AvatarBorder({ slug, size, children, className, showSparkles = t
   return (
     <div
       className={`relative inline-flex items-center justify-center shrink-0 ${className ?? ''}`}
-      style={{ width: totalSize, height: totalSize }}
+      style={{ width: totalSize, height: totalSize, borderRadius: '9999px', overflow: 'hidden' }}
     >
       <style>{`
         @keyframes ${id}-rotate     { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
