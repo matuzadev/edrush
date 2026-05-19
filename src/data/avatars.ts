@@ -106,7 +106,7 @@ export const AVATARS: AvatarDef[] = [
     category: 'character',
     name: 'Servidor Dedicado',
     tagline: 'Crachá de quem chegou lá',
-    imageUrl: 'imagens/'
+    imageUrl: 'imagens/servidor_dedicado.png', // usando PNG local existente em public/imagens
     colors: { primary: '#06b6d4', accent: '#67e8f9' },
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <circle cx="32" cy="32" r="30" fill="#031a20" stroke="#06b6d4" stroke-width="1.5"/>
