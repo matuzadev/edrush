@@ -6,6 +6,8 @@ export interface AvatarDef {
   name: string;
   tagline: string;
   svg: string;
+  // opcional: URL pública (ex: '/avatars/xxx.png' ou '/imagens/xxx.png') — será usada pelo componente Avatar quando disponível
+  imageUrl?: string;
   colors: { primary: string; accent: string };
 }
 
@@ -122,6 +124,8 @@ export const AVATARS: AvatarDef[] = [
     category: 'character',
     name: 'Águia Federal',
     tagline: 'Voe alto, chegue primeiro',
+    // usando PNG local existente em public/imagens
+    imageUrl: '/imagens/foto_de_perfil_KIRVANO.png',
     colors: { primary: '#dc2626', accent: '#fca5a5' },
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <circle cx="32" cy="32" r="30" fill="#200808" stroke="#dc2626" stroke-width="1.5"/>
