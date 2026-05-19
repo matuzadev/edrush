@@ -18,4 +18,4 @@ quero fazer um plano Free super limitado
 
 Preciso de fazer um mega teste diagnótico de um real Beta Tester e identificar erros.
 
-solucionar o erro de demora pra "Ver Resultado" depois de cada módulo de questões. 
+solucionar o erro de demora pra "Ver Resultado" depois de cada módulo de questões.      
