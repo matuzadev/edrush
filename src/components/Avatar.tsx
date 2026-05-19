@@ -9,10 +9,12 @@
    url?: string | null; // preferência: profile.foto_url ou avatar.imageUrl
    size?: number; // pixels (display size)
    className?: string;
+  /** percentual de zoom aplicado na imagem (ex: 0.12 => escala 1.12). Ajuda a preencher a miniatura */
+  zoom?: number;
    alt?: string;
  }
 
- export default function Avatar({ avatar, url, size = 40, className, alt }: Props) {
+export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 0.12 }: Props) {
    const innerSize = Math.round(size);
 
    // Prefer URL (user uploaded or image asset). Use next/image for optimization.
@@ -34,24 +36,41 @@
    }, []);
 
    if (src) {
-     const requestedSize = Math.max(1, Math.round(innerSize * dpr));
+    const requestedSize = Math.max(1, Math.round(innerSize * dpr));
      // next/image will create srcset entries based on the requested width/height
      // and the `sizes` attribute. We keep the displayed CSS size = innerSize so
      // the browser picks the higher-res resource for crisp rendering on HiDPI.
      return (
-       <div style={{ width: innerSize, height: innerSize, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className={className}>
-         <Image
-           src={src}
-           alt={alt ?? avatar?.name ?? 'avatar'}
-           width={requestedSize}
-           height={requestedSize}
-           className="w-full h-full object-cover"
-           sizes={`${innerSize}px`}
-           quality={80}
-           priority={false}
-           loading="lazy"
-         />
-       </div>
+      <div
+        style={{
+          width: innerSize,
+          height: innerSize,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '9999px',
+          overflow: 'hidden',
+        }}
+        className={className}
+      >
+        <Image
+          src={src}
+          alt={alt ?? avatar?.name ?? 'avatar'}
+          width={requestedSize}
+          height={requestedSize}
+          className="w-full h-full"
+          style={{
+            objectFit: 'cover',
+            objectPosition: 'center',
+            transform: `scale(${1 + Math.max(0, zoom)})`,
+            transition: 'transform 160ms ease-out',
+          }}
+          sizes={`${innerSize}px`}
+          quality={80}
+          priority={false}
+          loading="lazy"
+        />
+      </div>
      );
    }
 
