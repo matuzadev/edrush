@@ -56,34 +56,32 @@ export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 
         }}
         className={className}
       >
-        <Image
-          src={src}
-          alt={alt ?? avatar?.name ?? 'avatar'}
-          width={requestedSize}
-          height={requestedSize}
-          className="w-full h-full"
-          style={{
-            objectFit: 'cover',
-            objectPosition: 'center',
-            transform: `scale(${1 + Math.max(0, zoom)})`,
-            transition: 'transform 160ms ease-out',
-            willChange: 'transform',
-          }}
-          sizes={`${innerSize}px`}
-          quality={85}
-          priority={false}
-          loading="lazy"
-        />
+          <Image
+            src={src}
+            alt={alt ?? avatar?.name ?? 'avatar'}
+            width={requestedSize}
+            height={requestedSize}
+            className="w-full h-full"
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'center',
+              display: 'block',
+            }}
+            sizes={`${innerSize}px`}
+            quality={85}
+            priority={false}
+            loading="lazy"
+          />
 
         {/* inner ring / border to match the design and hide edge artifacts */}
         <div
           aria-hidden
-          style={{
+            style={{
             position: 'absolute',
             inset: 0,
             borderRadius: '9999px',
             boxShadow: '0 6px 18px rgba(2,6,23,0.45)',
-            border: '3px solid rgba(3,7,18,0.6)',
+            border: '2px solid rgba(3,7,18,0.55)',
             pointerEvents: 'none',
           }}
         />
