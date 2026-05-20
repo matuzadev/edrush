@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@libsql/client';
-import { db } from '@/lib/db';
+import { db, lsClient as rawClient } from '@/lib/db';
 import { concursos } from '@/db/schema';
 import { eq, and, like, SQL } from 'drizzle-orm';
-
-// Raw client para queries com ORDER BY em colunas novas (destaque) que o drizzle
-// schema não tem como orderBy sem recompilar os tipos.
-const rawClient = createClient({
-  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
 
 // Status válidos — alinhados com os valores usados no seed
 const VALID_STATUSES = new Set([

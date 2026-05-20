@@ -1,17 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
-import { db } from '@/lib/db';
+import { db, lsClient } from '@/lib/db';
 import { users, study_sessions, notifications, user_responses } from '@/db/schema';
 import { eq, sql, and } from 'drizzle-orm';
 import { createNotification } from '@/lib/notifications';
 import { computeLevel, computeMedals, xpForSession } from '@/lib/levels';
-import { createClient } from '@libsql/client';
-
-const lsClient = createClient({
-  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
 
 interface EquippedBadge {
   id: string;
@@ -94,38 +88,69 @@ export async function GET() {
   const userId = (session.user as any).id as string;
 
   try {
-    const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
-    if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
 
-    // Aggregate stats from sessions
-    const statsResult = await db
-      .select({
-        totalAnswered: sql<number>`COALESCE(SUM(questions_answered), 0)`,
-        totalCorrect: sql<number>`COALESCE(SUM(correct_answers), 0)`,
-        totalSessions: sql<number>`COUNT(*)`,
-      })
-      .from(study_sessions)
-      .where(eq(study_sessions.user_id, userId));
+    // Todas as queries independentes em paralelo — antes eram 7+ round-trips
+    // sequenciais ao Turso. O cliente libsql multiplexa, então queries
+    // independentes são bem mais rápidas em batch concorrente.
+    const [
+      user,
+      statsResult,
+      sessionsResult,
+      byDisciplinaRaw,
+      platformTotalRs,
+      platformByDiscRs,
+      equippedBadgesResult,
+      alreadyNotified,
+    ] = await Promise.all([
+      db.query.users.findFirst({ where: eq(users.id, userId) }),
+      db
+        .select({
+          totalAnswered: sql<number>`COALESCE(SUM(questions_answered), 0)`,
+          totalCorrect: sql<number>`COALESCE(SUM(correct_answers), 0)`,
+          totalSessions: sql<number>`COUNT(*)`,
+        })
+        .from(study_sessions)
+        .where(eq(study_sessions.user_id, userId)),
+      db
+        .select({
+          session_date: study_sessions.session_date,
+          questions_answered: study_sessions.questions_answered,
+          correct_answers: study_sessions.correct_answers,
+        })
+        .from(study_sessions)
+        .where(sql`${study_sessions.user_id} = ${userId} AND ${study_sessions.session_date} >= ${ninetyDaysAgoStr}`),
+      db
+        .select({
+          disciplina: user_responses.disciplina,
+          answered: sql<number>`COUNT(*)`,
+          correct: sql<number>`SUM(${user_responses.acertou})`,
+        })
+        .from(user_responses)
+        .where(sql`${user_responses.user_id} = ${userId} AND ${user_responses.disciplina} IS NOT NULL`)
+        .groupBy(user_responses.disciplina)
+        .orderBy(sql`COUNT(*) DESC`)
+        .limit(10),
+      lsClient.execute('SELECT COUNT(*) AS n FROM questions').catch(() => null),
+      lsClient
+        .execute('SELECT disciplina, COUNT(*) AS n FROM questions GROUP BY disciplina ORDER BY n DESC')
+        .catch(() => null),
+      fetchEquippedBadges(userId).catch(() => [] as EquippedBadge[]),
+      db
+        .select({ related_id: notifications.related_id })
+        .from(notifications)
+        .where(and(eq(notifications.user_id, userId), eq(notifications.type, 'achievement'))),
+    ]);
+
+    if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
 
     const stats = statsResult[0] ?? { totalAnswered: 0, totalCorrect: 0, totalSessions: 0 };
     const totalAnswered = Number(stats.totalAnswered);
     const totalCorrect  = Number(stats.totalCorrect);
     const totalSessions = Number(stats.totalSessions);
     const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-
-    // Sessions last 90 days for streak + activityLog
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-    const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
-
-    const sessionsResult = await db
-      .select({
-        session_date: study_sessions.session_date,
-        questions_answered: study_sessions.questions_answered,
-        correct_answers: study_sessions.correct_answers,
-      })
-      .from(study_sessions)
-      .where(sql`${study_sessions.user_id} = ${userId} AND ${study_sessions.session_date} >= ${ninetyDaysAgoStr}`);
 
     const activityMap = new Map<string, { questionsAnswered: number; correctAnswers: number; sessions: number }>();
     for (const s of sessionsResult) {
@@ -154,19 +179,6 @@ export async function GET() {
       weeklyProgress.push({ day: DAYS[d.getUTCDay()], date: dateStr, answered: day?.questionsAnswered ?? 0, correct: day?.correctAnswers ?? 0 });
     }
 
-    // Per-disciplina breakdown
-    const byDisciplinaRaw = await db
-      .select({
-        disciplina: user_responses.disciplina,
-        answered: sql<number>`COUNT(*)`,
-        correct: sql<number>`SUM(${user_responses.acertou})`,
-      })
-      .from(user_responses)
-      .where(sql`${user_responses.user_id} = ${userId} AND ${user_responses.disciplina} IS NOT NULL`)
-      .groupBy(user_responses.disciplina)
-      .orderBy(sql`COUNT(*) DESC`)
-      .limit(10);
-
     const byDisciplina = byDisciplinaRaw.map(r => ({
       disciplina: r.disciplina ?? 'Outros',
       answered: Number(r.answered),
@@ -174,45 +186,50 @@ export async function GET() {
       accuracy: Number(r.answered) > 0 ? Math.round((Number(r.correct) / Number(r.answered)) * 100) : 0,
     }));
 
-    // XP & Level — use stored value (updated by session endpoint), fallback to computed
+    const totalPlatformQuestions = platformTotalRs
+      ? Number((platformTotalRs.rows[0] as unknown as { n: number })?.n ?? 0)
+      : 0;
+    const platformQuestionsByDisciplina = platformByDiscRs
+      ? platformByDiscRs.rows.map((row) => {
+          const r = row as unknown as { disciplina: string | null; n: number };
+          return { disciplina: r.disciplina ?? 'Outros', total: Number(r.n) || 0 };
+        })
+      : [];
+
+    const distinctSubjectsTouched = byDisciplina.length;
+
     const storedXp = user.xp ?? 0;
     const levelInfo = computeLevel(storedXp);
 
-    // Medals
     const medals = computeMedals({
       totalAnswered,
       totalCorrect,
       totalSessions,
       streak,
       level: levelInfo.level,
+      distinctSubjectsTouched,
+      accuracy,
     });
     const unlockedMedals = medals.filter(m => m.unlocked);
 
-    // Selos equipados (até 3) — para renderizar inline no header do perfil
-    let equippedBadges: EquippedBadge[] = [];
-    try {
-      equippedBadges = await fetchEquippedBadges(userId);
-    } catch (err) {
-      console.warn('Falha ao buscar selos equipados (silenciado):', err);
-    }
+    const equippedBadges = equippedBadgesResult;
 
-    // Notify newly unlocked medals
-    const alreadyNotified = await db
-      .select({ related_id: notifications.related_id })
-      .from(notifications)
-      .where(and(eq(notifications.user_id, userId), eq(notifications.type, 'achievement')));
+    // Disparar notificações de medalhas em paralelo. Antes era um for-await
+    // sequencial — N writes serializados ao Turso para um endpoint de leitura.
     const notifiedIds = new Set(alreadyNotified.map(n => n.related_id));
-
-    for (const medal of unlockedMedals) {
-      if (!notifiedIds.has(medal.id)) {
-        await createNotification({
-          userId,
-          type: 'achievement',
-          title: `${medal.icon} Medalha desbloqueada: ${medal.label}`,
-          body: `${medal.description} · ${medal.tier === 'platinum' ? '💎 Platina' : medal.tier === 'gold' ? '🥇 Ouro' : medal.tier === 'silver' ? '🥈 Prata' : '🥉 Bronze'}`,
-          relatedId: medal.id,
-        });
-      }
+    const newMedalsToNotify = unlockedMedals.filter(m => !notifiedIds.has(m.id));
+    if (newMedalsToNotify.length > 0) {
+      await Promise.all(
+        newMedalsToNotify.map((medal) =>
+          createNotification({
+            userId,
+            type: 'achievement',
+            title: `${medal.icon} Medalha desbloqueada: ${medal.label}`,
+            body: `${medal.description} · ${medal.tier === 'platinum' ? '💎 Platina' : medal.tier === 'gold' ? '🥇 Ouro' : medal.tier === 'silver' ? '🥈 Prata' : '🥉 Bronze'}`,
+            relatedId: medal.id,
+          }).catch((err) => console.warn('createNotification falhou:', err))
+        )
+      );
     }
 
     return NextResponse.json({
@@ -238,12 +255,19 @@ export async function GET() {
       xpIntoLevel: levelInfo.xpIntoLevel,
       xpNeeded: levelInfo.xpNeeded,
       xpProgressPct: levelInfo.progressPct,
-      // Stats
+      // Stats do usuário
       totalQuestionsAnswered: totalAnswered,
       totalQuestionsCorrect: totalCorrect,
       totalSessions,
       accuracy,
       streak,
+      distinctSubjectsTouched,
+      // Stats da plataforma (banco inteiro)
+      totalPlatformQuestions,
+      platformQuestionsByDisciplina,
+      coveragePct: totalPlatformQuestions > 0
+        ? Math.round((totalAnswered / totalPlatformQuestions) * 1000) / 10  // uma casa decimal
+        : 0,
       // Medals
       medals: unlockedMedals.length,
       totalMedals: medals.length,

@@ -39,7 +39,7 @@ export function AvatarBorder({ slug, size, children, className, showSparkles = t
   return (
     <div
       className={`relative inline-flex items-center justify-center shrink-0 ${className ?? ''}`}
-      style={{ width: totalSize, height: totalSize }}
+      style={{ width: totalSize, height: totalSize, borderRadius: '9999px', overflow: 'hidden' }}
     >
       <style>{`
         @keyframes ${id}-rotate     { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
@@ -129,14 +129,25 @@ export function AvatarBorder({ slug, size, children, className, showSparkles = t
         >
           <div
             className="w-full h-full rounded-full overflow-hidden"
-            style={{ background: 'transparent' }}
+            style={{ background: 'transparent', position: 'relative' }}
           >
             <div
-              className="absolute inset-0"
+              // a wider, skewed strip that is blurred and uses a lightening blend
+              // mode so it appears as a golden highlight along the circular ring
+              className="absolute"
               style={{
-                background: `linear-gradient(90deg, transparent 0%, ${border.style.glow} 50%, transparent 100%)`,
-                animation: `${id}-shimmer 2.8s ease-in-out infinite`,
-                mixBlendMode: 'overlay',
+                left: '-140%',
+                top: 0,
+                bottom: 0,
+                width: '46%',
+                background: `linear-gradient(90deg, transparent 0%, ${border.style.glow ?? 'rgba(250,200,40,0.95)'} 45%, ${border.style.glow ?? 'rgba(250,200,40,0.95)'} 55%, transparent 100%)`,
+                transform: 'skewX(-14deg)',
+                filter: 'blur(6px)',
+                animation: `${id}-shimmer 2.4s linear infinite`,
+                mixBlendMode: 'screen',
+                opacity: 0.95,
+                borderRadius: '9999px',
+                pointerEvents: 'none',
               }}
             />
           </div>

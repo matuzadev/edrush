@@ -450,6 +450,53 @@ export const chapter_unlocks = sqliteTable(
   ]
 );
 
+// ── MATERIAIS DE ESTUDO (PDFs por disciplina/concurso) ────────────────
+// Pipeline: IA gera content_json → admin revisa/publica → PDF renderiza e
+// sobe pro Vercel Blob. Botão de download lê blob_url quando status='published'.
+export const study_materials = sqliteTable(
+  'study_materials',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    concurso_slug: text('concurso_slug').notNull(),
+    disciplina: text('disciplina').notNull(),
+    // JSON estruturado retornado pelo Claude (sections com type chapter/heading/paragraph/list/callout/example).
+    content_json: text('content_json'),
+    // URL no Vercel Blob — null enquanto não publicado.
+    blob_url: text('blob_url'),
+    // Hash MD5 das fontes (questions.material_*) usado pra invalidação.
+    source_hash: text('source_hash'),
+    page_count: integer('page_count'),
+    file_size: integer('file_size'),
+    // draft | published | failed | generating
+    status: text('status').notNull().default('draft'),
+    error_msg: text('error_msg'),
+    generated_at: text('generated_at'),
+    published_at: text('published_at'),
+    published_by: text('published_by').references(() => users.id),
+    criado_em: text('criado_em').notNull(),
+    atualizado_em: text('atualizado_em').notNull(),
+  },
+  (table) => [
+    index('idx_sm_concurso_disc').on(table.concurso_slug, table.disciplina),
+    index('idx_sm_status').on(table.status),
+  ]
+);
+
+// Log de downloads de materiais (auditoria + analytics).
+export const study_material_downloads = sqliteTable(
+  'study_material_downloads',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.id),
+    material_id: integer('material_id').notNull().references(() => study_materials.id),
+    downloaded_at: text('downloaded_at').notNull(),
+  },
+  (table) => [
+    index('idx_smd_user').on(table.user_id),
+    index('idx_smd_material').on(table.material_id),
+  ]
+);
+
 // Tabela de transações de cristais (auditoria)
 export const crystalTransactions = sqliteTable(
   'crystal_transactions',
@@ -520,6 +567,114 @@ export const userProfileLoadout = sqliteTable(
     equippedBadgeIds: text('equipped_badge_ids'), // JSON array max 3
     updatedAt: text('updated_at').notNull(),
   }
+);
+
+// ──────────────── COMUNIDADE ────────────────
+export const posts = sqliteTable(
+  'posts',
+  {
+    id: text('id').primaryKey(),
+    user_id: text('user_id').notNull().references(() => users.id),
+    content: text('content').notNull(),
+    post_type: text('post_type').notNull().default('text'),
+    group_id: text('group_id'),
+    target_type: text('target_type'),
+    target_id: text('target_id'),
+    image_url: text('image_url'),
+    metadata: text('metadata'),
+    likes_count: integer('likes_count').notNull().default(0),
+    comments_count: integer('comments_count').notNull().default(0),
+    is_pinned: integer('is_pinned').notNull().default(0),
+    deleted_at: text('deleted_at'),
+    created_at: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_posts_feed').on(table.group_id, table.created_at),
+    index('idx_posts_user').on(table.user_id, table.created_at),
+    index('idx_posts_target').on(table.target_type, table.target_id),
+    index('idx_posts_type').on(table.post_type, table.created_at),
+  ],
+);
+
+export const comments = sqliteTable(
+  'comments',
+  {
+    id: text('id').primaryKey(),
+    post_id: text('post_id').notNull().references(() => posts.id),
+    user_id: text('user_id').notNull().references(() => users.id),
+    parent_id: text('parent_id'),
+    content: text('content').notNull(),
+    likes_count: integer('likes_count').notNull().default(0),
+    deleted_at: text('deleted_at'),
+    created_at: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_comments_post').on(table.post_id, table.created_at),
+    index('idx_comments_parent').on(table.parent_id),
+  ],
+);
+
+export const likes = sqliteTable(
+  'likes',
+  {
+    user_id: text('user_id').notNull(),
+    target_id: text('target_id').notNull(),
+    target_type: text('target_type').notNull(),
+    created_at: text('created_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.user_id, table.target_id, table.target_type] }),
+    index('idx_likes_target').on(table.target_id, table.target_type),
+  ],
+);
+
+export const studyGroups = sqliteTable(
+  'study_groups',
+  {
+    id: text('id').primaryKey(),
+    owner_id: text('owner_id').notNull().references(() => users.id),
+    name: text('name').notNull(),
+    slug: text('slug').notNull().unique(),
+    description: text('description'),
+    concurso_slug: text('concurso_slug'),
+    is_private: integer('is_private').notNull().default(0),
+    member_count: integer('member_count').notNull().default(1),
+    icon: text('icon'),
+    accent_color: text('accent_color'),
+    created_at: text('created_at').notNull(),
+  },
+);
+
+export const studyGroupMembers = sqliteTable(
+  'study_group_members',
+  {
+    group_id: text('group_id').notNull().references(() => studyGroups.id),
+    user_id: text('user_id').notNull().references(() => users.id),
+    role: text('role').notNull().default('member'),
+    joined_at: text('joined_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.group_id, table.user_id] }),
+    index('idx_group_members_user').on(table.user_id),
+  ],
+);
+
+export const reports = sqliteTable(
+  'reports',
+  {
+    id: text('id').primaryKey(),
+    reporter_id: text('reporter_id').notNull().references(() => users.id),
+    target_id: text('target_id').notNull(),
+    target_type: text('target_type').notNull(),
+    reason: text('reason').notNull(),
+    status: text('status').notNull().default('pending'),
+    resolved_by: text('resolved_by'),
+    resolved_at: text('resolved_at'),
+    created_at: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_reports_pending').on(table.status, table.created_at),
+  ],
 );
 
 // Relações

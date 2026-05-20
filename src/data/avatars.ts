@@ -6,6 +6,8 @@ export interface AvatarDef {
   name: string;
   tagline: string;
   svg: string;
+  // opcional: URL pública (ex: '/avatars/xxx.png' ou '/imagens/xxx.png') — será usada pelo componente Avatar quando disponível
+  imageUrl?: string;
   colors: { primary: string; accent: string };
 }
 
@@ -104,6 +106,7 @@ export const AVATARS: AvatarDef[] = [
     category: 'character',
     name: 'Servidor Dedicado',
     tagline: 'Crachá de quem chegou lá',
+    imageUrl: '/imagens/servidor-dedicado.webp', // usando PNG local existente em public/imagens
     colors: { primary: '#06b6d4', accent: '#67e8f9' },
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <circle cx="32" cy="32" r="30" fill="#031a20" stroke="#06b6d4" stroke-width="1.5"/>
@@ -122,13 +125,15 @@ export const AVATARS: AvatarDef[] = [
     category: 'character',
     name: 'Águia Federal',
     tagline: 'Voe alto, chegue primeiro',
-    colors: { primary: '#dc2626', accent: '#fca5a5' },
+    // usando PNG local existente em public/imagens
+    imageUrl: '/imagens/foto_de_perfil_KIRVANO.png',
+    colors: { primary: '#4c00c7ff', accent: '#fca5a5' },
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <circle cx="32" cy="32" r="30" fill="#200808" stroke="#dc2626" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="30" fill="#200808" stroke="#3000b6ff" stroke-width="1.5"/>
   <path d="M32 14 C28 18 14 22 10 28 L22 26 L18 32 L28 30 L26 36 L32 34 L38 36 L36 30 L46 32 L42 26 L54 28 C50 22 36 18 32 14Z" fill="#991b1b" stroke="#dc2626" stroke-width="1.2"/>
   <circle cx="32" cy="25" r="3" fill="#fca5a5"/>
   <path d="M31 24 L29 26 L32 25 L35 26 L33 24Z" fill="#fbbf24"/>
-  <line x1="26" y1="36" x2="24" y2="44" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="26" y1="36" x2="24" y2="44" stroke="#070ae079" stroke-width="1.5" stroke-linecap="round"/>
   <line x1="38" y1="36" x2="40" y2="44" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round"/>
   <line x1="22" y1="44" x2="26" y2="44" stroke="#fca5a5" stroke-width="1.5" stroke-linecap="round"/>
   <line x1="38" y1="44" x2="42" y2="44" stroke="#fca5a5" stroke-width="1.5" stroke-linecap="round"/>
