@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import Avatar from './Avatar';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Settings, User, LogOut, ChevronDown, RefreshCw, Loader2, ShoppingBag, Package } from 'lucide-react';
+import { Settings, User, LogOut, ChevronDown, RefreshCw, Loader2, ShoppingBag, Package, Newspaper, BookOpen } from 'lucide-react';
 import { AvatarSelector } from '@/components/AvatarSelector';
 import { getAvatar } from '@/data/avatars';
 import { usUserProfile } from '@/hooks/useProfile';
@@ -113,14 +115,8 @@ export function UserMenu({ onLogout }: UserMenuProps) {
           >
             {isLoading ? (
               <div className="w-full h-full bg-slate-700 animate-pulse" />
-            ) : profile.foto_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.foto_url} alt={displayName} className="w-full h-full object-cover" />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center"
-                dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
-              />
+              <Avatar avatar={avatarDef} url={profile.foto_url ?? null} size={36} alt={displayName} />
             )}
           </div>
 
@@ -159,15 +155,7 @@ export function UserMenu({ onLogout }: UserMenuProps) {
                   background: `linear-gradient(135deg, ${avatarDef.colors.primary}22, ${avatarDef.colors.accent}11)`,
                 }}
               >
-                {profile.foto_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.foto_url} alt={displayName} className="w-full h-full object-cover" />
-                ) : (
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: avatarDef.svg }}
-                  />
-                )}
+                <Avatar avatar={avatarDef} url={profile.foto_url ?? null} size={40} alt={displayName} />
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-white truncate">{displayName}</p>
@@ -208,6 +196,24 @@ export function UserMenu({ onLogout }: UserMenuProps) {
             >
               <User className="w-4 h-4 text-emerald-400" />
               Perfil
+            </Link>
+            <Link
+              href="/dashboard/materiais"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition"
+              role="menuitem"
+            >
+              <BookOpen className="w-4 h-4 text-emerald-400" />
+              Materiais PDF
+            </Link>
+            <Link
+              href="/dashboard/feed"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition"
+              role="menuitem"
+            >
+              <Newspaper className="w-4 h-4 text-emerald-400" />
+              Comunidade
             </Link>
             <Link
               href="/dashboard/loja"

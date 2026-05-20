@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, initializeDatabase } from '@/lib/db';
+import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq, or } from 'drizzle-orm';
 import { hashPassword } from '@/auth';
 import { registerReferral } from '@/lib/referral';
 import { strictRateLimit } from '@/lib/rate-limit';
 import crypto from 'crypto';
-
-initializeDatabase();
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
 

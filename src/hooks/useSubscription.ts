@@ -10,28 +10,52 @@ interface SubscriptionInfo {
   isAdmin?: boolean;
 }
 
+// Cache de módulo: vários componentes que chamam useSubscription compartilham
+// o mesmo fetch ao invés de cada um disparar um GET /api/user/subscription.
+const SUB_TTL_MS = 60_000;
+let _subCache: { data: SubscriptionInfo | null; at: number } | null = null;
+let _subInFlight: Promise<SubscriptionInfo | null> | null = null;
+
+async function loadSubscription(): Promise<SubscriptionInfo | null> {
+  const now = Date.now();
+  if (_subCache && now - _subCache.at < SUB_TTL_MS) return _subCache.data;
+  if (_subInFlight) return _subInFlight;
+  _subInFlight = (async () => {
+    try {
+      const res = await fetch('/api/user/subscription');
+      const data = res.ok ? ((await res.json()) as SubscriptionInfo) : null;
+      _subCache = { data, at: Date.now() };
+      return data;
+    } finally {
+      _subInFlight = null;
+    }
+  })();
+  return _subInFlight;
+}
+
 export function useSubscription() {
-  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
-  const [isActive, setIsActive] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(
+    () => _subCache?.data ?? null
+  );
+  const [isActive, setIsActive] = useState(() => !!_subCache?.data?.hasAccess);
+  const [loading, setLoading] = useState(() => !_subCache);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/user/subscription')
-      .then(res => res.ok ? res.json() : null)
-      .then((data: SubscriptionInfo | null) => {
-        if (data) {
-          setSubscription(data);
-          setIsActive(data.hasAccess);
-        } else {
-          setIsActive(false);
-        }
+    let cancelled = false;
+    loadSubscription()
+      .then((data) => {
+        if (cancelled) return;
+        setSubscription(data);
+        setIsActive(!!data?.hasAccess);
       })
-      .catch(err => {
+      .catch((err) => {
+        if (cancelled) return;
         setError(err.message);
         setIsActive(false);
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   // daysRemaining kept for backwards compatibility — always 0 (no more free trial)

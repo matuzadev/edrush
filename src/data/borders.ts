@@ -336,6 +336,42 @@ export const BORDERS: BorderDef[] = [
       rays: true,
     },
   },
+  {
+    slug: 'aurora',
+    name: 'Aurora Boreal',
+    description: 'Cores que dançam como aurora. 5.000 questões respondidas.',
+    tier: 'diamond',
+    criteria: { type: 'questions', value: 5000 },
+    style: {
+      ring: 'conic-gradient(from 0deg, #34d399, #22d3ee, #818cf8, #c084fc, #34d399)',
+      glow: 'rgba(34,211,238,0.85)',
+      glowSize: 30,
+      width: 5,
+      rotate: true,
+      rotateSpeed: 12,
+      dualRing: 'conic-gradient(from 180deg, transparent 60%, #67e8f9 75%, transparent 90%)',
+      shimmer: true,
+      breathe: true,
+    },
+  },
+  {
+    slug: 'sol-poente',
+    name: 'Sol Poente',
+    description: 'Calor de quem termina o dia estudando. Sequência de 60 dias.',
+    tier: 'platinum',
+    criteria: { type: 'streak', value: 60 },
+    style: {
+      ring: 'conic-gradient(from 0deg, #fef3c7 0%, #fde047 25%, #fb923c 50%, #dc2626 75%, #fef3c7 100%)',
+      glow: 'rgba(251,146,60,0.85)',
+      glowSize: 28,
+      width: 5,
+      rotate: true,
+      rotateSpeed: 18,
+      rotateReverse: true,
+      pulse: true,
+      rays: true,
+    },
+  },
 
   // ─────────────────────── MÍTICA — exclusiva CEO ───────────────────────
   {

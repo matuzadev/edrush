@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe';
-import { db } from '@/lib/db';
+import { db, lsClient as rawClient } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { createClient } from '@libsql/client';
 import { processReferralReward } from '@/lib/referral';
-
-// Cliente raw para a tabela de dedup (não está no schema do drizzle).
-const rawClient = createClient({
-  url: process.env.TURSO_DATABASE_URL ?? 'file:data/foco-federal.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
 
 // Marca o event.id como processado. Retorna true se já estava (deve abortar).
 async function eventAlreadyProcessed(eventId: string, eventType: string): Promise<boolean> {
