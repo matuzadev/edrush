@@ -6,7 +6,8 @@
       "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('base64'\\)\\)\")",
       "PowerShell(Get-NetTCPConnection -State Listen -LocalPort 3000,3001,3002 -ErrorAction SilentlyContinue)",
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/api/auth/session\" -Method GET -TimeoutSec 30 -UseBasicParsing; Write-Output \"STATUS:$\\($r.StatusCode\\)\"; Write-Output \"BODY:$\\($r.Content\\)\" } catch { Write-Output \"ERROR: $\\($_.Exception.Message\\)\"; if \\($_.Exception.Response\\) { Write-Output \"STATUS: $\\($_.Exception.Response.StatusCode\\)\" } })",
-      "Bash(curl -sS -o NUL -w \"HTTP:%{http_code} TIME:%{time_total}\\\\n\" \"http://localhost:3000/api/auth/session\")"
+      "Bash(curl -sS -o NUL -w \"HTTP:%{http_code} TIME:%{time_total}\\\\n\" \"http://localhost:3000/api/auth/session\")",
+      "Bash(dir /B \"c:\\\\Users\\\\08422402173\\\\Documents\\\\GitHub\\\\foco-federal\")"
     ]
   }
 }
