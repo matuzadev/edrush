@@ -856,21 +856,21 @@
     "strategy": "Resolva provas anteriores de cada banca no tempo real e analise o estilo das questões. Para CESPE, treine a identificação de assertivas com advérbios absolutos (sempre, nunca, apenas) que costumam indicar erro."
   },
   "extras-esfcex": {
-    "quickReview": "O EsFCEx (Escola de Formação Complementar do Exército) avalia candidatos para o Serviço de Saúde do Exército, com provas de conhecimentos específicos da área de saúde e ciências biomédicas, além das disciplinas gerais.",
+    "quickReview": "Tópicos complementares do edital EsFCEx 2026 (Oficial do Quadro Complementar — Informática): virtualização, Git, LGPD, criptografia, logs/auditoria e fundamentos de forense digital. São assuntos modernos que aparecem com frequência crescente nas provas de TI do Exército.",
     "keyTopics": [
-      "Anatomia e fisiologia humana: sistemas do corpo humano",
-      "Bioquímica básica: metabolismo, enzimas e biomoléculas",
-      "Microbiologia e imunologia fundamentais",
-      "Saúde pública e epidemiologia",
-      "Legislação militar: Estatuto dos Militares e normas do Exército",
-      "Ética profissional e deontologia na área de saúde"
+      "Virtualização e containers (VMs, hypervisor Tipo 1/2, Docker, Kubernetes)",
+      "Versionamento Git (commits, branches, merge, rebase)",
+      "LGPD — Lei 13.709/2018 (princípios, ANPD, bases legais, direitos do titular)",
+      "Criptografia: hash, simétrica e assimétrica (AES, RSA, SHA-256, TLS, PKI)",
+      "Logs, auditoria e SIEM (coleta, retenção, correlação)",
+      "Forense digital (cadeia de custódia, hash de evidências, pós-incidente)"
     ],
     "references": [
-      { "title": "Anatomia Humana", "type": "livro", "author": "Sobotta" },
-      { "title": "Estatuto dos Militares - Lei 6.880/1980", "type": "lei", "author": "Brasil" },
-      { "title": "Bioquímica", "type": "livro", "author": "Lehninger" },
-      { "title": "Apostila EsFCEx - Conhecimentos Específicos", "type": "apostila", "author": "Gran Cursos Online" }
+      { "title": "LGPD — Lei nº 13.709/2018", "type": "lei", "author": "Brasil" },
+      { "title": "Cryptography and Network Security", "type": "livro", "author": "William Stallings" },
+      { "title": "Docker — Up & Running", "type": "livro", "author": "Sean Kane" },
+      { "title": "Pro Git", "type": "livro", "author": "Scott Chacon e Ben Straub" }
     ],
-    "strategy": "Combine o estudo das disciplinas específicas da área de saúde com as matérias gerais militares. A legislação do Exército e o Estatuto dos Militares são leitura obrigatória e muito cobrada."
+    "strategy": "Foque na ANPD, princípios e bases legais da LGPD (cobrança certa). Em criptografia, decore o que cada algoritmo é (AES/RSA/SHA) e quando se usa. Em virtualização, saiba diferenciar VM (kernel próprio) de container (compartilha o kernel do host)."
   }
 }
