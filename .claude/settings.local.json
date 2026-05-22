@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git checkout *)",
       "Bash(npm run *)",
-      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('base64'\\)\\)\")"
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('base64'\\)\\)\")",
+      "PowerShell(Get-NetTCPConnection -State Listen -LocalPort 3000,3001,3002 -ErrorAction SilentlyContinue)"
     ]
   }
 }
