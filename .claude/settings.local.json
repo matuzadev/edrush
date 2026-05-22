@@ -7,7 +7,9 @@
       "PowerShell(Get-NetTCPConnection -State Listen -LocalPort 3000,3001,3002 -ErrorAction SilentlyContinue)",
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/api/auth/session\" -Method GET -TimeoutSec 30 -UseBasicParsing; Write-Output \"STATUS:$\\($r.StatusCode\\)\"; Write-Output \"BODY:$\\($r.Content\\)\" } catch { Write-Output \"ERROR: $\\($_.Exception.Message\\)\"; if \\($_.Exception.Response\\) { Write-Output \"STATUS: $\\($_.Exception.Response.StatusCode\\)\" } })",
       "Bash(curl -sS -o NUL -w \"HTTP:%{http_code} TIME:%{time_total}\\\\n\" \"http://localhost:3000/api/auth/session\")",
-      "Bash(dir /B \"c:\\\\Users\\\\REDACTED_CPF\\\\Documents\\\\GitHub\\\\foco-federal\")"
+      "Bash(dir /B \"c:\\\\Users\\\\REDACTED_CPF\\\\Documents\\\\GitHub\\\\foco-federal\")",
+      "Bash(export TURSO_AUTH_TOKEN=\"REDACTED_TURSO_TOKEN\")",
+      "Bash(npx tsx *)"
     ]
   }
 }
