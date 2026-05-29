@@ -92,9 +92,17 @@ function PerfilTabsInner({ data }: Props) {
     <>
       <TabBar active={tab} onSelect={handleSelect} />
 
-      {tab === 'overview' && <OverviewTab data={data} />}
+      {tab === 'overview' && <OverviewTab data={data} isVisitor={isVisitor} />}
       {tab === 'posts' && <PostsTab userId={data.id} username={data.username} />}
       {tab === 'achievements' && <AchievementsTab achievements={data.achievements} />}
+
+      {/* Pop-up de captação — apenas para visitantes sem conta. */}
+      {isVisitor && (
+        <JoinPromoModal
+          username={data.username}
+          questionsAnswered={data.totalQuestionsAnswered}
+        />
+      )}
     </>
   );
 }
