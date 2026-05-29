@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, FileText, Award } from 'lucide-react';
+import { Eye, FileText, Award, Sparkles, ArrowRight } from 'lucide-react';
 import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';
 import { ConcursoBadge } from '@/components/ConcursoBadge';
@@ -178,7 +178,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">{children}</h2>;
 }
 
-function OverviewTab({ data }: { data: PerfilTabsData }) {
+function OverviewTab({ data, isVisitor }: { data: PerfilTabsData; isVisitor: boolean }) {
   const p = data;
   const medalsByCategory = MEDAL_CATEGORIES.map((cat) => ({
     category: cat,
@@ -324,27 +324,65 @@ function OverviewTab({ data }: { data: PerfilTabsData }) {
         </div>
       </Card>
 
-      {/* CTA */}
-      <div
-        className="relative overflow-hidden rounded-2xl text-center py-8 px-6"
-        style={{
-          background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.08))',
-          border: '1px solid rgba(16,185,129,0.25)',
-        }}
-      >
-        <p className="text-white font-black text-lg">Quer competir com {p.username}?</p>
-        <p className="text-slate-400 text-sm mt-1 mb-4">Crie sua conta grátis e comece a subir de nível.</p>
-        <Link
-          href="/auth/signup"
-          className="inline-block px-8 py-3 text-slate-950 font-black rounded-2xl transition active:scale-95"
+      {/* CTA — destacado apenas para visitantes sem conta.
+          Quem já está logado não vê (já faz parte da plataforma). */}
+      {isVisitor && (
+        <div
+          className="ff-cta-glow relative overflow-hidden rounded-3xl text-center py-9 px-6 scroll-mt-24"
           style={{
-            background: 'linear-gradient(135deg, #34d399, #10b981)',
-            boxShadow: '0 10px 30px -8px rgba(16,185,129,0.6)',
+            background: 'linear-gradient(135deg, rgba(16,185,129,0.16), rgba(6,182,212,0.10))',
+            border: '1px solid rgba(16,185,129,0.45)',
           }}
         >
-          Criar minha conta grátis
-        </Link>
-      </div>
+          {/* Brilho que percorre a borda */}
+          <span aria-hidden className="ff-cta-sheen pointer-events-none absolute inset-0" />
+
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-black mb-3"
+            style={{ background: 'rgba(16,185,129,0.18)', border: '1px solid rgba(16,185,129,0.45)', color: '#6ee7b7' }}
+          >
+            <Sparkles size={12} /> ENTRE NA DISPUTA
+          </span>
+
+          <p className="text-white font-black text-xl sm:text-2xl">Quer competir com {p.username}?</p>
+          <p className="text-slate-300 text-sm mt-1.5 mb-5 max-w-sm mx-auto">
+            {p.totalQuestionsAnswered > 0
+              ? `${p.username} já respondeu ${p.totalQuestionsAnswered.toLocaleString('pt-BR')} questões. Crie sua conta grátis e comece a subir de nível.`
+              : 'Crie sua conta grátis e comece a subir de nível.'}
+          </p>
+          <Link
+            href="/auth/signup"
+            className="ff-cta-pulse inline-flex items-center gap-2 px-8 py-3.5 text-slate-950 font-black rounded-2xl transition active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #34d399, #10b981)',
+              boxShadow: '0 10px 30px -8px rgba(16,185,129,0.6)',
+            }}
+          >
+            Criar minha conta grátis
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <p className="text-[11px] text-slate-500 mt-3">Sem cartão de crédito · leva 30 segundos</p>
+
+          <style jsx>{`
+            @keyframes ff-cta-pulse-kf {
+              0%, 100% { box-shadow: 0 10px 30px -8px rgba(16,185,129,0.6); }
+              50%      { box-shadow: 0 10px 40px -4px rgba(16,185,129,0.95); }
+            }
+            .ff-cta-pulse { animation: ff-cta-pulse-kf 2.4s ease-in-out infinite; }
+            @keyframes ff-cta-sheen-kf {
+              0%   { transform: translateX(-120%); }
+              60%, 100% { transform: translateX(120%); }
+            }
+            .ff-cta-sheen {
+              background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.10) 50%, transparent 60%);
+              animation: ff-cta-sheen-kf 4.5s ease-in-out infinite;
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .ff-cta-pulse, .ff-cta-sheen { animation: none; }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }
