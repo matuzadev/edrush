@@ -9,7 +9,14 @@
       "Bash(curl -sS -o NUL -w \"HTTP:%{http_code} TIME:%{time_total}\\\\n\" \"http://localhost:3000/api/auth/session\")",
       "Bash(dir /B \"c:\\\\Users\\\\08422402173\\\\Documents\\\\GitHub\\\\foco-federal\")",
       "Bash(export TURSO_AUTH_TOKEN=\"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJleHAiOjE3Nzk1NjE2ODgsImlhdCI6MTc3OTQ3NTI4OCwiaWQiOiIwMTlkZGM1OS1mZjAxLTczMzEtYTY2NS0yNGUxZjc2NjRlZjgiLCJyaWQiOiIwNmVjMTA3Mi00YWU0LTRjY2EtODM4ZC01Njc1MmI0MDcxZTcifQ.Cu4GHNI6fTv7iv1QyBp3E2WBCe8xDVW1X32fGMKdWl9KVXCb9BozKVJqghYlYJMUnOsw-mVskVCkqaZXcDOUBQ\")",
-      "Bash(npx tsx *)"
+      "Bash(npx tsx *)",
+      "Bash(python -c \"import json,glob; f=glob.glob\\('**/subjects.json',recursive=True\\); print\\(f\\); d=json.load\\(open\\(f[0],encoding='utf-8'\\)\\); print\\(type\\(d\\)\\); print\\(len\\(d\\) if isinstance\\(d,\\(list,dict\\)\\) else 'n/a'\\); print\\(list\\(d.keys\\(\\)\\)[:30] if isinstance\\(d,dict\\) else [x.get\\('slug'\\) or x.get\\('name'\\) for x in d][:30]\\)\")",
+      "Bash(node scripts/gerar-relatorio-extensao.mjs)",
+      "Bash(python -c \"import re; d=open\\('Projeto_Extensao_Foco_Federal.pdf','rb'\\).read\\(\\); print\\('size',len\\(d\\)\\); print\\('pages', len\\(re.findall\\(rb'/Type\\\\s*/Page[^s]', d\\)\\)\\)\")",
+      "Bash(node -e \"import\\('./scripts/gerar-relatorio-extensao.mjs'\\)\")",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(python scripts/_extract_pdf_text.py)",
+      "Bash(DEBUG_TOC=1 node scripts/gerar-relatorio-extensao.mjs)"
     ]
   }
 }
