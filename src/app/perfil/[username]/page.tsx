@@ -118,24 +118,20 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
           {/* Conteúdo do hero */}
           <div className="px-5 sm:px-8 pb-7 -mt-16 sm:-mt-20">
-            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5">
               {/* Avatar com borda equipada */}
-              <div className="relative shrink-0 drop-shadow-2xl">
-                <AvatarBorder slug={p.equippedBorder} size={92}>
+              <div className="shrink-0">
+                <AvatarBorder slug={p.equippedBorder} size={84}>
                   <AvatarSelector selectedId={p.avatar_id} size="lg" />
                 </AvatarBorder>
-                <div
-                  className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-black border whitespace-nowrap shadow-lg ${p.levelBg} ${p.levelBorder} ${p.levelColor}`}
-                  style={{ backdropFilter: 'blur(8px)' }}
-                >
-                  Nv {p.level}
-                </div>
               </div>
 
               {/* Nome + meta */}
               <div className="min-w-0 flex-1 sm:pb-2">
-                <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2 flex-wrap leading-tight">
-                  <span className="truncate">{p.username}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight break-words">
+                    {p.username}
+                  </h1>
                   {p.loadout?.badges && p.loadout.badges.length > 0 && (
                     <span className="inline-flex items-center gap-1 align-middle">
                       {p.loadout.badges.slice(0, 3).map((b) => {
@@ -154,10 +150,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                     </span>
                   )}
                   {p.isCeo && <CeoBrasao />}
-                </h1>
+                </div>
 
-                <div className="mt-1.5 flex items-center gap-3 flex-wrap text-xs text-slate-400">
-                  <span className={`font-black ${p.levelColor}`}>{p.levelName}</span>
+                <div className="mt-2 flex items-center gap-2.5 flex-wrap text-xs text-slate-400">
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 font-black ${p.levelBg} ${p.levelBorder} ${p.levelColor}`}>
+                    Nv {p.level} · {p.levelName}
+                  </span>
                   {p.location && (
                     <span className="inline-flex items-center gap-1"><MapPin size={12} /> {p.location}</span>
                   )}
