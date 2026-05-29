@@ -105,14 +105,12 @@ function TabBar({
   onSelect: (id: TabId) => void;
 }) {
   return (
-    <div
-      className="sticky z-10 -mx-4 px-4 bg-slate-950/80 backdrop-blur border-b border-white/5"
-      style={{ top: 56 }}
-    >
+    <div className="sticky z-20 py-2 -mx-4 px-4" style={{ top: 56 }}>
       <div
         role="tablist"
         aria-label="Seções do perfil"
-        className="flex gap-1 sm:gap-2 overflow-x-auto no-scrollbar"
+        className="flex gap-1 p-1 rounded-2xl backdrop-blur-xl"
+        style={{ background: 'rgba(15,23,42,0.75)', border: '1px solid rgba(255,255,255,0.08)' }}
       >
         {TABS.map((t) => {
           const isActive = active === t.id;
@@ -124,29 +122,21 @@ function TabBar({
               aria-selected={isActive}
               aria-controls={`panel-${t.id}`}
               onClick={() => onSelect(t.id)}
-              className="relative shrink-0 flex items-center gap-2 px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 rounded"
+              className="relative flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60"
               style={{
-                color: isActive ? '#34d399' : '#94a3b8',
+                color: isActive ? '#022c22' : '#94a3b8',
+                background: isActive
+                  ? 'linear-gradient(135deg, #34d399, #10b981)'
+                  : 'transparent',
+                boxShadow: isActive ? '0 6px 18px -6px rgba(16,185,129,0.7)' : 'none',
               }}
             >
               <Icon size={16} />
-              <span className="hidden sm:inline">{t.label}</span>
-              <span
-                aria-hidden
-                className="absolute left-0 right-0 -bottom-px h-0.5 rounded-t transition-all"
-                style={{
-                  background: isActive ? '#10b981' : 'transparent',
-                  boxShadow: isActive ? '0 0 12px -2px rgba(16,185,129,0.6)' : 'none',
-                }}
-              />
+              <span>{t.label}</span>
             </button>
           );
         })}
       </div>
-      <style jsx>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   );
 }
