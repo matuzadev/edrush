@@ -9,6 +9,8 @@ import type { Medal } from '@/lib/levels';
 import { ConcursoBadge } from '@/components/ConcursoBadge';
 import { ProfileShowcase } from '@/components/profile/ProfileShowcase';
 import { PostsTab } from './PostsTab';
+import { JoinPromoModal } from './JoinPromoModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ItemRef {
   id: string;
@@ -63,6 +65,12 @@ function PerfilTabsInner({ data }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+  const { user, isLoading: authLoading } = useAuth();
+
+  // Visitante sem conta: destacamos o CTA e mostramos o modal de captação.
+  // Enquanto a sessão carrega, tratamos como logado para evitar flash de
+  // conteúdo de marketing para quem na verdade já tem conta.
+  const isVisitor = !authLoading && !user;
 
   const initialTab = parseTab(sp?.get('tab') ?? null);
   const [tab, setTab] = useState<TabId>(initialTab);
