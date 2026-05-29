@@ -132,20 +132,42 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    // Notifica menções (não bloqueia criação em caso de falha).
+    // Busca dados do autor para compor a resposta (mesmo shape do /api/feed).
+    // Falha aqui não impede a criação — usamos fallbacks.
+    let authorRow:
+      | {
+          username: string | null;
+          nome: string | null;
+          avatar_id: number | null;
+          equipped_border: string | null;
+          xp: number | null;
+        }
+      | undefined;
     try {
       const authorRs = await lsClient.execute({
-        sql: 'SELECT username, nome FROM users WHERE id = ?',
+        sql: 'SELECT username, nome, avatar_id, equipped_border, xp FROM users WHERE id = ?',
         args: [userId],
       });
-      const authorRow = authorRs.rows[0] as unknown as
-        | { username: string | null; nome: string | null }
-        | undefined;
-      const authorUsername = authorRow?.username ?? authorRow?.nome ?? 'alguém';
+      authorRow = authorRs.rows[0] as unknown as typeof authorRow;
+    } catch (authorErr) {
+      console.error('[/api/posts POST] busca de autor falhou:', authorErr);
+    }
+
+    const author = {
+      id: userId,
+      username: authorRow?.username ?? authorRow?.nome ?? 'Concurseiro',
+      nome: authorRow?.nome ?? null,
+      avatarId: authorRow?.avatar_id ?? 1,
+      equippedBorder: authorRow?.equipped_border ?? 'recruta',
+      xp: authorRow?.xp ?? 0,
+    };
+
+    // Notifica menções (não bloqueia criação em caso de falha).
+    try {
       await notifyMentions({
         content,
         authorId: userId,
-        authorUsername,
+        authorUsername: author.username,
         type: 'mention',
         relatedId: id,
       });
@@ -169,6 +191,7 @@ export async function POST(req: NextRequest) {
           isPinned: false,
           likedByMe: false,
           createdAt: now,
+          author,
         },
       },
       { status: 201 },

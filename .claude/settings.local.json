@@ -16,7 +16,8 @@
       "Bash(node -e \"import\\('./scripts/gerar-relatorio-extensao.mjs'\\)\")",
       "Bash(node --input-type=module -e ' *)",
       "Bash(python scripts/_extract_pdf_text.py)",
-      "Bash(DEBUG_TOC=1 node scripts/gerar-relatorio-extensao.mjs)"
+      "Bash(DEBUG_TOC=1 node scripts/gerar-relatorio-extensao.mjs)",
+      "Bash(npx tsc *)"
     ]
   }
 }

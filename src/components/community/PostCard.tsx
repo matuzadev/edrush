@@ -19,7 +19,17 @@ import { AvatarSelector } from '@/components/AvatarSelector';
 import { AvatarBorder } from '@/components/AvatarBorder';
 import { CommentThread } from './CommentThread';
 import { RichContent } from './RichContent';
-import { type Post, type PostMetadataResult, relativeTime } from './types';
+import { type Post, type PostAuthor, type PostMetadataResult, relativeTime } from './types';
+
+/** Autor "fallback" para posts que cheguem sem o campo author preenchido. */
+const FALLBACK_AUTHOR: PostAuthor = {
+  id: '',
+  username: 'Concurseiro',
+  nome: null,
+  avatarId: 1,
+  equippedBorder: 'recruta',
+  xp: 0,
+};
 
 interface Props {
   post: Post;
@@ -45,6 +55,7 @@ export function PostCard({ post: initial, onUpdate, onDelete, defaultExpanded = 
 
   const accent = TYPE_ACCENT[post.postType] ?? TYPE_ACCENT.text;
   const isNews = post.postType === 'news';
+  const author = post.author ?? FALLBACK_AUTHOR;
 
   const handleLike = useCallback(async () => {
     // Otimista
@@ -142,21 +153,21 @@ export function PostCard({ post: initial, onUpdate, onDelete, defaultExpanded = 
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3 min-w-0">
             <Link
-              href={`/perfil/${encodeURIComponent(post.author.username)}`}
+              href={`/perfil/${encodeURIComponent(author.username)}`}
               className="shrink-0"
-              aria-label={`Perfil de ${post.author.username}`}
+              aria-label={`Perfil de ${author.username}`}
             >
-              <AvatarBorder slug={post.author.equippedBorder} size={40}>
-                <AvatarSelector selectedId={post.author.avatarId} size="sm" />
+              <AvatarBorder slug={author.equippedBorder} size={40}>
+                <AvatarSelector selectedId={author.avatarId} size="sm" />
               </AvatarBorder>
             </Link>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
-                  href={`/perfil/${encodeURIComponent(post.author.username)}`}
+                  href={`/perfil/${encodeURIComponent(author.username)}`}
                   className="text-sm font-bold text-white hover:text-emerald-300 transition truncate"
                 >
-                  {post.author.username}
+                  {author.username}
                 </Link>
                 <span className="text-[10px] text-slate-600">·</span>
                 <span className="text-[11px] text-slate-500">{relativeTime(post.createdAt)}</span>
