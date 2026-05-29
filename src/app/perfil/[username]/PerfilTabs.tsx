@@ -64,17 +64,18 @@ function PerfilTabsInner({ data }: Props) {
   const pathname = usePathname();
   const sp = useSearchParams();
 
-  const initialTab = parseTab(sp.get('tab'));
+  const initialTab = parseTab(sp?.get('tab') ?? null);
   const [tab, setTab] = useState<TabId>(initialTab);
 
   const handleSelect = useCallback(
     (next: TabId) => {
       setTab(next);
-      const params = new URLSearchParams(sp.toString());
+      const params = new URLSearchParams(sp?.toString() ?? '');
       if (next === 'overview') params.delete('tab');
       else params.set('tab', next);
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      const base = pathname ?? '';
+      router.replace(qs ? `${base}?${qs}` : base, { scroll: false });
     },
     [router, pathname, sp],
   );
