@@ -31,6 +31,8 @@ export interface PerfilTabsData {
   totalMedals: number;
   achievements: Medal[];
   activityLog: { date: string; questionsAnswered: number }[];
+  weeklyProgress?: { day: string; date: string; answered: number; correct: number }[];
+  byDisciplina?: { disciplina: string; answered: number; correct: number; accuracy: number }[];
   concursoSlug?: string | null;
   loadout?: { border: ItemRef | null; avatar: ItemRef | null; badges: ItemRef[] };
   inventory?: Array<{ category: string; items: ItemRef[] }>;
