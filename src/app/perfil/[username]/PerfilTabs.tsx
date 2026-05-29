@@ -143,6 +143,24 @@ function TabBar({
 
 // ─── Overview tab ───────────────────────────────────────────────────────────
 
+function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={`rounded-2xl p-5 ${className}`}
+      style={{
+        background: 'linear-gradient(135deg, rgba(15,23,42,0.9), rgba(15,23,42,0.55))',
+        border: '1px solid rgba(255,255,255,0.07)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">{children}</h2>;
+}
+
 function OverviewTab({ data }: { data: PerfilTabsData }) {
   const p = data;
   const medalsByCategory = MEDAL_CATEGORIES.map((cat) => ({
@@ -150,8 +168,12 @@ function OverviewTab({ data }: { data: PerfilTabsData }) {
     medals: p.achievements.filter((m) => m.category === cat),
   })).filter((g) => g.medals.length > 0);
 
+  const weekly = p.weeklyProgress ?? [];
+  const weekMax = Math.max(1, ...weekly.map((d) => d.answered));
+  const byDisc = (p.byDisciplina ?? []).filter((d) => d.answered > 0);
+
   return (
-    <div id="panel-overview" role="tabpanel" className="space-y-8">
+    <div id="panel-overview" role="tabpanel" className="space-y-6 mt-2">
       {/* Concurso em estudo */}
       {p.concursoSlug && <ConcursoBadge slug={p.concursoSlug} variant="card" />}
 
@@ -164,27 +186,76 @@ function OverviewTab({ data }: { data: PerfilTabsData }) {
         />
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: 'Questões',  value: p.totalQuestionsAnswered.toLocaleString('pt-BR'), icon: '📝', color: 'text-emerald-400' },
-          { label: 'Precisão',  value: `${p.accuracy}%`,           icon: '🎯', color: p.accuracy >= 80 ? 'text-emerald-400' : p.accuracy >= 60 ? 'text-yellow-400' : 'text-red-400' },
-          { label: 'Sequência', value: `${p.streak}d`,             icon: '🔥', color: 'text-orange-400' },
-          { label: 'Medalhas',  value: `${p.medals}/${p.totalMedals}`, icon: '🏅', color: 'text-yellow-400' },
-        ].map((s) => (
-          <div key={s.label} className="bg-slate-900 border border-white/8 rounded-2xl p-4">
-            <span className="text-xl">{s.icon}</span>
-            <p className={`text-2xl font-black mt-1 ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-600 uppercase tracking-wide mt-0.5 font-semibold">{s.label}</p>
+      {/* Atividade semanal + por disciplina */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Gráfico de barras — últimos 7 dias */}
+        <Card>
+          <SectionTitle>Últimos 7 dias</SectionTitle>
+          <div className="flex items-end justify-between gap-2 h-32">
+            {weekly.map((d) => {
+              const pct = Math.round((d.answered / weekMax) * 100);
+              return (
+                <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 group">
+                  <span className="text-[10px] font-bold text-slate-500 tabular-nums opacity-0 group-hover:opacity-100 transition">
+                    {d.answered}
+                  </span>
+                  <div className="w-full flex-1 flex items-end">
+                    <div
+                      className="w-full rounded-t-md transition-all"
+                      style={{
+                        height: `${Math.max(4, pct)}%`,
+                        background: d.answered > 0
+                          ? 'linear-gradient(180deg, #34d399, #059669)'
+                          : 'rgba(255,255,255,0.05)',
+                        boxShadow: d.answered > 0 ? '0 0 12px -4px rgba(16,185,129,0.8)' : 'none',
+                      }}
+                      title={`${d.date}: ${d.answered} questões`}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-600">{d.day}</span>
+                </div>
+              );
+            })}
+            {weekly.length === 0 && (
+              <p className="text-xs text-slate-600 w-full text-center self-center">Sem atividade recente.</p>
+            )}
           </div>
-        ))}
+        </Card>
+
+        {/* Desempenho por disciplina */}
+        <Card>
+          <SectionTitle>Desempenho por disciplina</SectionTitle>
+          {byDisc.length === 0 ? (
+            <p className="text-xs text-slate-600 py-8 text-center">Ainda sem dados por disciplina.</p>
+          ) : (
+            <div className="space-y-3">
+              {byDisc.map((d) => {
+                const color = d.accuracy >= 80 ? '#34d399' : d.accuracy >= 60 ? '#fbbf24' : '#fb7185';
+                return (
+                  <div key={d.disciplina}>
+                    <div className="flex items-center justify-between mb-1 text-xs">
+                      <span className="font-bold text-slate-300 truncate pr-2">{d.disciplina}</span>
+                      <span className="tabular-nums shrink-0" style={{ color }}>{d.accuracy}%</span>
+                    </div>
+                    <div className="h-2 rounded-full overflow-hidden bg-slate-800/80">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{ width: `${d.accuracy}%`, background: color }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
       </div>
 
       {/* Medals by category */}
-      <div className="space-y-5">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">Medalhas</h2>
+      <div className="space-y-4">
+        <SectionTitle>Medalhas</SectionTitle>
         {medalsByCategory.map(({ category, medals }) => (
-          <div key={category} className="bg-slate-900 border border-white/8 rounded-2xl p-5">
+          <Card key={category}>
             <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">{category}</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {medals.map((m) => {
@@ -206,19 +277,19 @@ function OverviewTab({ data }: { data: PerfilTabsData }) {
                 );
               })}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
       {/* Activity calendar */}
-      <div className="bg-slate-900 border border-white/8 rounded-2xl p-5">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">Atividade (30 dias)</h2>
+      <Card>
+        <SectionTitle>Atividade (30 dias)</SectionTitle>
         <div className="flex flex-wrap gap-1.5">
           {p.activityLog.map((d) => (
             <div
               key={d.date}
               title={`${d.date}: ${d.questionsAnswered} questões`}
-              className={`w-6 h-6 rounded-md cursor-default ${
+              className={`w-6 h-6 rounded-md cursor-default transition-transform hover:scale-110 ${
                 d.questionsAnswered >= 20 ? 'bg-emerald-400' :
                 d.questionsAnswered >= 10 ? 'bg-emerald-500/70' :
                 d.questionsAnswered >= 1  ? 'bg-emerald-700/70' :
@@ -234,14 +305,25 @@ function OverviewTab({ data }: { data: PerfilTabsData }) {
           ))}
           <span>Mais</span>
         </div>
-      </div>
+      </Card>
 
       {/* CTA */}
-      <div className="text-center py-4">
-        <p className="text-slate-500 text-sm mb-3">Quer competir com {p.username}?</p>
+      <div
+        className="relative overflow-hidden rounded-2xl text-center py-8 px-6"
+        style={{
+          background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.08))',
+          border: '1px solid rgba(16,185,129,0.25)',
+        }}
+      >
+        <p className="text-white font-black text-lg">Quer competir com {p.username}?</p>
+        <p className="text-slate-400 text-sm mt-1 mb-4">Crie sua conta grátis e comece a subir de nível.</p>
         <Link
           href="/auth/signup"
-          className="inline-block px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl transition active:scale-95 shadow-lg shadow-emerald-500/20"
+          className="inline-block px-8 py-3 text-slate-950 font-black rounded-2xl transition active:scale-95"
+          style={{
+            background: 'linear-gradient(135deg, #34d399, #10b981)',
+            boxShadow: '0 10px 30px -8px rgba(16,185,129,0.6)',
+          }}
         >
           Criar minha conta grátis
         </Link>
