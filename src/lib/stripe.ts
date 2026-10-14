@@ -56,19 +56,18 @@ export const createCheckoutSession = async (
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
-    line_items: [{ price: plan.priceId, quantity: 1 }],
-        line_items: [{
-          price_data: {
-            currency: 'brl',
-            unit_amount: Math.round(plan.price * 100),
-            recurring: { interval: 'month' },
-            product_data: {
-              name: plan.name,
-              description: plan.description,
-            },
-          },
-          quantity: 1,
-        }],
+    line_items: [{
+      price_data: {
+        currency: 'brl',
+        unit_amount: Math.round(plan.price * 100),
+        recurring: { interval: 'month' },
+        product_data: {
+          name: plan.name,
+          description: plan.description,
+        },
+      },
+      quantity: 1,
+    }],
     success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl}/assinar`,
     customer_email: userEmail,

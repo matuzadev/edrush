@@ -1,5 +1,3 @@
-                Materiais completos disponíveis no EdRush Premium
-                href="/assinar"
 // /dashboard/materiais — lista de materiais (PDFs) por disciplina do concurso do user.
 //
 // Server component:
