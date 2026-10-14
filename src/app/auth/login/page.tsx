@@ -21,7 +21,7 @@ const PERKS = [
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const justRegistered = searchParams.get('registered') === 'true';
 

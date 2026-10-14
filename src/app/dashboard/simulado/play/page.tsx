@@ -55,7 +55,7 @@ const QUESTIONS_BY_DISCIPLINE: Record<string, Question[]> = {
 
 export default function SimuladoPlayPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const disciplineId = searchParams.get('discipline') || 'portugues';
 
   const [questions, setQuestions] = useState<Question[]>([]);
