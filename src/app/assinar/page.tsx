@@ -66,7 +66,7 @@ export default function AssinarPage() {
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={32} height={32} />
-            <span className="font-black text-white text-lg">Foco<span className="text-emerald-400">Federal</span></span>
+            <span className="font-black text-white text-lg">Ed<span className="text-emerald-400">Rush</span></span>
           </Link>
           <div className="flex items-center gap-3">
             {user ? (

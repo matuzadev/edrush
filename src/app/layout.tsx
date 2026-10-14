@@ -10,8 +10,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
 export const metadata: Metadata = {
-  title: "Foco Federal | Perito PF Informática & ESFCEx",
-  description: "A única planilha com foco em 4000 questões, Active Recall e métricas reais para Perito Criminal Federal e ESFCEx.",
+  title: "EdRush | Aprendizado inteligente para concursos",
+  description: "Plataforma de estudo para concursos com revisão inteligente, métricas reais e fluxo de preparação otimizado.",
 };
 
 export default function RootLayout({
