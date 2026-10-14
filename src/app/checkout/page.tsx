@@ -1,3 +1,5 @@
+                <span>Assinatura mensal recorrente. Cobrado R$ {plan?.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês automaticamente. Cancele quando quiser, sem burocracia.</span>
+                    Assinar por R$ {plan?.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';

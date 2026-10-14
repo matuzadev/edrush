@@ -1,3 +1,4 @@
+              <span className="text-white font-semibold text-sm">EdRush Premium — R$ 14,99/mês</span>
 'use client';
 
 import { useEffect, useState } from 'react';

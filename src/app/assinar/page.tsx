@@ -87,6 +87,7 @@ export default function AssinarPage() {
           <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-full px-4 py-1.5 mb-5">
             <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
             <span className="text-red-400 text-xs font-bold uppercase tracking-widest">Acesso exclusivo por assinatura</span>
+                      <span className="text-red-400 text-xs font-bold uppercase tracking-widest">Comece grátis. Evolua para o Premium quando quiser.</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-4">
@@ -95,7 +96,10 @@ export default function AssinarPage() {
           </h1>
           <p className="text-lg text-slate-400 max-w-xl mx-auto">
             Acesso completo a todas as ferramentas, questões e analytics por um preço que cabe no seu bolso.
+            Use o EdRush gratuitamente e desbloqueie estudo ilimitado, analytics, simulados, materiais completos e personalização avançada com o Premium.
           </p>
+          <p className="text-emerald-300 text-sm font-semibold mt-3">O plano grátis inclui até 10 respostas por dia.</p>
+                            <span className="text-xs font-bold">EdRush Premium</span>
         </div>
 
         {/* Main grid: features + pricing card */}
@@ -149,8 +153,9 @@ export default function AssinarPage() {
                     <p className="text-slate-500 text-sm line-through mb-1">De R$ 49,90/mês</p>
                     <div className="flex items-baseline gap-1 mb-1">
                       <span className="text-slate-400 text-lg">R$</span>
-                      <span className="text-emerald-400 font-black" style={{ fontSize: '4rem', lineHeight: 1 }}>9</span>
-                      <span className="text-emerald-400 text-2xl font-bold">,90</span>
+                      <span className="text-emerald-400 font-black" style={{ fontSize: '4rem', lineHeight: 1 }}>14</span>
+                      <span className="text-emerald-400 text-2xl font-bold">,99</span>
+                                            Mensalidade recorrente — cancele quando quiser
                       <span className="text-slate-400 text-sm">/mês</span>
                     </div>
                     <p className="text-slate-300 text-xs font-semibold">
