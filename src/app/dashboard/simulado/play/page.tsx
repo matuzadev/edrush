@@ -99,7 +99,6 @@ export default function SimuladoPlayPage() {
         disciplina: disciplineId,
         subject: disciplineId,
         origem: 'simulado',
-        origem: 'simulado',
       }),
     }).catch(err => console.error('Falha ao salvar resposta do simulado:', err));
   };
