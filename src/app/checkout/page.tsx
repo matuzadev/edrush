@@ -67,8 +67,8 @@ function CheckoutContent() {
           <Link href="/assinar" className="p-2 rounded-xl hover:bg-white/5 transition-colors">
             <ChevronLeft size={20} className="text-slate-400" />
           </Link>
-          <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={28} height={28} />
-          <span className="font-black text-white">Foco<span className="text-emerald-400">Federal</span></span>
+          <Image src="/imagens/edrush-logo-removebg.png" alt="EdRush logo" width={28} height={28} />
+          <span className="font-black text-white">Ed<span className="text-emerald-400">Rush</span></span>
           <div className="ml-auto flex items-center gap-1.5 text-slate-500 text-xs">
             <Shield size={12} />
             <span>Checkout seguro via Stripe</span>

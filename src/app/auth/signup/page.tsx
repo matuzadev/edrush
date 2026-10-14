@@ -215,7 +215,7 @@ function SignupForm() {
           {/* ── Left ──────────────────────────────────────────────── */}
           <div className="hidden lg:flex flex-col gap-8 pt-4">
             <Link href="/" className="inline-flex items-center gap-3 w-fit">
-              <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={44} height={44} />
+              <Image src="/imagens/edrush-logo-removebg.png" alt="EdRush logo" width={44} height={44} />
               <span className="text-2xl font-black text-white">Ed<span className="text-emerald-400">Rush</span></span>
             </Link>
 
@@ -262,7 +262,7 @@ function SignupForm() {
           <div>
             {/* mobile logo */}
             <div className="flex items-center justify-center gap-3 mb-7 lg:hidden">
-              <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={36} height={36} />
+              <Image src="/imagens/edrush-logo-removebg.png" alt="EdRush logo" width={36} height={36} />
               <span className="text-xl font-black text-white">Ed<span className="text-emerald-400">Rush</span></span>
             </div>
 
