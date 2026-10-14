@@ -21,7 +21,6 @@ export interface Plan {
   id: string;
   name: string;
   price: number;
-  priceId: string;
   description: string;
   features: string[];
   popular?: boolean;
@@ -30,10 +29,9 @@ export interface Plan {
 export const PLANS: Plan[] = [
   {
     id: 'starter',
-    name: 'EdRush',
-    price: 9.90,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || '',
-    description: 'Acesso completo à plataforma',
+    name: 'EdRush Premium',
+    price: 14.99,
+    description: 'Estudo ilimitado e recursos avançados',
     popular: true,
     features: [
       'Acesso a 12.000+ questões comentadas',
@@ -59,6 +57,18 @@ export const createCheckoutSession = async (
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     line_items: [{ price: plan.priceId, quantity: 1 }],
+        line_items: [{
+          price_data: {
+            currency: 'brl',
+            unit_amount: Math.round(plan.price * 100),
+            recurring: { interval: 'month' },
+            product_data: {
+              name: plan.name,
+              description: plan.description,
+            },
+          },
+          quantity: 1,
+        }],
     success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl}/assinar`,
     customer_email: userEmail,

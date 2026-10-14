@@ -47,7 +47,10 @@ export default function Offer() {
           </span>
           <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
             Comece hoje por{' '}
-            <span className="text-emerald-400">R$9,90/mês</span>
+            Comece grátis. Faça upgrade quando quiser.
+                      O plano grátis oferece 10 respostas por dia. O Premium libera recursos avançados por R$ 14,99/mês.
+                        O que o Premium desbloqueia
+                            EdRush Premium
           </h2>
           <p className="text-slate-400 text-sm">
             Menos que um café por semana. Cancela quando quiser.
@@ -102,8 +105,8 @@ export default function Offer() {
                   <p className="text-slate-400 text-sm line-through mb-1">De R$ 49,90/mês</p>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-slate-400 text-base">R$</span>
-                    <span className="text-emerald-400 text-5xl font-black leading-none">9</span>
-                    <span className="text-emerald-400 text-2xl font-bold">,90</span>
+                    <span className="text-emerald-400 text-5xl font-black leading-none">14</span>
+                    <span className="text-emerald-400 text-2xl font-bold">,99</span>
                     <span className="text-slate-400 text-sm">/mês</span>
                   </div>
                   <p className="text-slate-300 text-xs font-semibold">

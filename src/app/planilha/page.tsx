@@ -50,7 +50,7 @@ export default function Planilha() {
             </h2>
             <p className="text-slate-400 text-sm leading-relaxed">
               Cada dia que você passa sem organizar seus estudos é um dia a mais na vida que você odeia.
-              Quanto custa a sua paz de espírito? R$ 49,90 é menos que uma pizza para garantir um salário vitalício.
+              Organize seus estudos com o plano grátis e desbloqueie os recursos avançados do EdRush Premium por R$ 14,99 ao mês.
             </p>
           </div>
 

@@ -9,8 +9,9 @@ export default function Hero() {
       <div className="relative z-50 w-full bg-emerald-500/10 border-b border-emerald-500/20 py-2 px-4 text-center">
         <p className="text-emerald-400 text-xs sm:text-sm font-semibold tracking-wide">
           Oferta de lançamento: apenas{' '}
-          <span className="text-white font-black">R$9,90/mês</span>
-          {' '}— Encerra em breve. Vagas limitadas.
+          Comece grátis com até 10 respostas por dia.{' '}
+          <span className="text-white font-black">Premium por R$ 14,99/mês</span>
+                      Conhecer o EdRush Premium — R$ 14,99/mês
         </p>
       </div>
 
