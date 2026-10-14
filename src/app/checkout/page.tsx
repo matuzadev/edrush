@@ -9,7 +9,7 @@ import { PLANS } from '@/lib/stripe';
 import { CheckCircle2, Loader2, CreditCard, ChevronLeft, Shield, Lock, RefreshCw, Zap, Star } from 'lucide-react';
 
 function CheckoutContent() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const router = useRouter();
   const planId = searchParams.get('plan') || 'starter';
   const { user, isLoading } = useAuth();

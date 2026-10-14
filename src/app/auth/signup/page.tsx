@@ -39,7 +39,7 @@ type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 
 function SignupForm() {
   const router       = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
 
   // ── fields ──
   const [fullName,            setFullName]            = useState('');
