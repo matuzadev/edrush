@@ -21,7 +21,7 @@ export default function StudyPage() {
 
 function StudyPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const { user, signOut, isLoading } = useAuth();
   const { profile, addCorrectAnswer, addIncorrectAnswer, completeChapter, saveStudySession } = usUserProfile();
 

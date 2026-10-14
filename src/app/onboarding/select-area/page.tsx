@@ -12,7 +12,7 @@ interface Area {
 
 function SelectAreaContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const { data: session, status, update } = useSession();
 
   const concursoId = searchParams.get('concursoId');
