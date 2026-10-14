@@ -8,8 +8,8 @@ export function CeoBrasao() {
   return (
     <span
       className="ceo-brasao inline-flex items-center justify-center relative"
-      title="CEO · Foco Federal"
-      aria-label="Fundador e CEO do Foco Federal"
+      title="CEO · EdRush"
+      aria-label="Fundador e CEO do EdRush"
       role="img"
     >
       {/* Glow de fundo animado */}

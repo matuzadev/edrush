@@ -159,7 +159,7 @@ function CheckoutContent() {
                   Checkout 100% seguro
                 </p>
                 <p className="text-slate-400 text-xs leading-relaxed">
-                  Você será redirecionado ao ambiente seguro do Stripe. A Foco Federal <strong className="text-white">não armazena</strong> dados do seu cartão.
+                  Você será redirecionado ao ambiente seguro do Stripe. A EdRush <strong className="text-white">não armazena</strong> dados do seu cartão.
                 </p>
               </div>
 

@@ -37,7 +37,7 @@ export function ShareResultModal({ isOpen, onClose, result, myAvatarId = 1 }: Pr
   const accuracyPct = result.accuracy;
   const dpart = result.disciplina ? ` em ${result.disciplina}` : '';
   const cpart = result.capitulo ? ` (cap. ${result.capitulo})` : '';
-  const initialText = `Acertei ${result.acertos}/${result.total}${dpart}${cpart} — ${accuracyPct}% de precisão. Foco federal! 🎯`;
+  const initialText = `Acertei ${result.acertos}/${result.total}${dpart}${cpart} — ${accuracyPct}% de precisão. EdRush! 🎯`;
 
   const metadata = {
     acertos: result.acertos,

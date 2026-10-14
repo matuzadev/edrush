@@ -1,4 +1,4 @@
-// Catálogo de concursos públicos suportados pelo Foco Federal.
+// Catálogo de concursos públicos suportados pelo EdRush.
 // Estrutura escalável — basta adicionar novas entradas aqui e tudo na UI atualiza.
 
 export interface ConcursoDef {

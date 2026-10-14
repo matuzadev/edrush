@@ -86,7 +86,7 @@ function drawHeaderFooter(doc: Doc, opts: { title: string; subtitle: string }) {
     doc.fontSize(8).font('NS-Regular').fillColor(COLORS.muted);
     const pageNum = i - range.start + 1;
     doc.text(
-      `Foco Federal · Material de Estudos`,
+      `EdRush · Material de Estudos`,
       PAGE_MARGIN, PAGE_HEIGHT - 30,
       { width: CONTENT_WIDTH, align: 'left', lineBreak: false }
     );
@@ -149,7 +149,7 @@ function drawCover(doc: Doc, content: StudyMaterialContent) {
   const gen = new Date(content.generated_at);
   const formatted = `${gen.getDate().toString().padStart(2, '0')}/${(gen.getMonth() + 1).toString().padStart(2, '0')}/${gen.getFullYear()}`;
   doc.fontSize(9).font('NS-Regular').fillColor(COLORS.muted);
-  doc.text(`Gerado em ${formatted}  ·  ${content.chapters.length} capítulos  ·  Foco Federal`,
+  doc.text(`Gerado em ${formatted}  ·  ${content.chapters.length} capítulos  ·  EdRush`,
     PAGE_MARGIN, PAGE_HEIGHT - 80, { width: CONTENT_WIDTH, align: 'center' });
 }
 
@@ -424,7 +424,7 @@ export async function renderPDF(content: StudyMaterialContent): Promise<{
       bufferPages: true,
       info: {
         Title: `${content.disciplina} — ${content.title}`,
-        Author: 'Foco Federal',
+        Author: 'EdRush',
         Subject: 'Material de Estudos para Concurso Público',
         Keywords: `concurso, ${content.disciplina}, ${content.concurso_slug}`,
       },

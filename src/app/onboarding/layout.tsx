@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Configurar Estudos - Foco Federal',
+  title: 'Configurar Estudos - EdRush',
 };
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {

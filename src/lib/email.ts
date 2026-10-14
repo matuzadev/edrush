@@ -69,10 +69,10 @@ export function emailConfirmacaoCadastro(
 ) {
   return {
     to: email,
-    subject: '🎉 Bem-vindo ao Foco Federal! Confirme seu email',
+    subject: '🎉 Bem-vindo ao EdRush! Confirme seu email',
     html: `
       <h2>Olá, ${nome}!</h2>
-      <p>Obrigado por se registrar no Foco Federal.</p>
+      <p>Obrigado por se registrar no EdRush.</p>
       <p>Para ativar sua conta, clique no botão abaixo:</p>
       <a href="${confirmacaoLink}" style="
         display: inline-block;
@@ -87,7 +87,7 @@ export function emailConfirmacaoCadastro(
         Ou copie este link: ${confirmacaoLink}
       </p>
       <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #999; font-size: 12px;">
-        Foco Federal - Preparação para Concursos
+        EdRush - Preparação para Concursos
       </p>
     `,
   };
@@ -103,7 +103,7 @@ export function emailRecuperacaoSenha(
 ) {
   return {
     to: email,
-    subject: '🔐 Recuperar Senha - Foco Federal',
+    subject: '🔐 Recuperar Senha - EdRush',
     html: `
       <h2>Olá, ${nome}!</h2>
       <p>Recebemos uma solicitação para recuperar sua senha.</p>
@@ -124,7 +124,7 @@ export function emailRecuperacaoSenha(
         Se você não solicitou recuperação de senha, ignore este email.
       </p>
       <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #999; font-size: 12px;">
-        Foco Federal - Preparação para Concursos
+        EdRush - Preparação para Concursos
       </p>
     `,
   };
@@ -143,7 +143,7 @@ export function emailConfirmacaoPagamento(
     to: email,
     subject: '✅ Pagamento Confirmado - Novo Plano Ativado!',
     html: `
-      <h2>🎉 Bem-vindo ao Foco Federal Premium!</h2>
+      <h2>🎉 Bem-vindo ao EdRush Premium!</h2>
       <p>Olá, ${nome}!</p>
       <p>Seu pagamento foi processado com sucesso!</p>
       
@@ -173,7 +173,7 @@ export function emailConfirmacaoPagamento(
       ">Ir para o Dashboard</a>
 
       <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #999; font-size: 12px;">
-        Foco Federal - Preparação para Concursos
+        EdRush - Preparação para Concursos
       </p>
     `,
   };
@@ -213,7 +213,7 @@ export function emailNovoConcurso(
       ">Ver Detalhes do Concurso</a>
 
       <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #999; font-size: 12px;">
-        Foco Federal - Preparação para Concursos
+        EdRush - Preparação para Concursos
       </p>
     `,
   };

@@ -111,7 +111,7 @@ export default function FeedPage() {
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <Link href="/dashboard" className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            FOCO FEDERAL
+            EDRUSH
           </Link>
           <span className="hidden sm:inline text-slate-600">·</span>
           <span className="text-sm text-slate-400 font-medium truncate">Comunidade</span>
@@ -312,7 +312,7 @@ function RightCard({
 function EmptyFeedState({ tab }: { tab: FeedTab }) {
   const messages: Record<FeedTab, { title: string; sub: string }> = {
     all:        { title: 'Seja o primeiro a postar!', sub: 'Compartilhe um resultado ou tire uma dúvida.' },
-    news:       { title: 'Sem notícias por enquanto', sub: 'A equipe Foco Federal posta updates importantes aqui.' },
+    news:       { title: 'Sem notícias por enquanto', sub: 'A equipe EdRush posta updates importantes aqui.' },
     results:    { title: 'Nenhum resultado compartilhado', sub: 'Termine um bloco e compartilhe sua performance.' },
     discussion: { title: 'Nenhuma discussão de questão', sub: 'Tire dúvidas sobre questões direto na sessão de estudo.' },
   };

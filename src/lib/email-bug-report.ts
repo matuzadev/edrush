@@ -135,7 +135,7 @@ export async function sendBugReportEmail(report: BugReport): Promise<void> {
     </div>
 
     <div class="card footer">
-      <p>Este é um email automatizado do sistema Foco Federal.</p>
+      <p>Este é um email automatizado do sistema EdRush.</p>
       <p style="margin-top: 8px;">Entre em contato com o usuário usando: ${report.email || 'email não fornecido'}</p>
     </div>
   </div>

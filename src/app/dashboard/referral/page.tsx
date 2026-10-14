@@ -66,7 +66,7 @@ export default function ReferralPage() {
   const shareWhatsApp = useCallback(() => {
     if (!data) return;
     const msg = encodeURIComponent(
-      `🎯 Estou estudando para concursos no Foco Federal e recomendo muito!\n\nUse meu link de convite e se você assinar, ganho 1 mês grátis 🎁\n\n${data.referralUrl}`
+      `🎯 Estou estudando para concursos no EdRush e recomendo muito!\n\nUse meu link de convite e se você assinar, ganho 1 mês grátis 🎁\n\n${data.referralUrl}`
     );
     window.open(`https://wa.me/?text=${msg}`, '_blank');
   }, [data]);
@@ -196,7 +196,7 @@ export default function ReferralPage() {
               <button
                 onClick={() => {
                   if (navigator.share) {
-                    navigator.share({ title: 'Foco Federal — 1 mês grátis para você!', url: data.referralUrl });
+                    navigator.share({ title: 'EdRush — 1 mês grátis para você!', url: data.referralUrl });
                   } else {
                     copy(data.referralUrl, 'url');
                   }
@@ -293,7 +293,7 @@ export default function ReferralPage() {
         <div className="bg-gradient-to-r from-emerald-900/30 to-blue-900/20 border border-emerald-500/20 rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4">
           <div>
             <p className="font-black text-white text-lg">Não tem assinatura ativa?</p>
-            <p className="text-slate-400 text-sm mt-0.5">Assine o Foco Federal e desbloqueie questões ilimitadas, simulados e análises.</p>
+            <p className="text-slate-400 text-sm mt-0.5">Assine o EdRush e desbloqueie questões ilimitadas, simulados e análises.</p>
           </div>
           <Link
             href="/assinar"

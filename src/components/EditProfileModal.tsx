@@ -200,7 +200,7 @@ export function EditProfileModal({
           {/* Título */}
           <div className="flex-1 min-w-0">
             <h2 className="text-xl font-black text-white leading-tight">Editar Perfil</h2>
-            <p className="text-sm text-slate-400 mt-0.5">Personalize seu painel no Foco Federal</p>
+            <p className="text-sm text-slate-400 mt-0.5">Personalize seu painel no EdRush</p>
           </div>
 
           {/* Fechar */}

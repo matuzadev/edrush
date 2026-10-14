@@ -95,7 +95,7 @@ export function BugReportForm({ onClose, onSubmit }: BugReportFormProps) {
         </div>
         <h3 className="text-lg font-semibold text-white mb-1">Relatório Enviado!</h3>
         <p className="text-sm text-slate-400 text-center">
-          Obrigado por ajudar a melhorar o Foco Federal. Fecharemos em breve.
+          Obrigado por ajudar a melhorar o EdRush. Fecharemos em breve.
         </p>
       </div>
     );

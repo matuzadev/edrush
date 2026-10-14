@@ -44,7 +44,7 @@ export const BORDERS: BorderDef[] = [
   {
     slug: 'recruta',
     name: 'Recruta',
-    description: 'Sua primeira borda. Bem-vindo ao Foco Federal.',
+    description: 'Sua primeira borda. Bem-vindo ao EdRush.',
     tier: 'bronze',
     criteria: { type: 'special', value: 0 },
     style: {
@@ -318,8 +318,8 @@ export const BORDERS: BorderDef[] = [
   },
   {
     slug: 'foco-federal',
-    name: 'Foco Federal',
-    description: 'Sua farda de aprovação. A coroa do Foco Federal.',
+    name: 'EdRush',
+    description: 'Sua farda de aprovação. A coroa do EdRush.',
     tier: 'diamond',
     criteria: { type: 'medals', value: 18 },
     style: {
@@ -377,7 +377,7 @@ export const BORDERS: BorderDef[] = [
   {
     slug: 'foco-ceo',
     name: 'Fundador',
-    description: 'Borda mítica do criador do Foco Federal. Única e intransferível.',
+    description: 'Borda mítica do criador do EdRush. Única e intransferível.',
     tier: 'mythic',
     criteria: { type: 'special', value: 0 },
     exclusive: true,
