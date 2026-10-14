@@ -18,7 +18,7 @@ export default function Hero() {
       <nav className="absolute top-8 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-16 pt-8">
         <div className="flex-shrink-0">
           <Link href="/" className="text-white font-black text-lg tracking-tight no-underline">
-            Foco<span className="text-emerald-400">Federal</span>
+            Ed<span className="text-emerald-400">Rush</span>
           </Link>
         </div>
 
