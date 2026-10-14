@@ -36,7 +36,7 @@ export default function AssinarPage() {
     fetch('/api/user/subscription')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data?.hasAccess) router.push('/dashboard');
+        if (data?.isPremium) router.push('/dashboard');
       })
       .catch(() => {});
   }, [user, isLoading, router]);
