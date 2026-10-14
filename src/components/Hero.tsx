@@ -5,13 +5,11 @@ export default function Hero() {
   return (
     <header className="min-h-screen flex flex-col bg-[#030712] relative overflow-hidden">
 
-      {/* Banner de urgência no topo */}
+      {/* Resumo do plano */}
       <div className="relative z-50 w-full bg-emerald-500/10 border-b border-emerald-500/20 py-2 px-4 text-center">
         <p className="text-emerald-400 text-xs sm:text-sm font-semibold tracking-wide">
-          Oferta de lançamento: apenas{' '}
           Comece grátis com até 10 respostas por dia.{' '}
           <span className="text-white font-black">Premium por R$ 14,99/mês</span>
-                      Conhecer o EdRush Premium — R$ 14,99/mês
         </p>
       </div>
 
