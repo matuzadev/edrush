@@ -7,6 +7,7 @@
 
 import { put } from '@vercel/blob';
 import { lsClient } from '@/lib/db';
+import { isUserPremium } from '@/lib/freemium';
 import { generateStudyMaterial } from './study-material-generator';
 import { renderPDF } from './pdf-renderer';
 import type { StudyMaterialContent } from './study-material-types';
@@ -260,22 +261,7 @@ export async function logDownload(userId: string, materialId: number): Promise<v
  * Hoje: requer subscription_status='active'. Pode ser estendido para "primeiro PDF grátis".
  */
 export async function userCanDownload(userId: string): Promise<{ allowed: boolean; reason?: string }> {
-  const rs = await lsClient.execute({
-    sql: `SELECT subscription_status, subscription_expires_at, is_admin
-          FROM users WHERE id = ? LIMIT 1`,
-    args: [userId],
-  });
-  if (rs.rows.length === 0) return { allowed: false, reason: 'user_not_found' };
-  const r = rs.rows[0] as unknown as {
-    subscription_status: string | null;
-    subscription_expires_at: string | null;
-    is_admin: number | null;
-  };
-  if (r.is_admin === 1) return { allowed: true };
-  if (r.subscription_status !== 'active') return { allowed: false, reason: 'subscription_required' };
-  if (r.subscription_expires_at) {
-    const exp = new Date(r.subscription_expires_at);
-    if (exp.getTime() < Date.now()) return { allowed: false, reason: 'subscription_expired' };
-  }
-  return { allowed: true };
+  return (await isUserPremium(userId))
+    ? { allowed: true }
+    : { allowed: false, reason: 'premium_required' };
 }

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { simulado_attempts, study_sessions } from '@/db/schema';
+import { isUserPremium } from '@/lib/freemium';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -11,6 +12,9 @@ export async function POST(req: NextRequest) {
   }
 
   const userId = (session.user as any).id as string;
+  if (!(await isUserPremium(userId, session.user.email))) {
+    return NextResponse.json({ error: 'premium_required' }, { status: 403 });
+  }
 
   let body: {
     discipline: string;
