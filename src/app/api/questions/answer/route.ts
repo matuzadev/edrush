@@ -12,17 +12,6 @@ export async function POST(req: NextRequest) {
   }
 
   const userId = (session.user as any).id as string;
-  const premium = await isUserPremium(userId, session.user.email);
-  if (!premium) {
-    const answeredToday = await getAnswersToday(userId);
-    if (answeredToday >= FREE_DAILY_QUESTION_LIMIT) {
-      return NextResponse.json({
-        error: 'daily_limit_reached',
-        dailyLimit: FREE_DAILY_QUESTION_LIMIT,
-        answeredToday,
-      }, { status: 429 });
-    }
-  }
 
   let body: {
     questionId: unknown;
@@ -43,6 +32,21 @@ export async function POST(req: NextRequest) {
 
   if (typeof body.resposta_dada !== 'string' || typeof body.acertou !== 'boolean') {
     return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
+  }
+
+  const premium = await isUserPremium(userId, session.user.email);
+  if (body.origem === 'simulado' && !premium) {
+    return NextResponse.json({ error: 'premium_required' }, { status: 403 });
+  }
+  if (!premium) {
+    const answeredToday = await getAnswersToday(userId);
+    if (answeredToday >= FREE_DAILY_QUESTION_LIMIT) {
+      return NextResponse.json({
+        error: 'daily_limit_reached',
+        dailyLimit: FREE_DAILY_QUESTION_LIMIT,
+        answeredToday,
+      }, { status: 429 });
+    }
   }
 
   const rawId = String(body.questionId ?? '');

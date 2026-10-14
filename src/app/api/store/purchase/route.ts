@@ -9,6 +9,7 @@ import {
   extendSubscription,
   grantCrystals,
 } from '@/lib/crystals';
+import { isUserPremium } from '@/lib/freemium';
 
 interface StoreItemRow {
   id: string;
@@ -77,6 +78,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'item_not_found' }, { status: 404 });
     }
     const item = itemRs.rows[0] as unknown as StoreItemRow;
+
+    if (
+      ['borda_perfil', 'avatar_orgao', 'avatar_vitoria', 'mini_logo_badge'].includes(item.category) &&
+      !(await isUserPremium(userId, session.user.email))
+    ) {
+      return NextResponse.json({ error: 'premium_required' }, { status: 403 });
+    }
 
     if (item.is_active !== 1) {
       return NextResponse.json({ error: 'item_inactive' }, { status: 400 });

@@ -6,6 +6,7 @@ import { users, study_sessions, notifications, user_responses } from '@/db/schem
 import { eq, sql, and } from 'drizzle-orm';
 import { createNotification } from '@/lib/notifications';
 import { computeLevel, computeMedals, xpForSession } from '@/lib/levels';
+import { isUserPremium } from '@/lib/freemium';
 
 interface EquippedBadge {
   id: string;
@@ -86,6 +87,9 @@ export async function GET() {
   }
 
   const userId = (session.user as any).id as string;
+  if (!(await isUserPremium(userId, session.user.email))) {
+    return NextResponse.json({ error: 'premium_required' }, { status: 403 });
+  }
 
   try {
     const ninetyDaysAgo = new Date();
