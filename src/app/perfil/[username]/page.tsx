@@ -22,10 +22,10 @@ const RARITY_GLOW: Record<string, string> = {
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const profile = await getProfileData(username);
-  if (!profile) return { title: 'Perfil não encontrado — Foco Federal' };
+  if (!profile) return { title: 'Perfil não encontrado — EdRush' };
   return {
-    title: `${profile.username} · Nível ${profile.level} ${profile.levelName} — Foco Federal`,
-    description: profile.bio ?? `${profile.username} estuda na Foco Federal. ${profile.totalQuestionsAnswered} questões respondidas, ${profile.accuracy}% de acerto.`,
+    title: `${profile.username} · Nível ${profile.level} ${profile.levelName} — EdRush`,
+    description: profile.bio ?? `${profile.username} estuda na EdRush. ${profile.totalQuestionsAnswered} questões respondidas, ${profile.accuracy}% de acerto.`,
   };
 }
 
@@ -67,7 +67,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               href="/"
               className="text-lg font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
             >
-              FOCO FEDERAL
+              EDRUSH
             </Link>
           </div>
           <Link

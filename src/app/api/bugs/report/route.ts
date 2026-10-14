@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         id: body.id,
-        message: 'Relatório de bug recebido com sucesso! Obrigado por ajudar a melhorar o Foco Federal.',
+        message: 'Relatório de bug recebido com sucesso! Obrigado por ajudar a melhorar o EdRush.',
       },
       { status: 201 }
     );

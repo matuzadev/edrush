@@ -204,7 +204,7 @@ export default function ProfilePage() {
             href="/dashboard"
             className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
           >
-            FOCO FEDERAL
+            EDRUSH
           </Link>
           <span className="hidden sm:inline text-slate-600">·</span>
           <span className="hidden sm:inline text-sm text-slate-400 font-medium">Meu Perfil</span>

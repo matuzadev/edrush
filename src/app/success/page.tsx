@@ -73,7 +73,7 @@ export default function SuccessPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Assinatura Ativada!</h1>
           <p className="text-slate-400 text-lg">
-            Bem-vindo ao Foco Federal. Sua jornada para a aprovação começa agora.
+            Bem-vindo ao EdRush. Sua jornada para a aprovação começa agora.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default function SuccessPage() {
             </div>
             <div className="flex justify-between items-center pb-4 border-b border-white/6">
               <span className="text-slate-400 text-sm">Plano</span>
-              <span className="text-white font-semibold text-sm">Foco Federal — R$9,90/mês</span>
+              <span className="text-white font-semibold text-sm">EdRush — R$9,90/mês</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm">Email</span>

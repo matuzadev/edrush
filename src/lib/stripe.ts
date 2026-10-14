@@ -30,7 +30,7 @@ export interface Plan {
 export const PLANS: Plan[] = [
   {
     id: 'starter',
-    name: 'Foco Federal',
+    name: 'EdRush',
     price: 9.90,
     priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || '',
     description: 'Acesso completo à plataforma',

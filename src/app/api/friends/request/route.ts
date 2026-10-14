@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     userId: receiverId,
     type: 'friend_request',
     title: 'Nova solicitação de amizade',
-    body: `${requesterName} quer ser seu amigo no Foco Federal.`,
+    body: `${requesterName} quer ser seu amigo no EdRush.`,
     relatedId: String(newFriendship.id),
   });
 

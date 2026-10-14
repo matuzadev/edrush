@@ -15,7 +15,7 @@ const testimonials: Testimonial[] = [
     color: 'bg-emerald-500',
     name: 'João Silva',
     role: 'Aprovado no INSS — Analista Previdenciário 2024',
-    text: 'O Active Recall mudou completamente minha forma de estudar. Eu estudava horas e esquecia tudo. Com os ciclos 1-7-30 do Foco Federal, eu retinha o conteúdo de verdade. Passei em 8 meses.',
+    text: 'O Active Recall mudou completamente minha forma de estudar. Eu estudava horas e esquecia tudo. Com os ciclos 1-7-30 do EdRush, eu retinha o conteúdo de verdade. Passei em 8 meses.',
   },
   {
     initials: 'MC',
@@ -159,7 +159,7 @@ export default function Testimonials() {
         <div className="border-t border-slate-800 pt-16">
           <div className="flex justify-center mb-10">
             <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-medium tracking-widest uppercase">
-              Quem ja passou usando o Foco Federal
+              Quem ja passou usando o EdRush
             </span>
           </div>
 

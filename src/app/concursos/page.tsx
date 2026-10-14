@@ -92,7 +92,7 @@ export default function ConcursosPage() {
       {/* Navbar */}
       <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex items-center justify-between">
         <Link href="/" className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-          FOCO FEDERAL
+          EDRUSH
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/auth/login" className="text-sm text-slate-400 hover:text-white transition">Entrar</Link>
@@ -207,7 +207,7 @@ export default function ConcursosPage() {
 
         {/* CTA */}
         <div className="mt-12 text-center bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-10">
-          <h2 className="text-2xl font-black text-white mb-3">Prepare-se com o Foco Federal</h2>
+          <h2 className="text-2xl font-black text-white mb-3">Prepare-se com o EdRush</h2>
           <p className="text-slate-400 mb-6">Questões comentadas, plano de estudos personalizado e simulados para cada concurso.</p>
           <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black rounded-xl transition">
             Começar Gratuitamente

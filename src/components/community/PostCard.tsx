@@ -43,7 +43,7 @@ const TYPE_ACCENT: Record<string, { color: string; bg: string; border: string; l
   text:     { color: '#94a3b8', bg: 'rgba(100,116,139,0.10)', border: 'rgba(100,116,139,0.30)', label: 'Post' },
   result:   { color: '#34d399', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.40)',  label: 'Resultado' },
   question: { color: '#22d3ee', bg: 'rgba(6,182,212,0.12)',   border: 'rgba(6,182,212,0.40)',   label: 'Discussão' },
-  news:     { color: '#fbbf24', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.40)',  label: 'Foco Federal' },
+  news:     { color: '#fbbf24', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.40)',  label: 'EdRush' },
 };
 
 export function PostCard({ post: initial, onUpdate, onDelete, defaultExpanded = false }: Props) {

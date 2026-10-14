@@ -56,7 +56,7 @@ export default function DashboardPage() {
       {/* Navbar Minimalista */}
       <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
         <Link href="/dashboard" className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-          FOCO FEDERAL
+          EDRUSH
         </Link>
         
         <div className="flex items-center gap-4">

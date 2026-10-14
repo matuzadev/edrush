@@ -93,7 +93,7 @@ export default function Showcase() {
                 <span className="w-3 h-3 rounded-full bg-amber-500/60" />
                 <span className="w-3 h-3 rounded-full bg-emerald-500/60" />
               </div>
-              <span className="text-slate-400 text-xs font-medium ml-2">Foco Federal — Dashboard</span>
+              <span className="text-slate-400 text-xs font-medium ml-2">EdRush — Dashboard</span>
             </div>
             <span className="text-slate-500 text-xs">Última atualização: agora</span>
           </div>
