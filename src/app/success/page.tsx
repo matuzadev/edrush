@@ -56,8 +56,8 @@ export default function SuccessPage() {
       {/* Nav */}
       <nav className="relative z-10 border-b border-white/5 bg-[#020617]/80 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={28} height={28} />
-          <span className="font-black text-white">Foco<span className="text-emerald-400">Federal</span></span>
+          <Image src="/imagens/edrush-logo-removebg.png" alt="EdRush logo" width={28} height={28} />
+          <span className="font-black text-white">Ed<span className="text-emerald-400">Rush</span></span>
         </div>
       </nav>
 

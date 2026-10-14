@@ -79,7 +79,7 @@ function LoginForm() {
           <div className="hidden lg:flex flex-col gap-10">
             {/* Logo */}
             <Link href="/" className="inline-flex items-center gap-3 w-fit group">
-              <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={44} height={44} />
+              <Image src="/imagens/edrush-logo-removebg.png" alt="EdRush logo" width={44} height={44} />
               <span className="text-2xl font-black text-white">
                 Ed<span className="text-emerald-400">Rush</span>
               </span>
@@ -138,7 +138,7 @@ function LoginForm() {
           <div>
             {/* Mobile logo */}
             <div className="flex items-center justify-center gap-3 mb-8 lg:hidden">
-              <Image src="/imagens/foco-federal-logo-removebg.png" alt="Logo" width={36} height={36} />
+              <Image src="/imagens/edrush-logo-removebg.png" alt="EdRush logo" width={36} height={36} />
               <span className="text-xl font-black text-white">Ed<span className="text-emerald-400">Rush</span></span>
             </div>
 
