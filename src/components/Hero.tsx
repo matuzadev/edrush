@@ -93,7 +93,7 @@ export default function Hero() {
               href="/#oferta"
               className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base sm:text-lg py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] no-underline text-center"
             >
-              Garantir Acesso por R$9,90/mês
+              Conhecer o EdRush Premium — R$ 14,99/mês
             </Link>
             <Link
               href="/#beneficios"

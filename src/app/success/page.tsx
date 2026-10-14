@@ -95,7 +95,7 @@ export default function SuccessPage() {
             </div>
             <div className="flex justify-between items-center pb-4 border-b border-white/6">
               <span className="text-slate-400 text-sm">Plano</span>
-              <span className="text-white font-semibold text-sm">EdRush — R$9,90/mês</span>
+              <span className="text-white font-semibold text-sm">EdRush Premium — R$ 14,99/mês</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm">Email</span>

@@ -142,13 +142,13 @@ export default async function MateriaisPage() {
             <Lock size={18} className="text-amber-400 mt-0.5 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-bold text-amber-300">
-                Materiais disponíveis no plano Foco Total
+                Materiais completos disponíveis no EdRush Premium
               </p>
               <p className="text-xs text-amber-200/70 mt-1">
                 Faça upgrade pra desbloquear todos os PDFs por disciplina, atualizados continuamente.
               </p>
               <Link
-                href="/dashboard/upgrade"
+                href="/assinar"
                 className="inline-flex mt-3 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest text-amber-50"
                 style={{
                   background: 'linear-gradient(135deg, #d97706, #b45309)',
@@ -271,7 +271,7 @@ function MaterialCard({
           }}
         >
           <Lock size={16} />
-          Disponível no Foco Total
+          Disponível no EdRush Premium
         </button>
       ) : (
         <a

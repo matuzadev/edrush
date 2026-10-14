@@ -168,7 +168,7 @@ function CheckoutContent() {
               {/* Billing note */}
               <div className="flex items-start gap-2.5 p-3 bg-slate-800/50 rounded-xl mb-6 text-xs text-slate-400">
                 <RefreshCw size={13} className="flex-shrink-0 mt-0.5 text-slate-500" />
-                <span>Assinatura mensal recorrente. Cobrado R${plan?.price.toFixed(2)}/mês automaticamente. Cancele quando quiser, sem burocracia.</span>
+                <span>Assinatura mensal recorrente. Cobrado R$ {plan?.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês automaticamente. Cancele quando quiser, sem burocracia.</span>
               </div>
 
               {error && (
@@ -190,7 +190,7 @@ function CheckoutContent() {
                 ) : (
                   <>
                     <CreditCard size={20} />
-                    Assinar por R${plan?.price.toFixed(2)}/mês
+                    Assinar por R$ {plan?.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês
                   </>
                 )}
               </button>
