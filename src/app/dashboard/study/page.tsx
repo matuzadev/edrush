@@ -220,7 +220,7 @@ function StudyPageContent() {
     );
   }
 
-  if (sessionQuestions.length === 0) {
+  if (dailyLimitReached || sessionQuestions.length === 0) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
         <div className="text-center max-w-md">

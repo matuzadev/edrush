@@ -23,10 +23,15 @@ export async function isUserPremium(userId: string, email?: string | null): Prom
 }
 
 export async function getAnswersToday(userId: string): Promise<number> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
   const result = await lsClient.execute({
     sql: `SELECT COUNT(*) AS total FROM user_responses
-          WHERE user_id = ? AND substr(respondida_em, 1, 10) = ?`,
+          WHERE user_id = ? AND date(respondida_em, '-3 hours') = ?`,
     args: [userId, today],
   });
   return Number((result.rows[0] as unknown as { total: number | string } | undefined)?.total ?? 0);
