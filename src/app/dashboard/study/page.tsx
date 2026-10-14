@@ -41,6 +41,7 @@ function StudyPageContent() {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [dailyLimitReached, setDailyLimitReached] = useState(false);
   const [blockLoading, setBlockLoading] = useState<boolean>(isBlockMode);
   const [shareOpen, setShareOpen] = useState(false);
   const sessionStartRef = useRef<number>(Date.now());
@@ -83,6 +84,7 @@ function StudyPageContent() {
           setSessionQuestions([]);
           return;
         }
+        setDailyLimitReached(Boolean(data.dailyLimitReached));
         let qs: Question[] = data.questions;
 
         // Filtro client-side por múltiplas dificuldades (se selecionou 2)
@@ -146,6 +148,34 @@ function StudyPageContent() {
 
   const handleQuestionSubmit = async (questionId: string, userAnswer: string, isCorrect: boolean, quality: number) => {
     setIsSubmitting(true);
+    const tempo_resposta_ms = Date.now() - questionStartRef.current;
+    const currentQ = sessionQuestions[currentQuestionIndex];
+    try {
+      const response = await fetch('/api/questions/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          questionId,
+          resposta_dada: userAnswer,
+          acertou: isCorrect,
+          tempo_resposta_ms,
+          disciplina: currentQ?.subject ?? subject ?? null,
+          capitulo: currentQ?.chapter != null ? String(currentQ.chapter) : null,
+          subject: subject ?? null,
+          origem: 'study',
+        }),
+      });
+      if (response.status === 429) {
+        setDailyLimitReached(true);
+        setIsSubmitting(false);
+        return;
+      }
+      if (!response.ok) throw new Error('Falha ao salvar resposta');
+    } catch (error) {
+      console.error('Falha ao salvar resposta:', error);
+      setIsSubmitting(false);
+      return;
+    }
 
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
@@ -153,24 +183,6 @@ function StudyPageContent() {
     } else {
       addIncorrectAnswer();
     }
-
-    // Persistir resposta individual no banco (fire-and-forget)
-    const tempo_resposta_ms = Date.now() - questionStartRef.current;
-    const currentQ = sessionQuestions[currentQuestionIndex];
-    fetch('/api/questions/answer', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        questionId,
-        resposta_dada: userAnswer,
-        acertou: isCorrect,
-        tempo_resposta_ms,
-        disciplina: currentQ?.subject ?? subject ?? null,
-        capitulo: currentQ?.chapter != null ? String(currentQ.chapter) : null,
-        subject: subject ?? null,
-        origem: 'study',
-      }),
-    }).catch(err => console.error('Falha ao salvar resposta:', err));
 
     setTimeout(async () => {
       if (currentQuestionIndex < sessionQuestions.length - 1) {
@@ -215,12 +227,21 @@ function StudyPageContent() {
           <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-7 h-7 text-slate-500" />
           </div>
-          <p className="text-white font-black text-lg">Nenhuma questão encontrada</p>
+          <p className="text-white font-black text-lg">
+            {dailyLimitReached ? 'Limite diário do plano grátis atingido' : 'Nenhuma questão encontrada'}
+          </p>
           <p className="text-slate-400 text-sm mt-1">
-            {isBlockMode
+            {dailyLimitReached
+              ? 'Você já respondeu 10 questões hoje. Assine o Premium para continuar estudando sem limite.'
+              : isBlockMode
               ? 'Tente reabrir o seletor e ajustar os filtros do bloco.'
               : 'Não há questões cadastradas para esta matéria ainda.'}
           </p>
+          {dailyLimitReached && (
+            <Link href="/assinar" className="inline-flex mt-5 px-5 py-2.5 rounded-xl text-sm font-black text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition">
+              Conhecer o Premium por R$ 14,99/mês
+            </Link>
+          )}
           <button
             onClick={() => router.back()}
             className="mt-5 px-5 py-2.5 rounded-xl text-sm font-black text-emerald-300 transition"
