@@ -11,12 +11,11 @@ export default function Footer() {
           {/* Sobre */}
           <div className="space-y-4">
             <h3 className="text-white font-black tracking-tight text-base">
-              Foco<span className="text-emerald-400">Federal</span>
+              Ed<span className="text-emerald-400">Rush</span>
             </h3>
             <p className="text-xs leading-relaxed">
               Plataforma de preparação inteligente para todos os concursos públicos do Brasil.
-              Combinamos Active Recall científico e Técnica de Feynman para transformar seu estudo
-              em aprovação.
+              Combinamos revisão ativa e estratégias práticas para transformar seu estudo em aprovação.
             </p>
           </div>
 
@@ -76,7 +75,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest">
-          <p>&copy; 2026 Foco Federal — Todos os direitos reservados.</p>
+          <p>&copy; 2026 EdRush — Todos os direitos reservados.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white transition-colors">
               Termos de Uso

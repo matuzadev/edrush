@@ -2,7 +2,7 @@ import { SubscriptionGuard } from '@/components/SubscriptionGuard';
 import { DashboardShell } from '@/components/DashboardShell';
 
 export const metadata = {
-  title: 'Dashboard - Foco Federal',
+  title: 'Dashboard - EdRush',
 };
 
 export default function DashboardLayout({
