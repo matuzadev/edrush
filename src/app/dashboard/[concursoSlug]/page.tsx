@@ -41,7 +41,7 @@ export default function PersonalizedDashboardPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session, status } = useSession();
-  const slug = params.concursoSlug as string;
+  const slug = (params?.concursoSlug as string | undefined) ?? '';
 
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [activeSubject, setActiveSubject] = useState<string>('');
