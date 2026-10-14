@@ -42,18 +42,11 @@ export default function Offer() {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold tracking-widest uppercase mb-4">
-            Vagas limitadas desta semana
-          </span>
           <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-            Comece hoje por{' '}
             Comece grátis. Faça upgrade quando quiser.
-                      O plano grátis oferece 10 respostas por dia. O Premium libera recursos avançados por R$ 14,99/mês.
-                        O que o Premium desbloqueia
-                            EdRush Premium
           </h2>
           <p className="text-slate-400 text-sm">
-            Menos que um café por semana. Cancela quando quiser.
+            O plano grátis oferece 10 respostas por dia. O Premium libera recursos avançados por R$ 14,99/mês.
           </p>
         </div>
 
@@ -63,7 +56,7 @@ export default function Offer() {
           {/* Benefícios */}
           <div className="flex flex-col gap-4">
             <h3 className="text-white font-bold text-xl mb-2">
-              O que está incluído no plano
+              O que o Premium desbloqueia
             </h3>
             {benefits.map((b, i) => (
               <div key={i} className="flex gap-4 items-start">
@@ -97,12 +90,11 @@ export default function Offer() {
 
               <div className="relative z-10">
                 <span className="inline-block px-3 py-1 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-bold uppercase tracking-widest mb-5">
-                  Plano Mensal — Mais Popular
+                  EdRush Premium
                 </span>
 
                 {/* Preço */}
                 <div className="rounded-xl bg-slate-900/70 border border-slate-700/50 p-5 mb-6">
-                  <p className="text-slate-400 text-sm line-through mb-1">De R$ 49,90/mês</p>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-slate-400 text-base">R$</span>
                     <span className="text-emerald-400 text-5xl font-black leading-none">14</span>
