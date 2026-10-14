@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface SubscriptionInfo {
   status: string;
   hasAccess: boolean;
+  isPremium: boolean;
   isTrial: boolean;
   isPaid: boolean;
   trialDaysRemaining: number;
@@ -14,7 +15,13 @@ interface SubscriptionInfo {
   isAdmin?: boolean;
 }
 
-export function SubscriptionGuard({ children }: { children: React.ReactNode }) {
+export function SubscriptionGuard({
+  children,
+  premiumOnly = false,
+}: {
+  children: React.ReactNode;
+  premiumOnly?: boolean;
+}) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
@@ -32,22 +39,22 @@ export function SubscriptionGuard({ children }: { children: React.ReactNode }) {
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data) setSubscription(data);
-        else setSubscription({ status: 'free', hasAccess: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
+        else setSubscription({ status: 'free', hasAccess: false, isPremium: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
       })
       .catch(() => {
-        setSubscription({ status: 'free', hasAccess: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
+        setSubscription({ status: 'free', hasAccess: false, isPremium: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
       })
       .finally(() => setHasChecked(true));
   }, [user, isLoading, router]);
 
-  // Redirect to paywall if no access
+  // Free accounts may use the dashboard; only explicitly premium routes redirect.
   useEffect(() => {
-    if (hasChecked && subscription && !subscription.hasAccess) {
+    if (premiumOnly && hasChecked && subscription && !subscription.isPremium) {
       router.push('/assinar');
     }
-  }, [hasChecked, subscription, router]);
+  }, [premiumOnly, hasChecked, subscription, router]);
 
-  if (isLoading || !hasChecked || (hasChecked && subscription && !subscription.hasAccess)) {
+  if (isLoading || !hasChecked || (premiumOnly && subscription && !subscription.isPremium)) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />

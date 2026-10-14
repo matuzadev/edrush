@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { user_responses } from '@/db/schema';
+import { FREE_DAILY_QUESTION_LIMIT, getAnswersToday, isUserPremium } from '@/lib/freemium';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -11,6 +12,17 @@ export async function POST(req: NextRequest) {
   }
 
   const userId = (session.user as any).id as string;
+  const premium = await isUserPremium(userId, session.user.email);
+  if (!premium) {
+    const answeredToday = await getAnswersToday(userId);
+    if (answeredToday >= FREE_DAILY_QUESTION_LIMIT) {
+      return NextResponse.json({
+        error: 'daily_limit_reached',
+        dailyLimit: FREE_DAILY_QUESTION_LIMIT,
+        answeredToday,
+      }, { status: 429 });
+    }
+  }
 
   let body: {
     questionId: unknown;
