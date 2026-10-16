@@ -71,7 +71,9 @@ export default function SuccessPage() {
               <CheckCircle2 className="w-12 h-12 text-emerald-400" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Assinatura Ativada!</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-3">
+            {subscription?.isPaid ? 'Plano Premium Ativado!' : 'Pagamento em processamento'}
+          </h1>
           <p className="text-slate-400 text-lg">
             Bem-vindo ao EdRush. Sua jornada para a aprovação começa agora.
           </p>
@@ -94,7 +96,7 @@ export default function SuccessPage() {
             </div>
             <div className="flex justify-between items-center pb-4 border-b border-white/6">
               <span className="text-slate-400 text-sm">Plano</span>
-              <span className="text-white font-semibold text-sm">EdRush Premium — R$ 14,99/mês</span>
+              <span className="text-white font-semibold text-sm">EdRush Premium — R$ 14,99 por 30 dias</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm">Email</span>

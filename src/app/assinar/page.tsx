@@ -20,8 +20,8 @@ const FEATURES = [
 ];
 
 const TRUST = [
-  { icon: Shield,     label: 'Stripe 256-bit SSL' },
-  { icon: RefreshCw,  label: 'Cancele quando quiser' },
+  { icon: Shield,     label: 'Pagamento seguro via PIX' },
+  { icon: RefreshCw,  label: 'Acesso por 30 dias' },
   { icon: Zap,        label: 'Acesso imediato' },
 ];
 
@@ -151,10 +151,10 @@ export default function AssinarPage() {
                       <span className="text-slate-400 text-lg">R$</span>
                       <span className="text-emerald-400 font-black" style={{ fontSize: '4rem', lineHeight: 1 }}>14</span>
                       <span className="text-emerald-400 text-2xl font-bold">,99</span>
-                      <span className="text-slate-400 text-sm">/mês</span>
+                      <span className="text-slate-400 text-sm">/30 dias</span>
                     </div>
                     <p className="text-slate-300 text-xs font-semibold">
-                      Assinatura mensal recorrente — cancele quando quiser
+                      Pagamento PIX único — acesso por 30 dias
                     </p>
                   </div>
 
@@ -162,8 +162,8 @@ export default function AssinarPage() {
                   <div className="space-y-2.5 mb-7">
                     {[
                       { icon: Zap, text: 'Ativação imediata após o pagamento', color: 'text-amber-400' },
-                      { icon: Lock, text: 'Pagamento 100% seguro via Stripe', color: 'text-emerald-400' },
-                      { icon: RefreshCw, text: 'Cancele a qualquer momento, sem burocracia', color: 'text-blue-400' },
+                      { icon: Lock, text: 'Pagamento seguro via Mercado Pago', color: 'text-emerald-400' },
+                      { icon: RefreshCw, text: 'Renove manualmente quando quiser', color: 'text-blue-400' },
                     ].map((item, i) => {
                       const Icon = item.icon;
                       return (
@@ -231,9 +231,9 @@ export default function AssinarPage() {
         {/* FAQ strip */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { q: 'Como cancelo?', a: 'A qualquer momento pelo portal Stripe, sem multa ou burocracia. O acesso continua até o fim do período pago.' },
+            { q: 'Como renovo meu acesso?', a: 'O plano é um pagamento PIX único válido por 30 dias. Para continuar, basta fazer um novo pagamento.' },
             { q: 'Quando tenho acesso?', a: 'Imediatamente após a confirmação do pagamento. Você recebe um email com os detalhes.' },
-            { q: 'Quais formas de pagamento?', a: 'Cartão de crédito, débito ou boleto bancário via Stripe — a plataforma de pagamentos mais segura do mundo.' },
+            { q: 'Quais formas de pagamento?', a: 'PIX via Mercado Pago. O acesso Premium é liberado automaticamente após a confirmação.' },
           ].map((item, i) => (
             <div key={i} className="p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
               <p className="font-bold text-white text-sm mb-2">{item.q}</p>
