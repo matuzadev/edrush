@@ -23,8 +23,8 @@ const benefits: { title: string; desc: string }[] = [
     desc: 'Editais abertos e datas de prova para todo o Brasil em um só lugar.',
   },
   {
-    title: 'Cancela quando quiser',
-    desc: 'Sem fidelidade, sem multa. Assine e cancele com 1 clique.',
+    title: 'Acesso por 30 dias',
+    desc: 'Pagamento único por PIX. Renove manualmente se quiser continuar.',
   },
 ];
 
@@ -46,7 +46,7 @@ export default function Offer() {
             Comece grátis. Faça upgrade quando quiser.
           </h2>
           <p className="text-slate-400 text-sm">
-            O plano grátis oferece 10 respostas por dia. O Premium libera recursos avançados por R$ 14,99/mês.
+            O plano grátis oferece 10 respostas por dia. O Premium libera recursos avançados por R$ 14,99 por 30 dias.
           </p>
         </div>
 
@@ -99,10 +99,10 @@ export default function Offer() {
                     <span className="text-slate-400 text-base">R$</span>
                     <span className="text-emerald-400 text-5xl font-black leading-none">14</span>
                     <span className="text-emerald-400 text-2xl font-bold">,99</span>
-                    <span className="text-slate-400 text-sm">/mês</span>
+                    <span className="text-slate-400 text-sm">/30 dias</span>
                   </div>
                   <p className="text-slate-300 text-xs font-semibold">
-                    Assinatura mensal — cancela quando quiser
+                    Pagamento PIX único — acesso por 30 dias
                   </p>
                 </div>
 
@@ -114,11 +114,11 @@ export default function Offer() {
                   </div>
                   <div className="flex items-center gap-3 text-slate-200 text-sm">
                     <Lock className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    <span>Pagamento 100% seguro via Stripe</span>
+                    <span>Pagamento seguro via Mercado Pago</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-200 text-sm">
                     <RefreshCw className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span>Cancele a qualquer momento, sem burocracia</span>
+                    <span>Renove manualmente quando quiser</span>
                   </div>
                 </div>
 

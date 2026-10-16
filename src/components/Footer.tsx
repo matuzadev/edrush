@@ -64,11 +64,11 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-3 text-xs">
               <CreditCard className="w-4 h-4 text-blue-400 flex-shrink-0" />
-              <span>Pagamento Seguro via Stripe</span>
+              <span>Pagamento Seguro via Mercado Pago</span>
             </div>
             <p className="text-[11px] leading-relaxed text-slate-500 pt-1">
               Seus dados financeiros nunca passam pelos nossos servidores.
-              Toda transacao e processada diretamente pelo Stripe.
+              Todo pagamento é processado diretamente pelo Mercado Pago.
             </p>
           </div>
         </div>

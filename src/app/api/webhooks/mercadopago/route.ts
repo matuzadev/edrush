@@ -8,7 +8,7 @@ import {
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
   const body = await request.json().catch(() => null);
-  const paymentId = String(body?.data?.id ?? url.searchParams.get('data.id') ?? '');
+  const paymentId = String(url.searchParams.get('data.id') ?? body?.data?.id ?? '');
 
   if (!paymentId || !verifyMercadoPagoSignature(
     request.headers.get('x-signature'),

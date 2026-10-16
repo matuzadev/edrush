@@ -102,10 +102,11 @@ export const authOptions: NextAuthOptions = {
             where: eq(users.email, user.email || ''),
           });
 
+          const userId = existingUser?.id || crypto.randomUUID();
           if (!existingUser) {
             const now = new Date().toISOString();
             await db.insert(users).values({
-              id: crypto.randomUUID(),
+              id: userId,
               email: user.email || '',
               nome: user.name || '',
               foto_url: user.image || '',
@@ -116,6 +117,7 @@ export const authOptions: NextAuthOptions = {
               atualizado_em: now,
             });
           }
+          user.id = userId;
         } catch (error) {
           // Não logar `user`/`profile` — contém e-mail.
           console.error('Erro ao criar usuário Google (email mascarado):', maskEmail(user.email), error);
