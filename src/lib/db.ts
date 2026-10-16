@@ -6,9 +6,22 @@ import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos
 import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
 import crypto from 'crypto';
 
+const databaseUrl =
+  process.env.TURSO_DB_URL ??
+  process.env.TURSO_DATABASE_URL ??
+  process.env.NEXT_PUBLIC_TURSO_CONNECTION_URL;
+const databaseAuthToken = process.env.TURSO_AUTH_TOKEN;
+
+if (process.env.NODE_ENV === 'production' && !databaseUrl) {
+  throw new Error('TURSO_DB_URL é obrigatória em produção; SQLite local não persiste na Vercel');
+}
+if (databaseUrl?.startsWith('libsql://') && !databaseAuthToken) {
+  throw new Error('TURSO_AUTH_TOKEN é obrigatório para conectar ao banco Turso');
+}
+
 export const client = createClient({
-  url: process.env.TURSO_DB_URL ?? process.env.TURSO_DATABASE_URL ?? process.env.NEXT_PUBLIC_TURSO_CONNECTION_URL ?? 'file:data/foco-federal.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
+  url: databaseUrl ?? 'file:data/foco-federal.db',
+  authToken: databaseAuthToken,
 });
 
 // Alias for code that needs the raw libsql client. Prefer importing `client`
