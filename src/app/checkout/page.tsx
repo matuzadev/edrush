@@ -223,9 +223,12 @@ function CheckoutContent() {
               {payment?.qrCodeBase64 && payment.qrCode ? (
                 <div className="space-y-4 text-center">
                   <p className="text-white font-bold">Escaneie o QR Code com o app do seu banco</p>
-                  <img
+                  <Image
                     src={`data:image/png;base64,${payment.qrCodeBase64}`}
                     alt="QR Code para pagamento PIX"
+                    width={224}
+                    height={224}
+                    unoptimized
                     className="mx-auto w-56 h-56 rounded-xl bg-white p-2"
                   />
                   <div className="space-y-2">
