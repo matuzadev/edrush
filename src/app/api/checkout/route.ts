@@ -3,8 +3,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { lsClient } from '@/lib/db';
-import { getMercadoPagoAccessToken } from '@/lib/mercadopago';
+import { applyApprovedPixPayment, getMercadoPagoAccessToken } from '@/lib/mercadopago';
 import { PLANS } from '@/lib/plans';
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as { id?: string } | undefined)?.id;
+    const paymentId = request.nextUrl.searchParams.get('paymentId');
+    if (!userId) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+    if (!paymentId) {
+      return NextResponse.json({ error: 'Pagamento inválido' }, { status: 400 });
+    }
+
+    const result = await lsClient.execute({
+      sql: 'SELECT status FROM mercadopago_payments WHERE payment_id = ? AND user_id = ? LIMIT 1',
+      args: [paymentId, userId],
+    });
+    const record = result.rows[0];
+    if (!record) {
+      return NextResponse.json({ error: 'Pagamento não encontrado' }, { status: 404 });
+    }
+
+    return NextResponse.json({ status: String(record.status) });
+  } catch (error) {
+    console.error('Erro ao consultar pagamento PIX:', error);
+    return NextResponse.json({ error: 'Erro ao consultar pagamento' }, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,6 +109,10 @@ export async function POST(request: NextRequest) {
       sql: 'UPDATE mercadopago_payments SET payment_id = ?, status = ? WHERE id = ?',
       args: [String(payment.id), String(payment.status), paymentRecordId],
     });
+
+    if (payment.status === 'approved') {
+      await applyApprovedPixPayment(payment);
+    }
 
     const transactionData = payment.point_of_interaction?.transaction_data;
     if (payment.status !== 'approved' && (!transactionData?.qr_code || !transactionData?.qr_code_base64)) {

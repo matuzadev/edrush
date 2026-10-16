@@ -6,6 +6,11 @@ import {
 } from '@/lib/mercadopago';
 
 export async function POST(request: NextRequest) {
+  if (!process.env.MERCADOPAGO_WEBHOOK_SECRET) {
+    console.error('MERCADOPAGO_WEBHOOK_SECRET não está configurado');
+    return NextResponse.json({ error: 'Webhook não configurado' }, { status: 500 });
+  }
+
   const url = new URL(request.url);
   const body = await request.json().catch(() => null);
   const paymentId = String(url.searchParams.get('data.id') ?? body?.data?.id ?? '');

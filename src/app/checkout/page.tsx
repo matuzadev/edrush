@@ -41,10 +41,13 @@ function CheckoutContent() {
 
     const checkSubscription = async () => {
       try {
-        const response = await fetch('/api/user/subscription', { cache: 'no-store' });
+        const response = await fetch(
+          `/api/checkout?paymentId=${encodeURIComponent(payment.paymentId)}`,
+          { cache: 'no-store' },
+        );
         if (response.ok) {
           const data = await response.json();
-          if (data.isPremium) router.push('/success');
+          if (data.status === 'approved') router.push('/success');
         }
       } catch (err) {
         console.error('Erro ao verificar confirmação do PIX:', err);
