@@ -467,6 +467,20 @@ export async function initializeDatabase() {
       `);
     } catch { /* já existe */ }
 
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS mercadopago_payments (
+        id TEXT PRIMARY KEY,
+        payment_id TEXT UNIQUE,
+        external_reference TEXT NOT NULL UNIQUE,
+        user_id TEXT NOT NULL,
+        amount REAL NOT NULL,
+        status TEXT NOT NULL,
+        processed_at TEXT,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+
     // Criar tabela de Desbloqueios
     try {
       await client.execute(`
