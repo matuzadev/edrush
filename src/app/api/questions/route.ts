@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     // Anti-farm: por padrão, exclui questões que o usuário já acertou.
     // Pode ser desligado via ?includeAnswered=1 (preview, admin, manage-questions).
     const includeAnswered = searchParams.get('includeAnswered') === '1';
+    const randomOrder = searchParams.get('random') === '1';
 
     const session = await getServerSession(authOptions);
     const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
@@ -128,7 +129,7 @@ export async function GET(request: NextRequest) {
     const sql = `SELECT id, titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
       resposta_correta, dificuldade, fonte, concurso_id, ano,
       material_resumo, material_topicos, material_estrategia, material_referencias, material_conteudo
-      FROM questions ${whereClause} LIMIT ?`;
+      FROM questions ${whereClause} ${randomOrder ? 'ORDER BY RANDOM()' : ''} LIMIT ?`;
     args.push(effectiveLimit);
 
     const rs = await rawClient.execute({ sql, args });
