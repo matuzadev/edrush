@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { lsClient as client } from '@/lib/db';
-import { isUserPremium } from '@/lib/freemium';
 
 interface LoadoutBody {
   borderItemId: string | null;
@@ -58,9 +57,6 @@ export async function POST(req: NextRequest) {
   const userId = (session.user as unknown as { id: string }).id;
   if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  }
-  if (!(await isUserPremium(userId, session.user.email))) {
-    return NextResponse.json({ error: 'premium_required' }, { status: 403 });
   }
 
   let raw: unknown;

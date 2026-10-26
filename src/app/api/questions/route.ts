@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { lsClient as rawClient } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
-import { FREE_DAILY_QUESTION_LIMIT, getAnswersToday, isUserPremium } from '@/lib/freemium';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,32 +13,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') ?? '100');
     let effectiveLimit = Number.isFinite(limit) ? Math.min(Math.max(limit, 1), 100) : 100;
-    let answeredToday = 0;
-    let dailyLimit: number | null = null;
     // Anti-farm: por padrão, exclui questões que o usuário já acertou.
     // Pode ser desligado via ?includeAnswered=1 (preview, admin, manage-questions).
     const includeAnswered = searchParams.get('includeAnswered') === '1';
 
     const session = await getServerSession(authOptions);
     const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
-    if (userId && !(await isUserPremium(userId, session?.user?.email))) {
-      dailyLimit = FREE_DAILY_QUESTION_LIMIT;
-      answeredToday = await getAnswersToday(userId);
-      const remaining = Math.max(0, dailyLimit - answeredToday);
-      if (remaining === 0) {
-        return NextResponse.json({
-          success: true,
-          questions: [],
-          count: 0,
-          dailyLimitReached: true,
-          dailyLimit,
-          answeredToday,
-          questionsRemainingToday: 0,
-        });
-      }
-      effectiveLimit = Math.min(effectiveLimit, remaining);
-    }
-
     // Build raw SQL query to ensure new material columns are fetched
     const conditions: string[] = [];
     const args: (string | number)[] = [];

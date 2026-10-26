@@ -6,10 +6,8 @@ import crypto from 'crypto';
 import {
   spendCrystals,
   applyExpBuff,
-  extendSubscription,
   grantCrystals,
 } from '@/lib/crystals';
-import { isUserPremium } from '@/lib/freemium';
 
 interface StoreItemRow {
   id: string;
@@ -79,15 +77,11 @@ export async function POST(req: NextRequest) {
     }
     const item = itemRs.rows[0] as unknown as StoreItemRow;
 
-    if (
-      ['borda_perfil', 'avatar_orgao', 'avatar_vitoria', 'mini_logo_badge'].includes(item.category) &&
-      !(await isUserPremium(userId, session.user.email))
-    ) {
-      return NextResponse.json({ error: 'premium_required' }, { status: 403 });
-    }
-
     if (item.is_active !== 1) {
       return NextResponse.json({ error: 'item_inactive' }, { status: 400 });
+    }
+    if (item.category === 'plataforma_trial') {
+      return NextResponse.json({ error: 'subscription_items_unavailable' }, { status: 410 });
     }
     if (item.stock !== null && item.stock !== undefined && Number(item.stock) <= 0) {
       return NextResponse.json({ error: 'out_of_stock' }, { status: 400 });
@@ -148,27 +142,6 @@ export async function POST(req: NextRequest) {
       const buff = await applyExpBuff(userId, multiplier, durationHours);
       expiresAt = buff.expiresAt;
       appliedEffect = { kind: 'exp_buff', multiplier: buff.multiplier, expiresAt: buff.expiresAt };
-    } else if (item.category === 'plataforma_trial') {
-      const meta = metadata as Partial<TrialMetadata> | null;
-      const days = Number(meta?.days);
-      if (!Number.isFinite(days) || days <= 0) {
-        await grantCrystals(userId, price, 'refund', `Reembolso: metadata inválida ${item.slug}`, item.id);
-        return NextResponse.json({ error: 'invalid_item_metadata' }, { status: 500 });
-      }
-      const ext = await extendSubscription(userId, days);
-      expiresAt = ext.newExpiresAt;
-      // Promove status para 'active' se estiver 'free' ou 'inactive'.
-      await client.execute({
-        sql: `UPDATE users
-              SET subscription_status = 'active'
-              WHERE id = ?
-                AND (subscription_status IS NULL
-                     OR subscription_status = 'free'
-                     OR subscription_status = 'inactive'
-                     OR subscription_status = 'cancelled')`,
-        args: [userId],
-      });
-      appliedEffect = { kind: 'subscription_extension', days, expiresAt: ext.newExpiresAt };
     }
 
     // Insere no inventário
