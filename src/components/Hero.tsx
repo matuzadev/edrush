@@ -5,11 +5,10 @@ export default function Hero() {
   return (
     <header className="min-h-screen flex flex-col bg-[#030712] relative overflow-hidden">
 
-      {/* Resumo do plano */}
+      {/* Aviso de acesso gratuito */}
       <div className="relative z-50 w-full bg-emerald-500/10 border-b border-emerald-500/20 py-2 px-4 text-center">
         <p className="text-emerald-400 text-xs sm:text-sm font-semibold tracking-wide">
-          Comece grátis com até 10 respostas por dia.{' '}
-          <span className="text-white font-black">Premium por R$ 14,99/30 dias</span>
+          EdRush é 100% gratuito: todos os recursos, sem mensalidade ou limite diário.
         </p>
       </div>
 
@@ -91,7 +90,7 @@ export default function Hero() {
               href="/#oferta"
               className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base sm:text-lg py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] no-underline text-center"
             >
-              Conhecer o EdRush Premium — R$ 14,99/30 dias
+              Começar gratuitamente
             </Link>
             <Link
               href="/#beneficios"
