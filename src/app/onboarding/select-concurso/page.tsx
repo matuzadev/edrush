@@ -52,7 +52,7 @@ export interface ConcursoFull {
   url_edital: string | null;
   url_site_oficial: string | null;
   url_inscricao: string | null;
-  status: 'previsto' | 'edital_proximo' | 'inscricoes_abertas' | 'aguardando_prova' | 'finalizado';
+  status: 'previsto' | 'edital_proximo' | 'inscricoes_abertas' | 'inscricoes_encerradas' | 'aguardando_prova' | 'finalizado';
   fonte_scrape: string | null;
   destaque: boolean;
   logo_url: string | null;
@@ -105,6 +105,8 @@ function getStatusConfig(status: ConcursoFull['status'] | string | null | undefi
         className: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30',
         dotClass: 'bg-emerald-400 animate-pulse',
       };
+    case 'inscricoes_encerradas':
+      return { label: 'Inscrições Encerradas', className: 'bg-slate-800/80 text-slate-400 border border-slate-700/40' };
     case 'aguardando_prova':
       return { label: 'Aguardando Prova', className: 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/25' };
     case 'finalizado':
@@ -126,6 +128,7 @@ const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
   previsto: 'Previstos',
   edital_proximo: 'Edital Próximo',
   inscricoes_abertas: 'Inscrições Abertas',
+  inscricoes_encerradas: 'Inscrições Encerradas',
   aguardando_prova: 'Aguardando Prova',
   finalizado: 'Finalizados',
 };
@@ -650,6 +653,7 @@ function FilterChips({
   const filters: StatusFilter[] = [
     'all',
     'inscricoes_abertas',
+    'inscricoes_encerradas',
     'aguardando_prova',
     'edital_proximo',
     'previsto',

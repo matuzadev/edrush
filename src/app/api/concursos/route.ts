@@ -10,6 +10,7 @@ const VALID_STATUSES = new Set([
   'previsto',
   'edital_proximo',
   'inscricoes_abertas',
+  'inscricoes_encerradas',
   'aguardando_prova',
   'finalizado',
   'ativo', // legado: compatibilidade com registros antigos
@@ -17,6 +18,13 @@ const VALID_STATUSES = new Set([
 
 export async function GET(request: NextRequest) {
   try {
+    const dateParts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date());
+    const today = `${dateParts.find((part) => part.type === 'year')?.value}-${dateParts.find((part) => part.type === 'month')?.value}-${dateParts.find((part) => part.type === 'day')?.value}`;
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const ufId = searchParams.get('ufId');
@@ -26,7 +34,15 @@ export async function GET(request: NextRequest) {
     const conditions: string[] = [];
     const args: (string | number)[] = [];
 
-    if (status && VALID_STATUSES.has(status)) {
+    if (status === 'inscricoes_abertas') {
+      conditions.push(
+        "c.status = ? AND (c.data_fechamento_inscricoes IS NULL OR c.data_fechamento_inscricoes >= ?)",
+      );
+      args.push(status, today);
+    } else if (status === 'inscricoes_encerradas') {
+      conditions.push('c.status = ? AND c.data_fechamento_inscricoes IS NOT NULL AND c.data_fechamento_inscricoes < ?');
+      args.push('inscricoes_abertas', today);
+    } else if (status && VALID_STATUSES.has(status)) {
       conditions.push('c.status = ?');
       args.push(status);
     }
@@ -87,7 +103,15 @@ export async function GET(request: NextRequest) {
       args,
     });
 
-    return NextResponse.json(rows);
+    const currentRows = rows.map((row) => {
+      const closingDate = row.data_fechamento_inscricoes;
+      if (row.status === 'inscricoes_abertas' && typeof closingDate === 'string' && closingDate < today) {
+        return { ...row, status: 'inscricoes_encerradas' };
+      }
+      return row;
+    });
+
+    return NextResponse.json(currentRows);
   } catch (error) {
     console.error('Erro ao buscar concursos:', error);
     return NextResponse.json({ error: 'Erro ao buscar concursos' }, { status: 500 });

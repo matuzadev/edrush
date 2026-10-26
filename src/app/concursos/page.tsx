@@ -29,6 +29,7 @@ interface Concurso {
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos' },
   { value: 'inscricoes_abertas', label: 'Inscrições abertas' },
+  { value: 'inscricoes_encerradas', label: 'Inscrições encerradas' },
   { value: 'edital_proximo', label: 'Edital Próximo' },
   { value: 'aguardando_prova', label: 'Aguardando prova' },
   { value: 'previsto', label: 'Previstos' },
@@ -55,6 +56,7 @@ function OrgaoLogo({ concurso }: { concurso: Concurso }) {
 }
 
 function hasRegistrationEnded(concurso: Concurso) {
+  if (concurso.status === 'inscricoes_encerradas') return true;
   if (concurso.status !== 'inscricoes_abertas' || !concurso.data_fechamento_inscricoes) {
     return false;
   }
@@ -78,6 +80,7 @@ function statusBadge(concurso: Concurso) {
     previsto: 'Previsto',
     edital_proximo: 'Edital próximo',
     inscricoes_abertas: 'Inscrições abertas',
+    inscricoes_encerradas: 'Inscrições encerradas',
     aguardando_prova: 'Aguardando prova',
     finalizado: 'Finalizado',
   };
