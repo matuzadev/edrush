@@ -68,7 +68,6 @@ export async function POST(req: NextRequest) {
       location: location?.trim() || null,
       senha_hash,
       provider: 'email',
-      subscription_status: 'free',
       criado_em: now,
       atualizado_em: now,
     });

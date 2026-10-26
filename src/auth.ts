@@ -112,7 +112,6 @@ export const authOptions: NextAuthOptions = {
               foto_url: user.image || '',
               provider: 'google',
               provider_id: user.id,
-              subscription_status: 'free',
               criado_em: now,
               atualizado_em: now,
             });
