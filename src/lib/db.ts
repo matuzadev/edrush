@@ -72,9 +72,6 @@ export async function initializeDatabase() {
           provider_id TEXT,
           uf_id INTEGER,
           cidade_id INTEGER,
-          subscription_status TEXT DEFAULT 'free',
-          subscription_expires_at TEXT,
-          stripe_customer_id TEXT,
           onboarding_completed INTEGER DEFAULT 0,
           selected_concurso_id INTEGER,
           selected_concurso_slug TEXT,
@@ -468,31 +465,6 @@ export async function initializeDatabase() {
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_user_chapter ON user_chapter_progress(user_id, chapter_id)`);
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_user_chprog_unlocked ON user_chapter_progress(is_unlocked)`);
     } catch { /* já existe */ }
-
-    // Criar tabela de eventos Stripe processados (idempotência de webhook)
-    try {
-      await client.execute(`
-        CREATE TABLE IF NOT EXISTS processed_stripe_events (
-          event_id TEXT PRIMARY KEY,
-          event_type TEXT NOT NULL,
-          processed_at TEXT NOT NULL
-        )
-      `);
-    } catch { /* já existe */ }
-
-    await client.execute(`
-      CREATE TABLE IF NOT EXISTS mercadopago_payments (
-        id TEXT PRIMARY KEY,
-        payment_id TEXT UNIQUE,
-        external_reference TEXT NOT NULL UNIQUE,
-        user_id TEXT NOT NULL,
-        amount REAL NOT NULL,
-        status TEXT NOT NULL,
-        processed_at TEXT,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-      )
-    `);
 
     // Criar tabela de Desbloqueios
     try {
