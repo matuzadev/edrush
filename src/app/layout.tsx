@@ -10,8 +10,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
 export const metadata: Metadata = {
-  title: "EdRush | Aprendizado inteligente para concursos",
-  description: "Plataforma de estudo para concursos com revisão inteligente, métricas reais e fluxo de preparação otimizado.",
+  title: "EdRush | Preparação gratuita para concursos",
+  description: "Estude para concursos com questões, simulados e acompanhamento do desempenho. Todos os recursos de estudo são gratuitos.",
 };
 
 export default function RootLayout({
