@@ -1,137 +1,129 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SimuladoCard } from '@/components/SimuladoCard';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Loader2, RefreshCw } from 'lucide-react';
 
-// Dados de exemplo - substituir por dados reais do BD
-const SIMULADOS_DATA = {
-  'perito-federal': {
-    title: 'Concurso: Perito Federal',
-    disciplines: [
-      {
-        id: 'portugues',
-        name: 'Português',
-        questionsCount: 45,
-        completedCount: 12,
-        difficulty: 'médio' as const,
-        estimatedTime: 90
-      },
-      {
-        id: 'redes-computadores',
-        name: 'Redes de Computadores',
-        questionsCount: 40,
-        completedCount: 0,
-        difficulty: 'difícil' as const,
-        estimatedTime: 120
-      },
-      {
-        id: 'lingua-portuguesa',
-        name: 'Língua Portuguesa',
-        questionsCount: 50,
-        completedCount: 25,
-        difficulty: 'médio' as const,
-        estimatedTime: 100
-      },
-      {
-        id: 'informatica-basica',
-        name: 'Informática Básica',
-        questionsCount: 35,
-        completedCount: 35,
-        difficulty: 'fácil' as const,
-        estimatedTime: 60
-      },
-      {
-        id: 'direito-penal',
-        name: 'Direito Penal e Processo',
-        questionsCount: 55,
-        completedCount: 8,
-        difficulty: 'difícil' as const,
-        estimatedTime: 140
-      },
-      {
-        id: 'raciocinio-logico',
-        name: 'Raciocínio Lógico',
-        questionsCount: 40,
-        completedCount: 20,
-        difficulty: 'difícil' as const,
-        estimatedTime: 110
-      }
-    ]
-  }
-};
+interface SimuladoDiscipline {
+  id: string;
+  name: string;
+  questionsCount: number;
+  completedCount: number;
+  difficulty: 'fácil' | 'médio' | 'difícil';
+  estimatedTime: number;
+}
+
+interface SimuladoData {
+  title: string;
+  concursoId: number | null;
+  disciplines: SimuladoDiscipline[];
+}
 
 export default function SimuladoPage() {
   const router = useRouter();
-  const [selectedSimulado] = useState('perito-federal');
+  const [data, setData] = useState<SimuladoData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const simulado = SIMULADOS_DATA[selectedSimulado as keyof typeof SIMULADOS_DATA];
+  const loadSimulados = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/simulado', { cache: 'no-store' });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error ?? 'Não foi possível carregar os simulados.');
+      }
+      setData(result as SimuladoData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Não foi possível carregar os simulados.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const handleStartSimulado = (disciplineId: string) => {
-    router.push(`/dashboard/simulado/play?discipline=${disciplineId}`);
+  useEffect(() => {
+    void loadSimulados();
+  }, [loadSimulados]);
+
+  const handleStartSimulado = (discipline: string) => {
+    const params = new URLSearchParams({ discipline });
+    if (data?.concursoId) params.set('concurso_id', String(data.concursoId));
+    router.push(`/dashboard/simulado/play?${params.toString()}`);
   };
 
+  const totalQuestions = data?.disciplines.reduce((total, discipline) => total + discipline.questionsCount, 0) ?? 0;
+  const completedQuestions = data?.disciplines.reduce((total, discipline) => total + discipline.completedCount, 0) ?? 0;
+  const progress = totalQuestions > 0 ? Math.round((completedQuestions / totalQuestions) * 100) : 0;
+
   return (
-    <div className="min-h-screen bg-[#020617] text-white pb-12">
-      {/* Back Button */}
+    <div className="min-h-screen bg-[#020617] pb-12 text-white">
       <div className="px-4 py-4 md:px-6">
-        <Link 
-          href="/dashboard"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition"
-        >
-          <ChevronLeft className="w-5 h-5" />
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-slate-400 transition hover:text-emerald-400">
+          <ChevronLeft className="h-5 w-5" />
           Voltar
         </Link>
       </div>
 
-      {/* Header */}
-      <div className="px-4 md:px-6 mb-12">
-        <div className="max-w-5xl">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            {simulado.title}
+      <header className="mb-10 px-4 md:px-6">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="mb-2 text-3xl font-bold md:text-4xl">
+            {data?.title ?? 'Simulados'}
           </h1>
-          <p className="text-slate-400">
-            Resolva simulados completos e avalie seu desempenho antes da prova
-          </p>
+          <p className="text-slate-400">Resolva questões do banco de dados e acompanhe seu progresso.</p>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content */}
-      <div className="px-4 md:px-6 max-w-5xl mx-auto">
-        <SimuladoCard
-          title="Simulado Completo"
-          disciplines={simulado.disciplines}
-          onStartSimulado={handleStartSimulado}
-        />
-      </div>
+      <main className="mx-auto max-w-5xl px-4 md:px-6">
+        {loading ? (
+          <div className="flex min-h-56 items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin text-emerald-400" />
+          </div>
+        ) : error ? (
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center">
+            <p className="text-red-300">{error}</p>
+            <button
+              onClick={() => void loadSimulados()}
+              className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/5"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Tentar novamente
+            </button>
+          </div>
+        ) : data && data.disciplines.length > 0 ? (
+          <SimuladoCard
+            title="Simulado por disciplina"
+            disciplines={data.disciplines}
+            onStartSimulado={handleStartSimulado}
+          />
+        ) : (
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+            <h2 className="text-lg font-bold">Ainda não há questões disponíveis</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Quando houver questões cadastradas para este concurso, elas aparecerão aqui.
+            </p>
+          </div>
+        )}
 
-      {/* Stats Footer */}
-      <div className="px-4 md:px-6 mt-12 max-w-5xl mx-auto">
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-400">
-              {simulado.disciplines.reduce((acc, d) => acc + d.questionsCount, 0)}
-            </p>
-            <p className="text-xs text-slate-400 mt-1">Questões Totais</p>
-          </div>
-          
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-400">
-              {simulado.disciplines.reduce((acc, d) => acc + d.completedCount, 0)}
-            </p>
-            <p className="text-xs text-slate-400 mt-1">Resolvidas</p>
-          </div>
-          
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-400">
-              {Math.round((simulado.disciplines.reduce((acc, d) => acc + d.completedCount, 0) / simulado.disciplines.reduce((acc, d) => acc + d.questionsCount, 0)) * 100)}%
-            </p>
-            <p className="text-xs text-slate-400 mt-1">Progresso Geral</p>
-          </div>
-        </div>
-      </div>
+        {!loading && !error && data && data.disciplines.length > 0 && (
+          <section className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatCard label="Questões disponíveis" value={totalQuestions} />
+            <StatCard label="Respondidas no simulado" value={completedQuestions} />
+            <StatCard label="Progresso geral" value={`${progress}%`} />
+          </section>
+        )}
+      </main>
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
+      <p className="text-2xl font-bold text-emerald-400">{value}</p>
+      <p className="mt-1 text-xs text-slate-400">{label}</p>
     </div>
   );
 }

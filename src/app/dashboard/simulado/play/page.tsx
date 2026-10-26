@@ -11,54 +11,64 @@ interface Question {
   text: string;
   options: string[];
   correctAnswer: number;
+  subject: string;
 }
 
-// Mock de questões por disciplina
-const QUESTIONS_BY_DISCIPLINE: Record<string, Question[]> = {
-  'portugues': [
-    {
-      id: '1',
-      text: 'Qual é o sujeito da oração: "O gato subiu no telhado"?',
-      options: ['O gato', 'no telhado', 'subiu', 'gato'],
-      correctAnswer: 0
-    },
-    {
-      id: '2',
-      text: 'Indique o verbo na frase: "Maria dança graciosamente".',
-      options: ['Maria', 'dança', 'graciosamente', 'na'],
-      correctAnswer: 1
-    }
-  ],
-  'redes-computadores': [
-    {
-      id: '1',
-      text: 'Qual é a principal função do protocolo TCP?',
-      options: ['Roteamento de pacotes', 'Garantir entrega ordenada de dados', 'Resolução de nomes de domínio', 'Encriptação de dados'],
-      correctAnswer: 1
-    },
-    {
-      id: '2',
-      text: 'Qual camada do modelo OSI é responsável pelo roteamento?',
-      options: ['Camada 2', 'Camada 3', 'Camada 4', 'Camada 7'],
-      correctAnswer: 1
-    }
-  ],
-  'informatica-basica': [
-    {
-      id: '1',
-      text: 'Qual é a unidade básica de armazenamento de dados?',
-      options: ['Bit', 'Byte', 'Megabyte', 'Gigabyte'],
-      correctAnswer: 0
-    }
-  ]
-};
+interface QuestionApiResult {
+  id: string;
+  question: string;
+  subject: string;
+  type: string;
+  options: unknown;
+  correctAnswer: string;
+}
+
+function normalizeAnswer(value: string): string {
+  return value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function toSimuladoQuestion(question: QuestionApiResult): Question | null {
+  const rawOptions = Array.isArray(question.options)
+    ? question.options
+    : ['verdadeiro_falso', 'true_false'].includes(question.type.toLowerCase())
+      ? ['Verdadeiro', 'Falso']
+      : [];
+  if (rawOptions.length < 2) return null;
+  const options = rawOptions.map(String);
+  const answer = question.correctAnswer.trim();
+  const letter = answer.match(/^([A-E])(?:[).])?$/i)?.[1]?.toUpperCase();
+  let correctAnswer = letter ? letter.charCodeAt(0) - 65 : -1;
+
+  if (correctAnswer < 0 || correctAnswer >= options.length) {
+    const normalizedAnswer = normalizeAnswer(answer);
+    correctAnswer = options.findIndex((option, index) => {
+      const normalizedOption = normalizeAnswer(option).replace(/^[a-e][).]\s*/, '');
+      return normalizedOption === normalizedAnswer ||
+        normalizeAnswer(option).startsWith(`${normalizedAnswer}) `);
+    });
+  }
+
+  if (correctAnswer < 0 || correctAnswer >= options.length) return null;
+  return {
+    id: question.id,
+    text: question.question,
+    options,
+    correctAnswer,
+    subject: question.subject,
+  };
+}
 
 export default function SimuladoPlayPage() {
   const router = useRouter();
   const searchParams = useSearchParams() ?? new URLSearchParams();
-  const disciplineId = searchParams.get('discipline') || 'portugues';
+  const disciplineId = searchParams.get('discipline') ?? '';
+  const contestId = searchParams.get('concurso_id');
 
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSavingAnswer, setIsSavingAnswer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
@@ -69,26 +79,65 @@ export default function SimuladoPlayPage() {
   const finishedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const disciplineQuestions = QUESTIONS_BY_DISCIPLINE[disciplineId] || QUESTIONS_BY_DISCIPLINE['portugues'];
-    setQuestions(disciplineQuestions);
-    startedAtRef.current = new Date().toISOString();
-    startedTsRef.current = Date.now();
-    questionStartRef.current = Date.now();
-    finishedRef.current = false;
-  }, [disciplineId]);
+    if (!disciplineId) {
+      router.replace('/dashboard/simulado');
+      return;
+    }
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      disciplina: disciplineId,
+      limit: '100',
+      includeAnswered: '1',
+      random: '1',
+    });
+    if (contestId) params.set('concurso_id', contestId);
+
+    setIsLoading(true);
+    setLoadError(null);
+    fetch(`/api/questions?${params.toString()}`, { signal: controller.signal, cache: 'no-store' })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error ?? 'Não foi possível carregar as questões.');
+        const loaded = (result.questions as QuestionApiResult[])
+          .map(toSimuladoQuestion)
+          .filter((question): question is Question => question !== null);
+        if (loaded.length === 0) {
+          throw new Error('Não há questões válidas cadastradas para esta disciplina.');
+        }
+        setQuestions(loaded);
+        setCurrentIndex(0);
+        setUserAnswers([]);
+        setShowResult(false);
+        setIsFinished(false);
+        setSaveError(null);
+        startedAtRef.current = new Date().toISOString();
+        startedTsRef.current = Date.now();
+        questionStartRef.current = Date.now();
+        finishedRef.current = false;
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar as questões.');
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [disciplineId, contestId, router]);
 
   // Reinicia o cronômetro a cada questão
   useEffect(() => {
     questionStartRef.current = Date.now();
   }, [currentIndex]);
 
-  const persistAnswer = (questionIndex: number, optionIndex: number) => {
+  const persistAnswer = async (questionIndex: number, optionIndex: number) => {
     const q = questions[questionIndex];
     if (!q) return;
     const correct = optionIndex === q.correctAnswer;
     const skipped = optionIndex === -1;
     const tempo_resposta_ms = Date.now() - questionStartRef.current;
-    fetch('/api/questions/answer', {
+    const response = await fetch('/api/questions/answer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -96,63 +145,85 @@ export default function SimuladoPlayPage() {
         resposta_dada: skipped ? '__skipped__' : (q.options[optionIndex] ?? ''),
         acertou: correct,
         tempo_resposta_ms,
-        disciplina: disciplineId,
-        subject: disciplineId,
+        disciplina: q.subject,
+        subject: q.subject,
         origem: 'simulado',
       }),
-    }).catch(err => console.error('Falha ao salvar resposta do simulado:', err));
+    });
+    if (!response.ok) throw new Error('Não foi possível salvar sua resposta.');
   };
 
-  const finishSimulado = (allAnswers: number[]) => {
+  const finishSimulado = async (allAnswers: number[]) => {
     if (finishedRef.current) return;
     finishedRef.current = true;
     const correct = allAnswers.filter((ans, idx) => ans === questions[idx]?.correctAnswer).length;
     const skipped = allAnswers.filter(a => a === -1).length;
-    fetch('/api/simulado/finish', {
+    try {
+      const response = await fetch('/api/simulado/finish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        discipline: disciplineId,
+        discipline: questions[0]?.subject ?? disciplineId,
         totalQuestions: questions.length,
         correctAnswers: correct,
         skipped,
         durationMs: Date.now() - startedTsRef.current,
         startedAt: startedAtRef.current,
       }),
-    }).catch(err => console.error('Falha ao salvar simulado:', err));
+      });
+      if (!response.ok) throw new Error('O resultado não pôde ser salvo no banco de dados.');
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'O resultado não pôde ser salvo.');
+    } finally {
+      setIsFinished(true);
+    }
   };
 
-  const handleAnswer = (optionIndex: number) => {
+  const handleAnswer = async (optionIndex: number) => {
+    if (showResult || isSavingAnswer) return;
     const newAnswers = [...userAnswers, optionIndex];
     setUserAnswers(newAnswers);
     setShowResult(true);
-    persistAnswer(currentIndex, optionIndex);
+    setIsSavingAnswer(true);
+    try {
+      await persistAnswer(currentIndex, optionIndex);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Sua resposta não foi salva.');
+    } finally {
+      setIsSavingAnswer(false);
+    }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setShowResult(false);
     } else {
-      finishSimulado(userAnswers);
-      setIsFinished(true);
+      await finishSimulado(userAnswers);
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    if (isSavingAnswer) return;
     const newAnswers = [...userAnswers, -1];
     setUserAnswers(newAnswers);
-    persistAnswer(currentIndex, -1);
+    setIsSavingAnswer(true);
+    try {
+      await persistAnswer(currentIndex, -1);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Sua resposta não foi salva.');
+    } finally {
+      setIsSavingAnswer(false);
+    }
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setShowResult(false);
     } else {
-      finishSimulado(newAnswers);
-      setIsFinished(true);
+      await finishSimulado(newAnswers);
     }
   };
 
-  if (questions.length === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-emerald-500"></div>
@@ -160,6 +231,18 @@ export default function SimuladoPlayPage() {
     );
   }
 
+  if (loadError || questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#020617] px-4 flex items-center justify-center text-center">
+        <div>
+          <p className="text-slate-200">{loadError ?? 'Nenhuma questão disponível.'}</p>
+          <Button variant="secondary" className="mt-5" onClick={() => router.push('/dashboard/simulado')}>
+            Voltar aos simulados
+          </Button>
+        </div>
+      </div>
+    );
+  }
   const currentQuestion = questions[currentIndex];
   const currentAnswer = userAnswers[currentIndex];
   const isAnswerCorrect = currentAnswer === currentQuestion.correctAnswer;
@@ -345,6 +428,11 @@ export default function SimuladoPlayPage() {
         )}
 
         {/* Botões de Ação */}
+        {saveError && (
+          <p role="alert" className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-sm text-amber-200">
+            {saveError}
+          </p>
+        )}
         <div className="flex gap-3">
           {!showResult ? (
             <>
@@ -352,24 +440,23 @@ export default function SimuladoPlayPage() {
                 variant="secondary" 
                 className="flex-1"
                 onClick={handleSkip}
+                disabled={isSavingAnswer}
               >
                 <SkipForward className="w-4 h-4" />
                 Pular
               </Button>
               <Button 
                 className="flex-1"
-                onClick={() => {
-                  // Simular clique em opção aleatória se não responder
-                  setShowResult(true);
-                }}
+                disabled
               >
-                Responder
+                Selecione uma alternativa
               </Button>
             </>
           ) : (
             <Button 
               className="w-full"
               onClick={handleNext}
+              disabled={isSavingAnswer}
             >
               {currentIndex === questions.length - 1 ? 'Finalizar' : 'Próxima'}
             </Button>
