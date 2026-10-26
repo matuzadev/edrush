@@ -8,10 +8,9 @@ import { BugReport, SEVERITY_COLORS, captureUserEnvironment, generateBugReportId
 
 interface BugReportFormProps {
   onClose: () => void;
-  onSubmit?: (report: BugReport) => void;
 }
 
-export function BugReportForm({ onClose, onSubmit }: BugReportFormProps) {
+export function BugReportForm({ onClose }: BugReportFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState<'baixa' | 'média' | 'alta' | 'crítica'>('média');
@@ -72,9 +71,6 @@ export function BugReportForm({ onClose, onSubmit }: BugReportFormProps) {
 
       setSubmitted(true);
       
-      // Chamar callback se fornecido
-      onSubmit?.(report);
-
       // Fechar após 3 segundos
       setTimeout(() => {
         onClose();

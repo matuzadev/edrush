@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Search, Building2, Users, Calendar, ChevronRight, Filter } from 'lucide-react';
+import { Search, Building2, Users, Calendar, ChevronRight, Filter, RefreshCw } from 'lucide-react';
 import { getOrgaoConfig } from '@/lib/orgao-config';
 
 interface Concurso {
@@ -14,6 +14,8 @@ interface Concurso {
   vagas_total: number | null;
   descricao: string | null;
   status: string;
+  cargo: string | null;
+  area_especialidade: string | null;
   remuneracao_inicial: number | null;
   nivel_escolaridade: string | null;
   data_prova_objetiva: string | null;
@@ -23,8 +25,10 @@ interface Concurso {
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos' },
-  { value: 'ativo', label: 'Ativos' },
+  { value: 'inscricoes_abertas', label: 'Inscrições abertas' },
   { value: 'edital_proximo', label: 'Edital Próximo' },
+  { value: 'aguardando_prova', label: 'Aguardando prova' },
+  { value: 'previsto', label: 'Previstos' },
   { value: 'finalizado', label: 'Finalizados' },
 ];
 
@@ -48,31 +52,67 @@ function OrgaoLogo({ concurso }: { concurso: Concurso }) {
 }
 
 function statusBadge(status: string) {
-  if (status === 'ativo') return <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Ativo</span>;
-  if (status === 'edital_proximo') return <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Edital Próximo</span>;
-  return <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-slate-700/60 text-slate-400 border border-white/5">Encerrado</span>;
+  const labels: Record<string, string> = {
+    ativo: 'Ativo',
+    previsto: 'Previsto',
+    edital_proximo: 'Edital próximo',
+    inscricoes_abertas: 'Inscrições abertas',
+    aguardando_prova: 'Aguardando prova',
+    finalizado: 'Finalizado',
+  };
+  const isOpen = status === 'ativo' || status === 'inscricoes_abertas';
+  const isUpcoming = status === 'previsto' || status === 'edital_proximo' || status === 'aguardando_prova';
+  const tone = isOpen
+    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+    : isUpcoming
+      ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+      : 'bg-slate-700/60 text-slate-400 border-white/5';
+
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${tone}`}>
+      {labels[status] ?? 'Status não informado'}
+    </span>
+  );
 }
 
 export default function ConcursosPage() {
   const [concursos, setConcursos] = useState<Concurso[]>([]);
   const [filtered, setFiltered] = useState<Concurso[]>([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ativo');
+  const [statusFilter, setStatusFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function load() {
+      setIsLoading(true);
+      setLoadError('');
       try {
         const params = new URLSearchParams();
         if (statusFilter) params.set('status', statusFilter);
-        const res = await fetch(`/api/concursos?${params.toString()}`);
-        if (res.ok) setConcursos(await res.json());
+        const res = await fetch(`/api/concursos?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error('Não foi possível carregar os concursos.');
+        const data: unknown = await res.json();
+        if (!Array.isArray(data)) throw new Error('A resposta de concursos está indisponível.');
+        setConcursos(data as Concurso[]);
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar os concursos.');
+        setConcursos([]);
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) setIsLoading(false);
       }
     }
+
     load();
-  }, [statusFilter]);
+
+    return () => controller.abort();
+  }, [statusFilter, retryCount]);
 
   useEffect(() => {
     const q = search.toLowerCase();
@@ -105,17 +145,17 @@ export default function ConcursosPage() {
       <main className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-black text-white mb-3">
-            Concursos{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              Públicos Federais
-            </span>
+          <p className="mb-2 text-sm font-semibold text-emerald-400">Encontre sua próxima oportunidade</p>
+          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            Concursos públicos
           </h1>
-          <p className="text-slate-400 text-lg">Acompanhe os principais concursos federais abertos e próximos.</p>
+          <p className="max-w-2xl text-slate-400">
+            Consulte concursos, conheça as áreas e organize sua preparação em um só lugar.
+          </p>
         </div>
 
         {/* Filtros */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
@@ -123,17 +163,20 @@ export default function ConcursosPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar por nome, órgão ou banca..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-white placeholder-slate-500 outline-none focus:border-emerald-500/50 transition text-sm"
+              aria-label="Buscar concursos por nome, órgão ou banca"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-500/50"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter size={14} className="text-slate-400 flex-shrink-0" />
-            <div className="flex gap-2 flex-wrap">
+          <div className="flex min-w-0 items-start gap-2 sm:items-center">
+            <Filter size={14} className="mt-2.5 shrink-0 text-slate-400 sm:mt-0" aria-hidden="true" />
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar concursos por status">
               {STATUS_OPTIONS.map(opt => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => setStatusFilter(opt.value)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  aria-pressed={statusFilter === opt.value}
+                  className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
                     statusFilter === opt.value
                       ? 'bg-emerald-500 text-slate-950'
                       : 'bg-white/[0.04] border border-white/10 text-slate-400 hover:border-emerald-500/40'
@@ -148,15 +191,34 @@ export default function ConcursosPage() {
 
         {/* Lista */}
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          <div className="space-y-3" role="status" aria-label="Carregando concursos">
+            {[0, 1, 2].map(item => (
+              <div key={item} className="h-32 animate-pulse rounded-2xl border border-white/5 bg-white/[0.03] motion-reduce:animate-none" />
+            ))}
+          </div>
+        ) : loadError ? (
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-6 py-12 text-center">
+            <p className="text-sm text-slate-300">{loadError}</p>
+            <button
+              type="button"
+              onClick={() => setRetryCount(count => count + 1)}
+              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5"
+            >
+              <RefreshCw size={14} aria-hidden="true" />
+              Tentar novamente
+            </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-slate-400">Nenhum concurso encontrado.</div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-16 text-center">
+            <p className="font-medium text-slate-200">Nenhum concurso encontrado</p>
+            <p className="mt-2 text-sm text-slate-400">
+              Tente alterar os filtros ou buscar por outro termo.
+            </p>
+          </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3" aria-live="polite">
             {filtered.map(c => (
-              <div key={c.id} className="bg-white/[0.03] border border-white/10 hover:border-emerald-500/30 rounded-2xl p-5 transition-all">
+              <article key={c.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-emerald-500/30">
                 <div className="flex items-start gap-4">
                   <OrgaoLogo concurso={c} />
                   <div className="flex-1 min-w-0">
@@ -169,7 +231,12 @@ export default function ConcursosPage() {
                       {c.banca && <span className="text-slate-500">Banca: <span className="text-slate-400">{c.banca}</span></span>}
                       {c.nivel_escolaridade && <span>{c.nivel_escolaridade}</span>}
                     </div>
-                    {c.descricao && <p className="text-xs text-slate-500 line-clamp-1 mb-3">{c.descricao}</p>}
+                    {(c.cargo || c.area_especialidade) && (
+                      <p className="mb-2 text-sm text-slate-300">
+                        {[c.cargo, c.area_especialidade].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
+                    {c.descricao && <p className="mb-3 line-clamp-2 text-xs leading-5 text-slate-500">{c.descricao}</p>}
                     <div className="flex flex-wrap items-center gap-3">
                       {c.vagas_total != null && (
                         <span className="flex items-center gap-1 text-xs text-slate-300 bg-slate-800/60 border border-white/5 rounded-lg px-2 py-1">
@@ -186,7 +253,7 @@ export default function ConcursosPage() {
                           <Calendar size={10} />Prova: {new Date(c.data_prova_objetiva + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </span>
                       )}
-                      {c.data_fechamento_inscricoes && c.status === 'ativo' && (
+                      {c.data_fechamento_inscricoes && c.status === 'inscricoes_abertas' && (
                         <span className="text-xs text-amber-400">
                           Inscrições até {new Date(c.data_fechamento_inscricoes + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </span>
@@ -195,22 +262,24 @@ export default function ConcursosPage() {
                   </div>
                   <Link
                     href="/auth/signup"
-                    className="flex-shrink-0 flex items-center gap-1.5 text-xs text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 px-3 py-2 rounded-xl transition font-semibold"
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-400 transition hover:bg-emerald-500/10"
                   >
                     Estudar <ChevronRight size={12} />
                   </Link>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
 
         {/* CTA */}
-        <div className="mt-12 text-center bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-10">
-          <h2 className="text-2xl font-black text-white mb-3">Prepare-se com o EdRush</h2>
-          <p className="text-slate-400 mb-6">Questões comentadas, plano de estudos personalizado e simulados para cada concurso.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black rounded-xl transition">
-            Começar Gratuitamente
+        <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center sm:p-10">
+          <h2 className="mb-3 text-xl font-semibold text-white sm:text-2xl">Prepare-se com o EdRush</h2>
+          <p className="mb-6 text-sm text-slate-400">
+            Questões, simulados e acompanhamento para apoiar sua rotina de estudos — sem mensalidade.
+          </p>
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">
+            Criar conta gratuita
           </Link>
         </div>
       </main>
