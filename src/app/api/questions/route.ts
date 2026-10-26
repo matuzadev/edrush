@@ -180,9 +180,6 @@ export async function GET(request: NextRequest) {
       count: transformedQuestions.length,
       excludedAlreadyCorrect: excludedCount, // questões filtradas por anti-farm
       reviewMode: chapterCompleted,          // capítulo já completado: tudo liberado
-      dailyLimit,
-      answeredToday,
-      questionsRemainingToday: dailyLimit === null ? null : Math.max(0, dailyLimit - answeredToday),
     });
   } catch (error) {
     console.error('Erro ao buscar questões:', error);
