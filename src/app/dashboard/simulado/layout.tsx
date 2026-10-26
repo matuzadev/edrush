@@ -1,5 +1,5 @@
-import { SubscriptionGuard } from '@/components/SubscriptionGuard';
+import { AuthGuard } from '@/components/AuthGuard';
 
 export default function SimuladoLayout({ children }: { children: React.ReactNode }) {
-  return <SubscriptionGuard>{children}</SubscriptionGuard>;
+  return <AuthGuard>{children}</AuthGuard>;
 }

@@ -34,7 +34,6 @@ export async function POST(req: Request) {
       senha_hash,
       nome: fullName ?? '',
       provider: 'email',
-      subscription_status: 'active',
       criado_em: now,
       atualizado_em: now,
     };

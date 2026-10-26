@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { SubscriptionGuard } from '@/components/SubscriptionGuard';
+import { AuthGuard } from '@/components/AuthGuard';
 import { Question, MOCK_QUESTIONS } from '@/lib/questions';
 import { QuestionModal } from '@/components/QuestionModal';
 import { usUserProfile } from '@/hooks/useProfile';
@@ -13,9 +13,9 @@ import { ShareResultModal } from '@/components/community/ShareResultModal';
 
 export default function StudyPage() {
   return (
-    <SubscriptionGuard>
+    <AuthGuard>
       <StudyPageContent />
-    </SubscriptionGuard>
+    </AuthGuard>
   );
 }
 

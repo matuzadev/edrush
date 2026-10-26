@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { SubscriptionGuard } from '@/components/SubscriptionGuard';
+import { AuthGuard } from '@/components/AuthGuard';
 
 interface DisciplinaStats {
   disciplina: string;
@@ -42,9 +42,9 @@ interface StatsData {
 
 export default function AnalyticsPage() {
   return (
-    <SubscriptionGuard>
+    <AuthGuard>
       <AnalyticsContent />
-    </SubscriptionGuard>
+    </AuthGuard>
   );
 }
 
