@@ -1,4 +1,4 @@
-import { SubscriptionGuard } from '@/components/SubscriptionGuard';
+import { AuthGuard } from '@/components/AuthGuard';
 import { DashboardShell } from '@/components/DashboardShell';
 
 export const metadata = {
@@ -11,8 +11,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SubscriptionGuard>
+    <AuthGuard>
       <DashboardShell>{children}</DashboardShell>
-    </SubscriptionGuard>
+    </AuthGuard>
   );
 }

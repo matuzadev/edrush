@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
-export function SubscriptionGuard({ children }: {
+export function AuthGuard({ children }: {
   children: React.ReactNode;
 }) {
   const { user, isLoading } = useAuth();

@@ -256,6 +256,6 @@ export async function logDownload(userId: string, materialId: number): Promise<v
 }
 
 /**
- * Determina se o user tem acesso ao material (gate de subscription).
+ * Materiais publicados podem ser baixados por qualquer usuário autenticado.
  * Os downloads publicados estão disponíveis a todos os usuários autenticados.
  */
