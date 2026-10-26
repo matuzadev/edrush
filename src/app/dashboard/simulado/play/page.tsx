@@ -36,7 +36,7 @@ function toSimuladoQuestion(question: QuestionApiResult): Question | null {
   if (rawOptions.length < 2) return null;
   const options = rawOptions.map(String);
   const answer = question.correctAnswer.trim();
-  const letter = answer.match(/^([A-E])(?:[).])?$/i)?.[1]?.toUpperCase();
+  const letter = answer.match(/^([A-E])(?:[).]\s*|$)/i)?.[1]?.toUpperCase();
   let correctAnswer = letter ? letter.charCodeAt(0) - 65 : -1;
 
   if (correctAnswer < 0 || correctAnswer >= options.length) {
