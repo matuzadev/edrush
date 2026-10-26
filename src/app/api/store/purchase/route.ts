@@ -23,7 +23,6 @@ interface StoreItemRow {
 }
 
 interface BuffMetadata { multiplier: number; durationHours: number }
-interface TrialMetadata { days: number }
 
 function parseMetadata(raw: string | null): Record<string, unknown> | null {
   if (!raw) return null;
@@ -89,9 +88,8 @@ export async function POST(req: NextRequest) {
 
     const metadata = parseMetadata(item.metadata);
 
-    // Bloqueia recompra de itens permanentes (não-buff/trial). Buffs e trials podem
-    // ser recomprados (acumulam duração via applyExpBuff/extendSubscription).
-    const stackable = item.category === 'exp_buff' || item.category === 'plataforma_trial';
+    // Buffs can be purchased repeatedly and extend their duration.
+    const stackable = item.category === 'exp_buff';
     if (!stackable) {
       const existingRs = await client.execute({
         sql: `SELECT id FROM user_inventory
@@ -127,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     // Calcula expiresAt para itens consumíveis.
     let expiresAt: string | null = null;
-    let appliedEffect: { kind: string; expiresAt?: string; multiplier?: number; days?: number } | null = null;
+    let appliedEffect: { kind: string; expiresAt?: string; multiplier?: number } | null = null;
 
     if (item.category === 'exp_buff') {
       const meta = metadata as Partial<BuffMetadata> | null;

@@ -171,7 +171,7 @@ export const authOptions: NextAuthOptions = {
   },
   cookies: {
     // Cookies da sessão sempre Secure em prod. SameSite=lax mitiga CSRF
-    // (mantendo navegação cross-site para Stripe/Google).
+    // (mantendo navegação cross-site para autenticação Google).
     sessionToken: {
       name: process.env.NODE_ENV === 'production'
         ? '__Secure-next-auth.session-token'

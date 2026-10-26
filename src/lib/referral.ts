@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { users, referrals } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export function generateReferralCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -77,48 +77,6 @@ export async function registerReferral(opts: {
     .where(eq(users.id, referredId));
 
   return true;
-}
-
-export async function processReferralReward(subscribedUserId: string): Promise<void> {
-  const referral = await db.query.referrals.findFirst({
-    where: sql`${referrals.referred_id} = ${subscribedUserId} AND ${referrals.status} = 'registered'`,
-  });
-  if (!referral) return;
-
-  const now = new Date().toISOString();
-
-  // Mark as subscribed
-  await db.update(referrals)
-    .set({ status: 'subscribed', atualizado_em: now })
-    .where(eq(referrals.id, referral.id));
-
-  // Extend referrer subscription by 30 days
-  const referrer = await db.query.users.findFirst({
-    where: eq(users.id, referral.referrer_id),
-    columns: { id: true, subscription_status: true, subscription_expires_at: true },
-  });
-  if (!referrer) return;
-
-  const currentExpiry = referrer.subscription_expires_at
-    ? new Date(referrer.subscription_expires_at)
-    : new Date();
-
-  // If expired, start from today
-  if (currentExpiry < new Date()) currentExpiry.setTime(Date.now());
-  currentExpiry.setDate(currentExpiry.getDate() + 30);
-
-  await db.update(users).set({
-    subscription_status: 'active',
-    subscription_expires_at: currentExpiry.toISOString(),
-    atualizado_em: now,
-  }).where(eq(users.id, referral.referrer_id));
-
-  // Mark reward as granted
-  await db.update(referrals).set({
-    status: 'rewarded',
-    reward_granted_at: now,
-    atualizado_em: now,
-  }).where(eq(referrals.id, referral.id));
 }
 
 export async function getReferralStats(userId: string) {

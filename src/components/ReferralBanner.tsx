@@ -25,16 +25,16 @@ export default function ReferralBanner() {
                 <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Programa de Indicação</span>
               </div>
               <h3 className="text-2xl md:text-3xl font-black text-white mb-2">
-                Indique amigos e ganhe <span className="text-emerald-400">meses grátis</span>
+                Convide amigos para estudar <span className="text-emerald-400">gratuitamente</span>
               </h3>
               <p className="text-slate-400 text-sm md:text-base max-w-xl">
-                Compartilhe seu link exclusivo. Quando um amigo assinar a plataforma pela primeira vez, você recebe automaticamente <strong className="text-white">30 dias gratuitos</strong>. Sem limite de indicações.
+                Compartilhe seu link exclusivo e convide amigos para estudar com todos os recursos gratuitos. Sem limite de indicações.
               </p>
 
               {/* Stats */}
               <div className="flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
                 {[
-                  { icon: Users, label: '1 assinatura', sub: '= 1 mês grátis' },
+                  { icon: Users, label: 'EdRush gratuito', sub: 'para todos' },
                   { icon: Gift, label: 'Sem limite', sub: 'de indicações' },
                   { icon: Sparkles, label: 'Automático', sub: 'sem burocracia' },
                 ].map((item, i) => {

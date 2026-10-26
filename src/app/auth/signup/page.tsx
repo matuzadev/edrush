@@ -279,8 +279,7 @@ function SignupForm() {
                 <div className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl mb-5">
                   <Gift size={16} className="text-emerald-400 flex-shrink-0" />
                   <p className="text-emerald-300 text-sm font-medium">
-                    Você foi convidado! Ao assinar, seu amigo ganha{' '}
-                    <span className="font-bold text-emerald-400">1 mês grátis</span>.
+                    Você foi convidado para estudar gratuitamente no EdRush.
                   </p>
                 </div>
               )}

@@ -8,8 +8,7 @@ export type StoreItemCategory =
   | 'avatar_vitoria'
   | 'borda_perfil'
   | 'mini_logo_badge'
-  | 'exp_buff'
-  | 'plataforma_trial';
+  | 'exp_buff';
 
 export type StoreItemRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
@@ -333,15 +332,4 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     metadata: { multiplier: 2.0, durationHours: 168 },
   },
 
-  // ── 1 TRIAL MÍTICO ────────────────────────────────────────────────
-  {
-    slug: 'trial-mes-gratis-platinum',
-    name: '30 Dias Premium Grátis',
-    description: 'Estende sua assinatura premium em 30 dias. Item mítico exclusivo.',
-    category: 'plataforma_trial',
-    priceCrystals: 40000,
-    rarity: 'mythic',
-    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="mythicGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23FF00FF;stop-opacity:1"/><stop offset="50%" style="stop-color:%2300FFFF;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23mythicGrad)"/><path d="M50 20 L60 40 L82 40 L65 55 L75 75 L50 60 L25 75 L35 55 L18 40 L40 40 Z" fill="white" stroke="%23FFD700" stroke-width="1"/><text x="50" y="85" text-anchor="middle" font-size="10" fill="white" font-weight="bold">30 DIAS</text></svg>',
-    metadata: { days: 30 },
-  },
 ];

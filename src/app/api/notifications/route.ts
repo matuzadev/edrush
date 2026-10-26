@@ -35,8 +35,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
   }
 
-  // Admin é definido por ADMIN_EMAILS env var (não por subscription_status,
-  // que é mutável pelo webhook Stripe).
+  // Admin é definido por ADMIN_EMAILS env var, não pelo estado da conta.
   if (!isAdminSession(session)) {
     return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
   }

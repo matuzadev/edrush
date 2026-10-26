@@ -4,7 +4,7 @@ import { getAvatar } from '@/data/avatars';
 
 // ─── Renderização visual de cada categoria de item da loja ────────────
 // Para avatares (órgão), reaproveita o catálogo de avatares (`avatarId`).
-// Para os demais (vitória, bordas, badges, buffs, trial), produz SVGs
+// Para os demais (vitória, bordas, badges e buffs), produz SVGs
 // inline pequenos e estilizados — isso evita criar 27 arquivos novos
 // e mantém o catálogo todo data-driven.
 
@@ -13,8 +13,7 @@ export type ItemCategory =
   | 'avatar_vitoria'
   | 'borda_perfil'
   | 'mini_logo_badge'
-  | 'exp_buff'
-  | 'plataforma_trial';
+  | 'exp_buff';
 
 export interface StoreItemLite {
   id: string;
@@ -320,26 +319,6 @@ function BuffPreview({ meta, size }: { meta: unknown; size: number }) {
   );
 }
 
-// ─── Trial mítico ─────────────────────────────────────────────────────
-function TrialPreview({ meta, size }: { meta: unknown; size: number }) {
-  const obj = asObj(meta);
-  const days = typeof obj.days === 'number' ? obj.days : 30;
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
-      <defs>
-        <radialGradient id="tr" cx="0.5" cy="0.4" r="0.7">
-          <stop offset="0%" stopColor="#f0abfc" />
-          <stop offset="60%" stopColor="#a855f7" />
-          <stop offset="100%" stopColor="#581c87" />
-        </radialGradient>
-      </defs>
-      <circle cx="32" cy="32" r="30" fill="url(#tr)" stroke="#fbbf24" strokeWidth="2" />
-      <text x="32" y="30" textAnchor="middle" fontWeight="900" fontFamily="Arial" fontSize="18" fill="#fff">{days}</text>
-      <text x="32" y="44" textAnchor="middle" fontWeight="800" fontFamily="Arial" fontSize="7" fill="#fde047">DIAS PRO</text>
-    </svg>
-  );
-}
-
 // ─── Componente principal ─────────────────────────────────────────────
 export function StoreItemPreview({ item, size = 96 }: Props) {
   const haloColor = RARITY_COLOR[item.rarity] ?? RARITY_COLOR.common;
@@ -390,8 +369,6 @@ export function StoreItemPreview({ item, size = 96 }: Props) {
     inner = <BadgePreview kind={kind} size={size} />;
   } else if (item.category === 'exp_buff') {
     inner = <BuffPreview meta={item.metadata} size={size} />;
-  } else if (item.category === 'plataforma_trial') {
-    inner = <TrialPreview meta={item.metadata} size={size} />;
   }
 
   return (
