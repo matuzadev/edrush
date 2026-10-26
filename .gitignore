@@ -23,6 +23,7 @@ dist/
 *.swo
 *.swn
 *.md
+!/VERCEL-DEPLOY.md
 *.yml
 *.yaml
 *.csv
