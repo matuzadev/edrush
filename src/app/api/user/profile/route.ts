@@ -4,7 +4,6 @@ import { authOptions } from '@/auth';
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { isUserPremium } from '@/lib/freemium';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -60,10 +59,6 @@ export async function PATCH(req: NextRequest) {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Body inválido' }, { status: 400 });
-  }
-
-  if (body.avatar_id !== undefined && !(await isUserPremium(userId, session.user.email))) {
-    return NextResponse.json({ error: 'premium_required' }, { status: 403 });
   }
 
   // Validação mínima

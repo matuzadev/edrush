@@ -6,7 +6,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { listMaterialsByConcurso } from '@/lib/study-materials';
-import { isUserPremium } from '@/lib/freemium';
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,9 +13,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
   }
   const userId = (session.user as { id?: string }).id;
-  if (!userId || !(await isUserPremium(userId, session.user.email))) {
-    return NextResponse.json({ error: 'premium_required' }, { status: 403 });
-  }
+  if (!userId) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
 
   const concursoSlug = req.nextUrl.searchParams.get('concursoSlug');
   if (!concursoSlug) {
