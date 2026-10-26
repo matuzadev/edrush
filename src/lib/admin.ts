@@ -4,7 +4,6 @@
 //   1. e-mail listado em `ADMIN_EMAILS` (env var, vírgula-separado), OU
 //   2. coluna `users.is_admin = 1` no banco (gerenciado por outro engenheiro).
 //
-// Não usar `subscription_status='admin'` como autorização administrativa.
 //
 // Uso típico (gating por sessão — síncrono, sem hit no banco):
 //   const session = await getServerSession(authOptions);

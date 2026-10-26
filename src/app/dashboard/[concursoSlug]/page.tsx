@@ -180,7 +180,7 @@ export default function PersonalizedDashboardPage() {
         <div className="flex items-center gap-3">
           <NotificationBell />
           <UserMenu onLogout={handleLogout} />
-          {/* Badge PRO — premium minimalista com gradient dourado e brilho sutil no hover */}
+          {/* Badge de destaque com gradient dourado e brilho sutil no hover */}
           <div
             className="pro-badge hidden md:flex relative items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden cursor-default group"
             style={{

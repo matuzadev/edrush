@@ -82,26 +82,9 @@ export async function registerReferral(opts: {
 export async function getReferralStats(userId: string) {
   const refs = await db.query.referrals.findMany({
     where: eq(referrals.referrer_id, userId),
-    columns: { status: true, referred_email: true, criado_em: true, reward_granted_at: true },
+    columns: { referred_email: true, criado_em: true },
     orderBy: (r, { desc }) => [desc(r.criado_em)],
   });
 
-  return {
-    total: refs.length,
-    subscribed: refs.filter(r => r.status === 'subscribed' || r.status === 'rewarded').length,
-    rewarded: refs.filter(r => r.status === 'rewarded').length,
-    list: refs.map(r => ({
-      email: r.referred_email ? maskEmail(r.referred_email) : '—',
-      status: r.status,
-      date: r.criado_em,
-      rewardAt: r.reward_granted_at,
-    })),
-  };
-}
-
-function maskEmail(email: string): string {
-  const [local, domain] = email.split('@');
-  if (!domain) return email;
-  const masked = local.slice(0, 2) + '***' + (local.length > 4 ? local.slice(-1) : '');
-  return masked + '@' + domain;
+  return { total: refs.length };
 }
