@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Search, Building2, Users, Calendar, ChevronRight, Filter, RefreshCw } from 'lucide-react';
 import { getOrgaoConfig } from '@/lib/orgao-config';
@@ -12,8 +12,11 @@ interface Concurso {
   orgao: string;
   banca: string | null;
   vagas_total: number | null;
+  vagas_cargo: number | null;
   descricao: string | null;
   status: string;
+  url_edital: string | null;
+  url_site_oficial: string | null;
   cargo: string | null;
   area_especialidade: string | null;
   remuneracao_inicial: number | null;
@@ -51,7 +54,25 @@ function OrgaoLogo({ concurso }: { concurso: Concurso }) {
   );
 }
 
-function statusBadge(status: string) {
+function hasRegistrationEnded(concurso: Concurso) {
+  if (concurso.status !== 'inscricoes_abertas' || !concurso.data_fechamento_inscricoes) {
+    return false;
+  }
+
+  const closingDate = new Date(`${concurso.data_fechamento_inscricoes}T23:59:59`);
+  return !Number.isNaN(closingDate.getTime()) && closingDate.getTime() < Date.now();
+}
+
+function statusBadge(concurso: Concurso) {
+  const { status } = concurso;
+  if (hasRegistrationEnded(concurso)) {
+    return (
+      <span className="inline-flex items-center rounded-full border border-slate-700/60 bg-slate-700/40 px-2.5 py-0.5 text-xs font-semibold text-slate-300">
+        Inscrições encerradas
+      </span>
+    );
+  }
+
   const labels: Record<string, string> = {
     ativo: 'Ativo',
     previsto: 'Previsto',
@@ -77,7 +98,6 @@ function statusBadge(status: string) {
 
 export default function ConcursosPage() {
   const [concursos, setConcursos] = useState<Concurso[]>([]);
-  const [filtered, setFiltered] = useState<Concurso[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -102,7 +122,7 @@ export default function ConcursosPage() {
         setConcursos(data as Concurso[]);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') return;
-        setLoadError(error instanceof Error ? error.message : 'Não foi possível carregar os concursos.');
+        setLoadError('Não foi possível carregar os concursos. Verifique sua conexão e tente novamente.');
         setConcursos([]);
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
@@ -114,18 +134,22 @@ export default function ConcursosPage() {
     return () => controller.abort();
   }, [statusFilter, retryCount]);
 
-  useEffect(() => {
+  const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    setFiltered(
-      q
-        ? concursos.filter(c =>
-            c.titulo.toLowerCase().includes(q) ||
-            c.organizador.toLowerCase().includes(q) ||
-            (c.banca ?? '').toLowerCase().includes(q)
-          )
-        : concursos
-    );
-  }, [search, concursos]);
+    const visibleContests = statusFilter === 'inscricoes_abertas'
+      ? concursos.filter(concurso => !hasRegistrationEnded(concurso))
+      : concursos;
+
+    return q
+      ? visibleContests.filter(c =>
+          c.titulo.toLowerCase().includes(q) ||
+          c.organizador.toLowerCase().includes(q) ||
+          (c.banca ?? '').toLowerCase().includes(q) ||
+          (c.cargo ?? '').toLowerCase().includes(q) ||
+          (c.area_especialidade ?? '').toLowerCase().includes(q)
+        )
+      : visibleContests;
+  }, [search, concursos, statusFilter]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020617] via-slate-900 to-[#0f172a]">
@@ -224,12 +248,22 @@ export default function ConcursosPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <h3 className="font-bold text-white text-base leading-snug">{c.titulo}</h3>
-                      {statusBadge(c.status)}
+                      {statusBadge(c)}
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mb-2">
                       <span className="flex items-center gap-1"><Building2 size={11} />{c.organizador}</span>
                       {c.banca && <span className="text-slate-500">Banca: <span className="text-slate-400">{c.banca}</span></span>}
                       {c.nivel_escolaridade && <span>{c.nivel_escolaridade}</span>}
+                      {c.url_site_oficial?.startsWith('https://') && (
+                        <a href={c.url_site_oficial} target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline-offset-2 hover:underline">
+                          Site oficial
+                        </a>
+                      )}
+                      {c.url_edital?.startsWith('https://') && (
+                        <a href={c.url_edital} target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline-offset-2 hover:underline">
+                          Edital
+                        </a>
+                      )}
                     </div>
                     {(c.cargo || c.area_especialidade) && (
                       <p className="mb-2 text-sm text-slate-300">
@@ -238,9 +272,10 @@ export default function ConcursosPage() {
                     )}
                     {c.descricao && <p className="mb-3 line-clamp-2 text-xs leading-5 text-slate-500">{c.descricao}</p>}
                     <div className="flex flex-wrap items-center gap-3">
-                      {c.vagas_total != null && (
+                      {(c.vagas_cargo ?? c.vagas_total) != null && (
                         <span className="flex items-center gap-1 text-xs text-slate-300 bg-slate-800/60 border border-white/5 rounded-lg px-2 py-1">
-                          <Users size={10} />{c.vagas_total.toLocaleString('pt-BR')} vagas
+                          <Users size={10} />
+                          {c.vagas_cargo ?? c.vagas_total} vagas
                         </span>
                       )}
                       {c.remuneracao_inicial != null && (
@@ -250,10 +285,10 @@ export default function ConcursosPage() {
                       )}
                       {c.data_prova_objetiva && (
                         <span className="flex items-center gap-1 text-xs text-slate-400">
-                          <Calendar size={10} />Prova: {new Date(c.data_prova_objetiva + 'T00:00:00').toLocaleDateString('pt-BR')}
+                          <Calendar size={10} />Data da prova: {new Date(c.data_prova_objetiva + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </span>
                       )}
-                      {c.data_fechamento_inscricoes && c.status === 'inscricoes_abertas' && (
+                      {c.data_fechamento_inscricoes && c.status === 'inscricoes_abertas' && !hasRegistrationEnded(c) && (
                         <span className="text-xs text-amber-400">
                           Inscrições até {new Date(c.data_fechamento_inscricoes + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </span>

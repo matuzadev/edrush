@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
+import { isAdminSession } from '@/lib/admin';
 import { db, lsClient as rawClient } from '@/lib/db';
 import { concursos } from '@/db/schema';
-import { eq, and, like, SQL } from 'drizzle-orm';
 
 // Status válidos — alinhados com os valores usados no seed
 const VALID_STATUSES = new Set([
@@ -93,6 +95,14 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  if (!isAdminSession(session)) {
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  }
+
   try {
     const body = await request.json();
 
