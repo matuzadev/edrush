@@ -3,7 +3,7 @@
 // Server component:
 //   - Lê selected_concurso_slug do user na sessão (ou banco)
 //   - Busca materiais publicados naquele concurso (+ globais)
-//   - Renderiza cards com botão "Baixar PDF" ou cadeado por gate de subscription
+//   - Renderiza cards com botão "Baixar PDF" para materiais publicados
 //   - Materiais ainda não gerados aparecem como "Em breve"
 
 import { redirect } from 'next/navigation';
@@ -11,16 +11,14 @@ import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { lsClient } from '@/lib/db';
-import { listMaterialsByConcurso, userCanDownload } from '@/lib/study-materials';
-import { BookOpen, ChevronLeft, Download, Lock, FileText, Clock } from 'lucide-react';
+import { listMaterialsByConcurso } from '@/lib/study-materials';
+import { BookOpen, ChevronLeft, Download, FileText, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 interface UserInfo {
   selected_concurso_slug: string | null;
   selected_areas: string | null;
-  subscription_status: string | null;
-  is_admin: number | null;
 }
 
 interface ConcursoInfo {
@@ -30,7 +28,7 @@ interface ConcursoInfo {
 
 async function loadUserInfo(userId: string): Promise<UserInfo | null> {
   const rs = await lsClient.execute({
-    sql: `SELECT selected_concurso_slug, selected_areas, subscription_status, is_admin
+    sql: `SELECT selected_concurso_slug, selected_areas
           FROM users WHERE id = ? LIMIT 1`,
     args: [userId],
   });
@@ -74,13 +72,10 @@ export default async function MateriaisPage() {
   }
 
   const concursoSlug = user.selected_concurso_slug;
-  const [concurso, materials, accessCheck] = await Promise.all([
+  const [concurso, materials] = await Promise.all([
     loadConcurso(concursoSlug),
     listMaterialsByConcurso(concursoSlug),
-    userCanDownload(userId),
   ]);
-
-  const isLocked = !accessCheck.allowed;
 
   // Áreas selecionadas pelo usuário no onboarding (string JSON)
   let userAreas: string[] = [];
@@ -129,36 +124,6 @@ export default async function MateriaisPage() {
           </p>
         </header>
 
-        {isLocked && (
-          <div
-            className="mb-6 px-5 py-4 rounded-2xl flex items-start gap-3"
-            style={{
-              background: 'linear-gradient(135deg, rgba(245,158,11,0.10), rgba(245,158,11,0.04))',
-              border: '1px solid rgba(245,158,11,0.30)',
-            }}
-          >
-            <Lock size={18} className="text-amber-400 mt-0.5 shrink-0" />
-            <div className="flex-1">
-              <p className="text-sm font-bold text-amber-300">
-                Materiais completos disponíveis no EdRush Premium
-              </p>
-              <p className="text-xs text-amber-200/70 mt-1">
-                Faça upgrade pra desbloquear todos os PDFs por disciplina, atualizados continuamente.
-              </p>
-              <Link
-                href="/assinar"
-                className="inline-flex mt-3 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest text-amber-50"
-                style={{
-                  background: 'linear-gradient(135deg, #d97706, #b45309)',
-                  boxShadow: '0 0 16px rgba(245,158,11,0.40)',
-                }}
-              >
-                Ver planos →
-              </Link>
-            </div>
-          </div>
-        )}
-
         {published.length === 0 && expectedDisciplinas.length === 0 ? (
           <EmptyState />
         ) : (
@@ -171,7 +136,6 @@ export default async function MateriaisPage() {
                 pageCount={m.page_count}
                 fileSize={m.file_size}
                 publishedAt={m.published_at}
-                locked={isLocked}
               />
             ))}
             {expectedDisciplinas.map((d) => (
@@ -196,14 +160,12 @@ function MaterialCard({
   pageCount,
   fileSize,
   publishedAt,
-  locked,
 }: {
   disciplina: string;
   concursoSlug: string;
   pageCount: number | null;
   fileSize: number | null;
   publishedAt: string | null;
-  locked: boolean;
 }) {
   const encoded = encodeURIComponent(disciplina);
   return (
@@ -258,32 +220,17 @@ function MaterialCard({
         <span>{formatFileSize(fileSize)}</span>
       </div>
 
-      {locked ? (
-        <button
-          disabled
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold cursor-not-allowed"
-          style={{
-            background: 'rgba(15,23,42,0.60)',
-            border: '1px solid rgba(255,255,255,0.10)',
-            color: '#64748b',
-          }}
-        >
-          <Lock size={16} />
-          Disponível no EdRush Premium
-        </button>
-      ) : (
-        <a
-          href={`/api/study-materials/${concursoSlug}/${encoded}/download`}
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-white transition"
-          style={{
-            background: 'linear-gradient(135deg, #059669, #047857)',
-            boxShadow: '0 0 16px rgba(16,185,129,0.30)',
-          }}
-        >
-          <Download size={16} />
-          Baixar PDF completo
-        </a>
-      )}
+      <a
+        href={`/api/study-materials/${concursoSlug}/${encoded}/download`}
+        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-white transition"
+        style={{
+          background: 'linear-gradient(135deg, #059669, #047857)',
+          boxShadow: '0 0 16px rgba(16,185,129,0.30)',
+        }}
+      >
+        <Download size={16} />
+        Baixar PDF completo
+      </a>
     </div>
   );
 }

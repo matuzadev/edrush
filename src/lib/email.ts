@@ -131,55 +131,6 @@ export function emailRecuperacaoSenha(
 }
 
 /**
- * Email de sucesso de pagamento
- */
-export function emailConfirmacaoPagamento(
-  email: string,
-  nome: string,
-  plano: string,
-  dataExpiracao: string
-) {
-  return {
-    to: email,
-    subject: '✅ Pagamento Confirmado - Novo Plano Ativado!',
-    html: `
-      <h2>🎉 Bem-vindo ao EdRush Premium!</h2>
-      <p>Olá, ${nome}!</p>
-      <p>Seu pagamento foi processado com sucesso!</p>
-      
-      <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>Plano:</strong> ${plano}</p>
-        <p><strong>Válido até:</strong> ${new Date(dataExpiracao).toLocaleDateString('pt-BR')}</p>
-      </div>
-
-      <p>Agora você tem acesso a:</p>
-      <ul>
-        <li>🎯 Milho + questões em sua disciplina</li>
-        <li>📊 Analytics detalhados de performance</li>
-        <li>🎓 Simulados completos</li>
-        <li>💬 Comunidade de estudos</li>
-        <li>📱 Acesso no app mobile</li>
-      </ul>
-
-      <a href="https://focofederal.com/dashboard" style="
-        display: inline-block;
-        padding: 12px 24px;
-        background-color: #10b981;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: bold;
-        margin-top: 20px;
-      ">Ir para o Dashboard</a>
-
-      <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #999; font-size: 12px;">
-        EdRush - Preparação para Concursos
-      </p>
-    `,
-  };
-}
-
-/**
  * Email de novo concurso (notificação)
  */
 export function emailNovoConcurso(
@@ -253,19 +204,6 @@ export async function sendPasswordResetEmail(
   resetLink: string
 ): Promise<boolean> {
   const emailOptions = emailRecuperacaoSenha(email, nome, resetLink);
-  return sendEmail(emailOptions);
-}
-
-/**
- * Enviar email de confirmação de pagamento
- */
-export async function sendPaymentConfirmationEmail(
-  email: string,
-  nome: string,
-  plano: string,
-  dataExpiracao: string
-): Promise<boolean> {
-  const emailOptions = emailConfirmacaoPagamento(email, nome, plano, dataExpiracao);
   return sendEmail(emailOptions);
 }
 

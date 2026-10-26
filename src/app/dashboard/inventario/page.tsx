@@ -55,7 +55,6 @@ const CATEGORY_LABELS: Record<string, { label: string; Icon: typeof Crown }> = {
   borda_perfil:     { label: 'Bordas', Icon: Sparkles },
   mini_logo_badge:  { label: 'Selos', Icon: Star },
   exp_buff:         { label: 'Buffs EXP', Icon: Zap },
-  plataforma_trial: { label: 'Plano Premium', Icon: Gem },
 };
 
 const RARITY_TINT: Record<string, { color: string; bg: string; border: string }> = {
@@ -460,7 +459,7 @@ export default function InventarioPage() {
                             </div>
                             <div className="px-3 pb-3 border-t border-white/5 pt-2">
                               <p className="text-xs font-bold text-white truncate">{item.name}</p>
-                              {item.category === 'exp_buff' || item.category === 'plataforma_trial' ? (
+                              {item.category === 'exp_buff' ? (
                                 <p className="text-[10px] text-slate-500 mt-0.5">Consumível</p>
                               ) : (
                                 <p className="text-[10px] mt-0.5" style={{ color: isSelected ? '#34d399' : '#64748b' }}>

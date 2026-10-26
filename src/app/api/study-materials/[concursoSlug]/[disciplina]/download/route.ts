@@ -2,7 +2,7 @@
 //
 // Comportamento:
 //   - 401 se não autenticado
-//   - 403 se sem subscription ativa (admin bypass)
+//   - 404 se material não existe ou não publicado
 //   - 404 se material não existe ou não publicado
 //   - 202 se status='generating' (cliente exibe "em preparação")
 //   - 302 redirect ao Vercel Blob se 'published'
@@ -15,7 +15,6 @@ import { authOptions } from '@/auth';
 import {
   getMaterialByDisciplina,
   logDownload,
-  userCanDownload,
 } from '@/lib/study-materials';
 
 export async function GET(
@@ -28,14 +27,6 @@ export async function GET(
   const userId = (session?.user as { id?: string } | undefined)?.id;
   if (!userId) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-  }
-
-  const gate = await userCanDownload(userId);
-  if (!gate.allowed) {
-    return NextResponse.json(
-      { error: 'Acesso restrito', reason: gate.reason },
-      { status: 403 },
-    );
   }
 
   const decoded = decodeURIComponent(disciplina);

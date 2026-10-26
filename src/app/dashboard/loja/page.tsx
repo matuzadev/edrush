@@ -43,7 +43,6 @@ const CATEGORIES: { value: string; label: string; Icon: typeof Crown }[] = [
   { value: 'borda_perfil', label: 'Bordas', Icon: Sparkles },
   { value: 'mini_logo_badge', label: 'Selos', Icon: Star },
   { value: 'exp_buff', label: 'Buffs EXP', Icon: Zap },
-  { value: 'plataforma_trial', label: 'Plano Premium', Icon: Gem },
 ];
 
 const RARITY_LABEL: Record<string, string> = {
@@ -323,7 +322,7 @@ export default function LojaPage() {
                         </span>
                       </div>
 
-                      {item.owned && item.category !== 'exp_buff' && item.category !== 'plataforma_trial' ? (
+                      {item.owned && item.category !== 'exp_buff' ? (
                         <Link
                           href="/dashboard/inventario"
                           className="text-xs font-bold text-cyan-400 hover:text-cyan-300 px-2 py-1 transition"

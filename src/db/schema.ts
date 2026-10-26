@@ -523,7 +523,7 @@ export const storeItems = sqliteTable(
     slug: text('slug').notNull().unique(),
     name: text('name').notNull(),
     description: text('description').notNull(),
-    category: text('category').notNull(), // avatar_orgao | avatar_vitoria | borda_perfil | mini_logo_badge | exp_buff | plataforma_trial
+    category: text('category').notNull(), // avatar_orgao | avatar_vitoria | borda_perfil | mini_logo_badge | exp_buff
     priceCrystals: integer('price_crystals').notNull(),
     rarity: text('rarity').notNull(), // common | rare | epic | legendary | mythic
     imageUrl: text('image_url'),

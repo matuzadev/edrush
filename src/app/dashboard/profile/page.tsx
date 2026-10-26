@@ -102,7 +102,6 @@ export default function ProfilePage() {
   const [isAddFriendsOpen, setIsAddFriendsOpen] = useState(false);
   const [isFriendsPopupOpen, setIsFriendsPopupOpen] = useState(false);
   const [friendsCount, setFriendsCount] = useState<number | null>(null);
-  const [isPremium, setIsPremium] = useState<boolean | null>(null);
 
   // Carrega só a contagem de amigos para o badge (leve, ~1 request)
   useEffect(() => {
@@ -115,13 +114,6 @@ export default function ProfilePage() {
       .catch(() => {});
   }, [user]);
 
-  useEffect(() => {
-    if (!user) return;
-    fetch('/api/user/subscription')
-      .then((response) => response.ok ? response.json() : null)
-      .then((data) => setIsPremium(Boolean(data?.isPremium)))
-      .catch(() => setIsPremium(false));
-  }, [user]);
   const [viewingFriend, setViewingFriend] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -239,18 +231,6 @@ export default function ProfilePage() {
           <div className="text-center py-32 text-slate-400">{error}</div>
         ) : (
           <div className="space-y-6">
-            {isPremium === false && (
-              <div className="flex flex-col gap-3 border border-emerald-500/20 bg-emerald-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-bold text-white">Personalização avançada é Premium</p>
-                  <p className="mt-1 text-xs text-slate-400">Avatares, bordas e selos exclusivos por R$ 14,99/mês.</p>
-                </div>
-                <Link href="/assinar" className="inline-flex items-center gap-2 text-sm font-bold text-emerald-300 hover:text-emerald-200">
-                  Ver Premium <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            )}
-
             {/* ── Hero ── */}
             <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl">
               {/* Glow de fundo */}
@@ -420,7 +400,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* ── Programa de Indicação (CTA premium) ── */}
+            {/* ── Programa de Indicação ── */}
             <Link
               href="/dashboard/referral"
               className="referral-cta relative block overflow-hidden rounded-2xl group"
@@ -523,7 +503,7 @@ export default function ProfilePage() {
                     Programa de Indicação
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5 leading-snug">
-                    Convide amigos concurseiros e <span className="font-bold text-emerald-400">ganhe meses grátis</span> a cada inscrição.
+                    Convide amigos concurseiros para estudar gratuitamente no EdRush.
                   </p>
                 </div>
 

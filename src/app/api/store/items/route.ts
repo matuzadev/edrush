@@ -10,7 +10,6 @@ const VALID_CATEGORIES = new Set([
   'borda_perfil',
   'mini_logo_badge',
   'exp_buff',
-  'plataforma_trial',
 ]);
 
 const VALID_RARITIES = new Set(['common', 'rare', 'epic', 'legendary', 'mythic']);
@@ -60,7 +59,7 @@ export async function GET(req: NextRequest) {
     }
 
     // SQL básico — filtros opcionais via concatenação parametrizada
-    const where: string[] = ['is_active = 1'];
+    const where: string[] = ["is_active = 1", "category != 'plataforma_trial'"];
     const args: (string | number)[] = [];
     if (category) { where.push('category = ?'); args.push(category); }
     if (rarity) { where.push('rarity = ?'); args.push(rarity); }

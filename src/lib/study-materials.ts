@@ -7,7 +7,6 @@
 
 import { put } from '@vercel/blob';
 import { lsClient } from '@/lib/db';
-import { isUserPremium } from '@/lib/freemium';
 import { generateStudyMaterial } from './study-material-generator';
 import { renderPDF } from './pdf-renderer';
 import type { StudyMaterialContent } from './study-material-types';
@@ -258,10 +257,5 @@ export async function logDownload(userId: string, materialId: number): Promise<v
 
 /**
  * Determina se o user tem acesso ao material (gate de subscription).
- * Hoje: requer subscription_status='active'. Pode ser estendido para "primeiro PDF grátis".
+ * Os downloads publicados estão disponíveis a todos os usuários autenticados.
  */
-export async function userCanDownload(userId: string): Promise<{ allowed: boolean; reason?: string }> {
-  return (await isUserPremium(userId))
-    ? { allowed: true }
-    : { allowed: false, reason: 'premium_required' };
-}

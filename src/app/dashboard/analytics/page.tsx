@@ -42,7 +42,7 @@ interface StatsData {
 
 export default function AnalyticsPage() {
   return (
-    <SubscriptionGuard premiumOnly>
+    <SubscriptionGuard>
       <AnalyticsContent />
     </SubscriptionGuard>
   );

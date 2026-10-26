@@ -50,7 +50,7 @@ export default function Planilha() {
             </h2>
             <p className="text-slate-400 text-sm leading-relaxed">
               Cada dia que você passa sem organizar seus estudos é um dia a mais na vida que você odeia.
-              Organize seus estudos com o plano grátis e desbloqueie os recursos avançados do EdRush Premium por R$ 14,99 ao mês.
+              Organize seus estudos com todos os recursos gratuitos do EdRush, sem mensalidade ou cobranças para acessar a plataforma.
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default function Planilha() {
 
           <p className="mt-8 text-slate-500 text-xs uppercase tracking-widest animate-pulse flex items-center justify-center gap-2">
             <Zap className="w-4 h-4 text-yellow-500" />
-            Aviso: O próximo lote terá reajuste de 65% no valor.
+            EdRush: acesso gratuito, sem lotes ou reajustes.
           </p>
         </div>
       </section>

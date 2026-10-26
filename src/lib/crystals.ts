@@ -196,34 +196,3 @@ export async function applyExpBuff(
  * Se a assinatura está expirada (ou nunca existiu), usa now como base.
  * Caso contrário, soma sobre a expiração atual.
  */
-export async function extendSubscription(
-  userId: string,
-  days: number,
-): Promise<{ newExpiresAt: string }> {
-  if (!Number.isFinite(days) || days <= 0) {
-    throw new Error('extendSubscription: days deve ser positivo');
-  }
-
-  const rs = await client.execute({
-    sql: 'SELECT subscription_expires_at FROM users WHERE id = ?',
-    args: [userId],
-  });
-  const current = (rs.rows[0] as unknown as { subscription_expires_at: string | null })
-    ?.subscription_expires_at ?? null;
-
-  const now = Date.now();
-  const currentMs = current ? new Date(current).getTime() : 0;
-  const baseMs = currentMs > now ? currentMs : now;
-  const newExpiresMs = baseMs + days * 24 * 60 * 60 * 1000;
-  const newExpires = new Date(newExpiresMs).toISOString();
-
-  await client.execute({
-    sql: `UPDATE users
-          SET subscription_expires_at = ?,
-              atualizado_em = ?
-          WHERE id = ?`,
-    args: [newExpires, new Date().toISOString(), userId],
-  });
-
-  return { newExpiresAt: newExpires };
-}

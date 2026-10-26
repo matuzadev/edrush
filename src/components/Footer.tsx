@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShieldCheck, CreditCard } from 'lucide-react';
+import { ShieldCheck, Gift } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -37,7 +37,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/#oferta" className="hover:text-emerald-400 transition-colors no-underline">
-                  Ver Planos
+                  Recursos gratuitos
                 </Link>
               </li>
               <li>
@@ -63,12 +63,11 @@ export default function Footer() {
               <span>Ambiente 100% criptografado</span>
             </div>
             <div className="flex items-center gap-3 text-xs">
-              <CreditCard className="w-4 h-4 text-blue-400 flex-shrink-0" />
-              <span>Pagamento Seguro via Mercado Pago</span>
+              <Gift className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <span>Todos os recursos de estudo são gratuitos</span>
             </div>
             <p className="text-[11px] leading-relaxed text-slate-500 pt-1">
-              Seus dados financeiros nunca passam pelos nossos servidores.
-              Todo pagamento é processado diretamente pelo Mercado Pago.
+              Moedas e cosméticos são opcionais e não condicionam o acesso à plataforma.
             </p>
           </div>
         </div>

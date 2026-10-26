@@ -24,7 +24,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   borda_perfil: 'Bordas',
   mini_logo_badge: 'Selos',
   exp_buff: 'Buffs (consumidos)',
-  plataforma_trial: 'Premium ativado',
 };
 
 function formatBuffRemaining(expiresAt: string): string {
