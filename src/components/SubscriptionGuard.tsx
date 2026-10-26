@@ -4,57 +4,17 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface SubscriptionInfo {
-  status: string;
-  hasAccess: boolean;
-  isPremium: boolean;
-  isTrial: boolean;
-  isPaid: boolean;
-  trialDaysRemaining: number;
-  expiresAt: string | null;
-  isAdmin?: boolean;
-}
-
-export function SubscriptionGuard({
-  children,
-  premiumOnly = false,
-}: {
+export function SubscriptionGuard({ children }: {
   children: React.ReactNode;
-  premiumOnly?: boolean;
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
-  const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return;
-
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    fetch('/api/user/subscription')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data) setSubscription(data);
-        else setSubscription({ status: 'free', hasAccess: false, isPremium: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
-      })
-      .catch(() => {
-        setSubscription({ status: 'free', hasAccess: false, isPremium: false, isTrial: false, isPaid: false, trialDaysRemaining: 0, expiresAt: null });
-      })
-      .finally(() => setHasChecked(true));
+    if (!isLoading && !user) router.push('/auth/login');
   }, [user, isLoading, router]);
 
-  // Free accounts may use the dashboard; only explicitly premium routes redirect.
-  useEffect(() => {
-    if (premiumOnly && hasChecked && subscription && !subscription.isPremium) {
-      router.push('/assinar');
-    }
-  }, [premiumOnly, hasChecked, subscription, router]);
-
-  if (isLoading || !hasChecked || (premiumOnly && subscription && !subscription.isPremium)) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />

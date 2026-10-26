@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CheckCircle2, Zap, Users, Lock, RefreshCw } from 'lucide-react';
+import { CheckCircle2, Gift, Users } from 'lucide-react';
 
 const benefits: { title: string; desc: string }[] = [
   {
@@ -22,10 +22,6 @@ const benefits: { title: string; desc: string }[] = [
     title: 'Mapa de Concursos',
     desc: 'Editais abertos e datas de prova para todo o Brasil em um só lugar.',
   },
-  {
-    title: 'Acesso por 30 dias',
-    desc: 'Pagamento único por PIX. Renove manualmente se quiser continuar.',
-  },
 ];
 
 export default function Offer() {
@@ -43,10 +39,10 @@ export default function Offer() {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-            Comece grátis. Faça upgrade quando quiser.
+            Tudo gratuito, sem mensalidade e sem bloqueios por plano.
           </h2>
           <p className="text-slate-400 text-sm">
-            O plano grátis oferece 10 respostas por dia. O Premium libera recursos avançados por R$ 14,99 por 30 dias.
+            Questões, simulados, materiais, estatísticas e personalização estão disponíveis para todos.
           </p>
         </div>
 
@@ -56,7 +52,7 @@ export default function Offer() {
           {/* Benefícios */}
           <div className="flex flex-col gap-4">
             <h3 className="text-white font-bold text-xl mb-2">
-              O que o Premium desbloqueia
+              Recursos incluídos gratuitamente
             </h3>
             {benefits.map((b, i) => (
               <div key={i} className="flex gap-4 items-start">
@@ -81,7 +77,7 @@ export default function Offer() {
             </div>
           </div>
 
-          {/* Card de preço */}
+          {/* Acesso gratuito */}
           <div className="relative rounded-2xl p-px bg-gradient-to-b from-emerald-500/40 to-slate-800/20">
             <div className="rounded-2xl bg-[#0b1628] p-8 overflow-hidden relative">
 
@@ -90,48 +86,37 @@ export default function Offer() {
 
               <div className="relative z-10">
                 <span className="inline-block px-3 py-1 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-bold uppercase tracking-widest mb-5">
-                  EdRush Premium
+                  EdRush gratuito
                 </span>
 
-                {/* Preço */}
                 <div className="rounded-xl bg-slate-900/70 border border-slate-700/50 p-5 mb-6">
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-slate-400 text-base">R$</span>
-                    <span className="text-emerald-400 text-5xl font-black leading-none">14</span>
-                    <span className="text-emerald-400 text-2xl font-bold">,99</span>
-                    <span className="text-slate-400 text-sm">/30 dias</span>
-                  </div>
-                  <p className="text-slate-300 text-xs font-semibold">
-                    Pagamento PIX único — acesso por 30 dias
+                  <p className="text-emerald-400 text-3xl font-black mb-2">R$ 0,00</p>
+                  <p className="text-slate-300 text-sm font-semibold">
+                    Sem mensalidade e sem cobrança para acessar os recursos.
                   </p>
                 </div>
 
-                {/* Mini features */}
                 <div className="flex flex-col gap-3 mb-7">
                   <div className="flex items-center gap-3 text-slate-200 text-sm">
-                    <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                    <span>Ativação imediata após o pagamento</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Acesso completo após criar sua conta</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-200 text-sm">
-                    <Lock className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    <span>Pagamento seguro via Mercado Pago</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-200 text-sm">
-                    <RefreshCw className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span>Renove manualmente quando quiser</span>
+                    <Gift className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Moedas e cosméticos são opcionais</span>
                   </div>
                 </div>
 
                 {/* CTA */}
                 <Link
-                  href="/assinar"
+                  href="/auth/signup"
                   className="block w-full text-center py-4 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base uppercase tracking-wide transition-all hover:scale-[1.02] hover:shadow-[0_10px_40px_rgba(16,185,129,0.4)] no-underline"
                 >
-                  GARANTIR MEU ACESSO AGORA
+                  CRIAR CONTA GRATUITA
                 </Link>
 
                 <p className="text-slate-500 text-xs text-center mt-4 leading-relaxed">
-                  Garantia de satisfação de 7 dias. Suporte via email 24h.
+                  Nenhum pagamento é necessário para usar a plataforma.
                 </p>
               </div>
             </div>
