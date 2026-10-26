@@ -147,44 +147,6 @@ html.light {
     -moz-osx-font-smoothing: grayscale;
   }
 
-  .hero {
-    @apply relative flex min-h-screen w-full flex-col overflow-hidden;
-  }
-
-  .hero-bg-overlay {
-    @apply pointer-events-none absolute inset-0 z-0;
-  }
-
-  .hero-bg-image {
-    @apply h-full w-full object-cover;
-    filter: brightness(0.45) saturate(0.85);
-  }
-
-  /* ---------------- REVEAL ---------------- */
-  [data-reveal] {
-    @apply opacity-0 translate-y-6 transition-all duration-800 will-change-transform;
-  }
-
-  [data-reveal].revealed {
-    @apply opacity-100 translate-y-0;
-  }
-
-  [data-reveal="top"] {
-    @apply -translate-y-12;
-  }
-
-  [data-reveal="bottom"] {
-    @apply translate-y-12;
-  }
-
-  [data-reveal="left"] {
-    @apply -translate-x-12;
-  }
-
-  [data-reveal="right"] {
-    @apply translate-x-12;
-  }
-
   /* ---------------- CARDS / ACCESSIBILITY ---------------- */
   .radar-card {
     @apply outline-none transition-shadow;
@@ -200,18 +162,6 @@ html.light {
 ========================================================= */
 @layer utilities {
   /* -------- KEYFRAMES -------- */
-  @keyframes slow-zoom {
-    0% {
-      transform: scale(1.1);
-    }
-    50% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1.1);
-    }
-  }
-
   @keyframes bounce-subtle {
     0%,
     100% {
@@ -232,10 +182,6 @@ html.light {
   }
 
   /* -------- ANIMATION UTILS -------- */
-  .animate-slow-zoom {
-    animation: slow-zoom 25s ease-in-out infinite;
-  }
-
   .animate-bounce-subtle {
     animation: bounce-subtle 2s ease-in-out infinite;
   }
