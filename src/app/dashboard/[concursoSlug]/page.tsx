@@ -333,25 +333,31 @@ export default function PersonalizedDashboardPage() {
               icon: CheckCheck,
               label: 'Matérias feitas',
               hint:
-                displaySubjects.length > 0
+                stats.error
+                  ? 'não foi possível carregar'
+                  : displaySubjects.length > 0
                   ? `${Math.round((stats.subjectsDone / displaySubjects.length) * 100)}% do plano`
                   : '—',
-              value: stats.loaded ? `${stats.subjectsDone}/${displaySubjects.length}` : '...',
+              value: stats.loaded ? (stats.error ? '—' : `${stats.subjectsDone}/${displaySubjects.length}`) : '...',
               accent: '#22c55e',
               iconBg: 'bg-green-500/10',
               iconColor: 'text-green-400',
               ringFrom: 'from-green-500/30',
               ringTo: 'to-green-500/0',
               progress:
-                displaySubjects.length > 0
+                !stats.error && displaySubjects.length > 0
                   ? Math.min(100, Math.round((stats.subjectsDone / displaySubjects.length) * 100))
-                  : 0,
+                  : undefined,
             },
             {
               icon: TrendingUp,
               label: 'Respondidas',
-              hint: stats.totalAnswered > 0 ? `${stats.totalCorrect} corretas` : 'comece agora',
-              value: stats.loaded ? stats.totalAnswered.toLocaleString('pt-BR') : '...',
+              hint: stats.error
+                ? 'não foi possível carregar'
+                : stats.totalAnswered > 0
+                  ? `${stats.totalCorrect} corretas`
+                  : 'comece agora',
+              value: stats.loaded ? (stats.error ? '—' : stats.totalAnswered.toLocaleString('pt-BR')) : '...',
               accent: '#3b82f6',
               iconBg: 'bg-blue-500/10',
               iconColor: 'text-blue-400',
@@ -362,7 +368,9 @@ export default function PersonalizedDashboardPage() {
               icon: Target,
               label: 'Taxa de Acertos',
               hint:
-                stats.totalAnswered > 0
+                stats.error
+                  ? 'não foi possível carregar'
+                  : stats.totalAnswered > 0
                   ? stats.accuracy >= 70
                     ? 'Excelente desempenho'
                     : stats.accuracy >= 50
@@ -370,16 +378,18 @@ export default function PersonalizedDashboardPage() {
                       : 'Foco nas revisões'
                   : 'sem dados ainda',
               value: stats.loaded
-                ? stats.totalAnswered > 0
-                  ? `${stats.accuracy}%`
-                  : '—'
+                ? stats.error
+                  ? '—'
+                  : stats.totalAnswered > 0
+                    ? `${stats.accuracy}%`
+                    : '—'
                 : '...',
               accent: '#8b5cf6',
               iconBg: 'bg-violet-500/10',
               iconColor: 'text-violet-400',
               ringFrom: 'from-violet-500/30',
               ringTo: 'to-violet-500/0',
-              progress: stats.totalAnswered > 0 ? stats.accuracy : 0,
+              progress: !stats.error && stats.totalAnswered > 0 ? stats.accuracy : undefined,
             },
           ] as const).map((metric) => {
             const Icon = metric.icon;
