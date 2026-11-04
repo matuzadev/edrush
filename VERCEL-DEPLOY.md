@@ -45,6 +45,7 @@ Use a primeira saída para `NEXTAUTH_SECRET` e a segunda para `QUESTION_SECRET`.
 3. Em **Authorized redirect URIs**, adicione exatamente: `https://seu-dominio/api/auth/callback/google`.
 4. Se o domínio ainda não estiver definido, use inicialmente o domínio HTTPS atribuído pela Vercel. Ao adicionar domínio próprio, atualize a origem, o redirect URI e `NEXTAUTH_URL` para esse domínio.
 5. Copie Client ID e Client Secret para as variáveis da Vercel. Para testar Preview, configure separadamente os domínios de Preview no OAuth e use um banco de teste.
+6. Endereços em `ADMIN_EMAILS` só recebem acesso administrativo ao entrar pelo Google com o e-mail verificado. O login por e-mail e senha não concede privilégios administrativos.
 
 ## 5. Domínio e publicação
 

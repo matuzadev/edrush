@@ -33,7 +33,7 @@ interface BatchResult {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
-  if (!userId || !(await requireAdmin(userId))) {
+  if (!userId || !(await requireAdmin(userId, session))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

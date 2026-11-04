@@ -1,8 +1,7 @@
 // Admin authorization helper.
 //
-// Admin é definido por:
-//   1. e-mail listado em `ADMIN_EMAILS` (env var, vírgula-separado), OU
-//   2. coluna `users.is_admin = 1` no banco (gerenciado por outro engenheiro).
+// Admins precisam ter uma sessão Google com e-mail verificado. A autorização
+// pode vir de `ADMIN_EMAILS` ou da coluna `users.is_admin`.
 //
 //
 // Uso típico (gating por sessão — síncrono, sem hit no banco):
@@ -13,7 +12,7 @@
 //
 // Uso por userId (assíncrono, consulta o banco — para casos onde só
 // temos o id, ou quando `is_admin` é fonte da verdade):
-//   const ok = await requireAdmin(userId);
+//   const ok = await requireAdmin(userId, session);
 //   if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
 import type { Session } from 'next-auth';
@@ -29,60 +28,61 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   return ADMIN_EMAILS.includes(email.toLowerCase());
 }
 
-export function isAdminSession(session: Session | null | undefined): boolean {
-  return isAdminEmail(session?.user?.email ?? null);
+function hasVerifiedGoogleSession(
+  session: Session | null | undefined,
+): session is Session {
+  return (
+    session?.user?.provider === 'google' &&
+    session.user.googleEmailVerified === true
+  );
 }
 
-// Reutiliza o singleton libsql centralizado em @/lib/db (evita conexões
-// redundantes ao Turso).
-function getAdminClient() {
-  return lsClient;
+export function isAdminSession(session: Session | null | undefined): boolean {
+  return (
+    hasVerifiedGoogleSession(session) &&
+    isAdminEmail(session.user.email)
+  );
 }
 
 /**
- * Verifica se um usuário é admin consultando o banco.
- *
- * Aceita admin tanto por:
- *   - `users.is_admin = 1` (fonte de verdade no banco), OU
- *   - `users.email` listado em `ADMIN_EMAILS` (failsafe via env)
- *
- * Robusto contra a coluna `is_admin` ainda não existir (outro engenheiro
- * a cria via ALTER TABLE) — nesse caso recai para o gating por email.
- *
- * Retorna `false` em qualquer falha (nunca lança), de modo que o caller
- * possa simplesmente fazer `if (!await requireAdmin(id)) return 403`.
+ * Confirms both the authenticated Google identity and the user's admin grant.
  */
-export async function requireAdmin(userId: string | null | undefined): Promise<boolean> {
-  if (!userId || typeof userId !== 'string') return false;
-  const client = getAdminClient();
+export async function requireAdmin(
+  userId: string | null | undefined,
+  session: Session | null | undefined,
+): Promise<boolean> {
+  if (
+    !userId ||
+    !hasVerifiedGoogleSession(session) ||
+    session.user.id !== userId
+  ) {
+    return false;
+  }
+
+  const sessionEmail = session.user.email?.trim().toLowerCase();
+  if (!sessionEmail) return false;
+
   try {
-    // Tenta buscar is_admin + email; se a coluna não existir, faz fallback
-    // só com email.
-    let isAdminFlag = 0;
-    let email: string | null = null;
     try {
-      const rs = await client.execute({
+      const rs = await lsClient.execute({
         sql: 'SELECT is_admin, email FROM users WHERE id = ? LIMIT 1',
         args: [userId],
       });
       if (rs.rows.length === 0) return false;
       const row = rs.rows[0] as unknown as { is_admin: number | null; email: string | null };
-      isAdminFlag = Number(row.is_admin ?? 0);
-      email = row.email ?? null;
+      const email = row.email?.trim().toLowerCase();
+      if (email !== sessionEmail) return false;
+      return Number(row.is_admin ?? 0) === 1 || isAdminEmail(email);
     } catch {
-      // Coluna `is_admin` ainda não existe — busca só email.
-      const rs = await client.execute({
+      const rs = await lsClient.execute({
         sql: 'SELECT email FROM users WHERE id = ? LIMIT 1',
         args: [userId],
       });
       if (rs.rows.length === 0) return false;
       const row = rs.rows[0] as unknown as { email: string | null };
-      email = row.email ?? null;
+      const email = row.email?.trim().toLowerCase();
+      return email === sessionEmail && isAdminEmail(email);
     }
-
-    if (isAdminFlag === 1) return true;
-    if (isAdminEmail(email)) return true;
-    return false;
   } catch (err) {
     console.error('[admin] requireAdmin failed:', err);
     return false;

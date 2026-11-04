@@ -17,7 +17,7 @@ export const maxDuration = 300; // 5 min — geração + render + upload
 export async function GET() {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
-  if (!userId || !(await requireAdmin(userId))) {
+  if (!userId || !(await requireAdmin(userId, session))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   try {
@@ -32,7 +32,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
-  if (!userId || !(await requireAdmin(userId))) {
+  if (!userId || !(await requireAdmin(userId, session))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

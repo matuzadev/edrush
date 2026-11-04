@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const ok = await requireAdmin(userId);
+  const ok = await requireAdmin(userId, session);
   if (!ok) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

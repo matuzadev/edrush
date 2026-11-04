@@ -45,7 +45,7 @@ export async function PATCH(
   if (!adminId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const ok = await requireAdmin(adminId);
+  const ok = await requireAdmin(adminId, session);
   if (!ok) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -176,7 +176,7 @@ export async function DELETE(
   if (!adminId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const ok = await requireAdmin(adminId);
+  const ok = await requireAdmin(adminId, session);
   if (!ok) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

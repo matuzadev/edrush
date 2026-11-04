@@ -24,7 +24,7 @@ export default async function AdminStudyMaterialsPage() {
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
   if (!userId) redirect('/auth/login');
 
-  const ok = await requireAdmin(userId);
+  const ok = await requireAdmin(userId, session);
   if (!ok) redirect('/dashboard');
 
   const [materials, generatable, ollamaHealth] = await Promise.all([
