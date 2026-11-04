@@ -25,6 +25,7 @@ export interface ProfileData {
   id: string;
   username: string;
   nome: string | null;
+  foto_url: string | null;
   avatar_id: number;
   isCeo: boolean;
   bio: string | null;
@@ -284,6 +285,7 @@ export async function getProfileData(username: string): Promise<ProfileData | nu
     id: user.id,
     username: user.username ?? user.nome ?? 'Concurseiro',
     nome: user.nome,
+    foto_url: user.foto_url ?? null,
     avatar_id: user.avatar_id ?? 1,
     isCeo,
     bio: user.bio ?? null,

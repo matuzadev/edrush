@@ -122,7 +122,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               {/* Avatar com borda equipada */}
               <div className="shrink-0">
                 <AvatarBorder slug={p.equippedBorder} size={84}>
-                  <AvatarSelector selectedId={p.avatar_id} size="lg" />
+                  <AvatarSelector selectedId={p.avatar_id} size="lg" imageUrl={p.foto_url} />
                 </AvatarBorder>
               </div>
 

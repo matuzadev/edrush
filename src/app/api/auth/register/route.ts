@@ -5,6 +5,7 @@ import { eq, or } from 'drizzle-orm';
 import { hashPassword } from '@/auth';
 import { registerReferral } from '@/lib/referral';
 import { strictRateLimit } from '@/lib/rate-limit';
+import { grantWelcomeBadge } from '@/lib/welcome-rewards';
 import crypto from 'crypto';
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
@@ -68,9 +69,13 @@ export async function POST(req: NextRequest) {
       location: location?.trim() || null,
       senha_hash,
       provider: 'email',
+      xp: 50,
+      crystals: 500,
       criado_em: now,
       atualizado_em: now,
     });
+
+    await grantWelcomeBadge(newUserId);
 
     // ── referral ──────────────────────────────────────────────────────────────
     if (referralCode && typeof referralCode === 'string') {

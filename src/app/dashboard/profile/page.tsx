@@ -29,6 +29,7 @@ import {
   Copy,
   Check,
   Gift,
+  Gem,
   ArrowRight,
   Flame,
   Lock,
@@ -129,6 +130,7 @@ export default function ProfilePage() {
     location: string;
     bio: string;
     avatar: number;
+    foto_url?: string | null;
   }) => {
     setSaveError(null);
     try {
@@ -139,10 +141,12 @@ export default function ProfilePage() {
         birthday: data.birthday || undefined,
         location: data.location,
         avatar_id: data.avatar,
+        ...(data.foto_url !== undefined ? { foto_url: data.foto_url } : {}),
       });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao salvar perfil';
       setSaveError(message);
+      throw err;
     }
   };
 
@@ -251,7 +255,7 @@ export default function ProfilePage() {
                 <div className="flex items-end justify-between mb-5">
                   <div className="relative">
                     <AvatarBorder slug={profile.equippedBorder} size={96}>
-                      <AvatarSelector selectedId={profile.avatar_id} size="lg" />
+                      <AvatarSelector selectedId={profile.avatar_id} size="lg" imageUrl={profile.foto_url} />
                     </AvatarBorder>
                     {/* Badge de nível */}
                     <div
@@ -348,6 +352,40 @@ export default function ProfilePage() {
                     <span>+{(profile.xpNeeded - profile.xpIntoLevel).toLocaleString('pt-BR')} para Nível {profile.level + 1}</span>
                   </div>
                 </div>
+
+                {profile.hasWelcomeKit && (
+                  <div className="mb-5 overflow-hidden rounded-xl border border-amber-300/20 bg-gradient-to-r from-amber-500/10 via-emerald-500/5 to-cyan-500/10">
+                    <div className="flex items-center gap-3 border-b border-white/5 px-4 py-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300">
+                        <Gift className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-wider text-amber-200">Kit de boas-vindas</p>
+                        <p className="text-[11px] text-slate-400">Sua jornada começou com recompensas especiais.</p>
+                      </div>
+                      <Link
+                        href="/dashboard/inventario"
+                        className="ml-auto hidden items-center gap-1 text-xs font-bold text-emerald-300 hover:text-emerald-200 sm:flex"
+                      >
+                        Ver inventário <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-3 divide-x divide-white/5">
+                      <div className="flex items-center justify-center gap-2 px-2 py-3 text-center">
+                        <Gem className="h-4 w-4 shrink-0 text-cyan-300" />
+                        <span className="text-[11px] font-bold text-slate-200">500 cristais</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 px-2 py-3 text-center">
+                        <Zap className="h-4 w-4 shrink-0 text-emerald-300" />
+                        <span className="text-[11px] font-bold text-slate-200">50 XP</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 px-2 py-3 text-center">
+                        <Award className="h-4 w-4 shrink-0 text-amber-300" />
+                        <span className="text-[11px] font-bold text-slate-200">Medalha Recruta</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {saveError && (
                   <p className="text-red-400 text-xs mb-3 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
@@ -1115,6 +1153,7 @@ export default function ProfilePage() {
           location: profile.location ?? '',
           bio: profile.bio ?? '',
           avatar: profile.avatar_id,
+          foto_url: profile.foto_url,
         }}
       />
       <AddFriendsModal

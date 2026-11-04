@@ -61,6 +61,7 @@ export default function Avatar({ avatar, url, size = 40, className, alt, zoom = 
             alt={alt ?? avatar?.name ?? 'avatar'}
             width={requestedSize}
             height={requestedSize}
+            unoptimized
             className="w-full h-full"
             style={{
               objectFit: 'cover',
