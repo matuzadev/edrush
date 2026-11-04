@@ -74,7 +74,14 @@ export function EditProfileModal({
   // Sincroniza estado interno quando o modal reabrir com novo initialData
   useEffect(() => {
     if (!isOpen) return;
-    setFormData(initialData);
+    setFormData({
+      username: initialData.username,
+      birthday: initialData.birthday,
+      location: initialData.location,
+      bio: initialData.bio,
+      avatar: initialData.avatar,
+      foto_url: initialData.foto_url,
+    });
     setPhotoFile(null);
     setPhotoPreview(initialData.foto_url ?? null);
     setPhotoChanged(false);

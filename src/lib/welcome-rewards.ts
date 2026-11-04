@@ -27,6 +27,14 @@ export async function grantWelcomeBadge(userId: string): Promise<void> {
     args: [crypto.randomUUID(), userId, itemId, now, userId, itemId],
   });
 
+  await lsClient.execute({
+    sql: `INSERT INTO user_profile_loadout
+          (user_id, border_item_id, avatar_item_id, equipped_badge_ids, updated_at)
+          VALUES (?, NULL, NULL, ?, ?)
+          ON CONFLICT(user_id) DO NOTHING`,
+    args: [userId, JSON.stringify([itemId]), now],
+  });
+
   const transactionResult = await lsClient.execute({
     sql: `SELECT id FROM crystal_transactions
           WHERE user_id = ? AND reference_id = ? LIMIT 1`,
