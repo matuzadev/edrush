@@ -85,6 +85,15 @@ export async function initializeDatabase() {
         `CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`,
         `CREATE INDEX IF NOT EXISTS idx_users_provider_id ON users(provider_id)`,
 
+        `CREATE TABLE IF NOT EXISTS student_presence (
+          user_id TEXT PRIMARY KEY NOT NULL,
+          last_seen TEXT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )`,
+
+        `CREATE INDEX IF NOT EXISTS idx_student_presence_last_seen
+          ON student_presence(last_seen)`,
+
         `CREATE TABLE IF NOT EXISTS concursos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           titulo TEXT NOT NULL,

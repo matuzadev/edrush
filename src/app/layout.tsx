@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BugReportButton } from "@/components/BugReportButton";
 import FriendsChatLoader from "@/components/FriendsChatLoader";
+import { StudentPresenceTracker } from "@/components/StudentPresenceTracker";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider>
           <AuthProvider>
+            <StudentPresenceTracker />
             {children}
           </AuthProvider>
         </ThemeProvider>
