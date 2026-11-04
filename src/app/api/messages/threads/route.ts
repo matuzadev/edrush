@@ -121,12 +121,13 @@ export async function GET() {
     if (friendIds.length > 0) {
       const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS).toISOString();
       const presenceResult = await lsClient.execute({
-        sql: `SELECT user_id FROM student_presence
-              WHERE last_seen >= ? AND user_id IN (${friendIds.map(() => '?').join(',')})`,
-        args: [onlineSince, ...friendIds],
+        sql: 'SELECT user_id FROM student_presence WHERE last_seen >= ?',
+        args: [onlineSince],
       });
+      const friendIdSet = new Set(friendIds);
       for (const row of presenceResult.rows) {
-        onlineIds.add(String(row.user_id));
+        const onlineId = String(row.user_id);
+        if (friendIdSet.has(onlineId)) onlineIds.add(onlineId);
       }
     }
 
