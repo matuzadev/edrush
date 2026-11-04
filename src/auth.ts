@@ -12,6 +12,15 @@ import { DUMMY_BCRYPT_HASH, maskEmail } from '@/lib/sanitize';
 // "usuário não existe" vs "senha incorreta" evita enumeração de e-mails.
 const AUTH_ERROR_GENERIC = 'E-mail ou senha inválidos';
 
+function hasVerifiedGoogleEmail(profile: unknown): boolean {
+  return (
+    typeof profile === 'object' &&
+    profile !== null &&
+    'email_verified' in profile &&
+    profile.email_verified === true
+  );
+}
+
 // Failsafe: detecta NEXTAUTH_SECRET ausente/placeholder. Em vez de travar o
 // build (que roda com NODE_ENV=production), trava apenas em RUNTIME — no
 // primeiro request de auth, via callback abaixo.
@@ -96,10 +105,13 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google' && profile) {
+      if (account?.provider === 'google') {
+        if (!user.email || !hasVerifiedGoogleEmail(profile)) return false;
+
         try {
+          const email = user.email.toLowerCase().trim();
           const existingUser = await db.query.users.findFirst({
-            where: eq(users.email, user.email || ''),
+            where: eq(users.email, email),
           });
 
           const userId = existingUser?.id || crypto.randomUUID();
@@ -107,7 +119,7 @@ export const authOptions: NextAuthOptions = {
             const now = new Date().toISOString();
             await db.insert(users).values({
               id: userId,
-              email: user.email || '',
+              email,
               nome: user.name || '',
               foto_url: user.image || '',
               provider: 'google',
@@ -115,6 +127,15 @@ export const authOptions: NextAuthOptions = {
               criado_em: now,
               atualizado_em: now,
             });
+          } else {
+            await db
+              .update(users)
+              .set({
+                provider: 'google',
+                provider_id: user.id,
+                atualizado_em: new Date().toISOString(),
+              })
+              .where(eq(users.id, userId));
           }
           user.id = userId;
         } catch (error) {
@@ -137,6 +158,7 @@ export const authOptions: NextAuthOptions = {
       }
       if (account) {
         token.provider = account.provider;
+        token.googleEmailVerified = account.provider === 'google';
       }
       // Atualizar token quando session.update() for chamado (pós-onboarding)
       if (trigger === 'update') {
@@ -150,9 +172,11 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id as string;
-        (session.user as any).onboardingCompleted = token.onboardingCompleted as boolean;
-        (session.user as any).concursoSlug = token.concursoSlug as string | null;
+        session.user.id = token.id as string;
+        session.user.provider = token.provider;
+        session.user.googleEmailVerified = token.googleEmailVerified === true;
+        session.user.onboardingCompleted = token.onboardingCompleted as boolean;
+        session.user.concursoSlug = token.concursoSlug as string | null;
       }
       return session;
     },

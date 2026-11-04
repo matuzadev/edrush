@@ -253,7 +253,7 @@ export default async function AdminReportsPage(props: {
     redirect('/auth/login');
   }
 
-  const isAdmin = await requireAdmin(userId);
+  const isAdmin = await requireAdmin(userId, session);
   if (!isAdmin) {
     redirect('/dashboard');
   }
