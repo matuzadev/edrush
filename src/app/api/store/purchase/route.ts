@@ -79,6 +79,9 @@ export async function POST(req: NextRequest) {
     if (item.is_active !== 1) {
       return NextResponse.json({ error: 'item_inactive' }, { status: 400 });
     }
+    if (item.slug === 'badge-membro-fundador') {
+      return NextResponse.json({ error: 'item_unavailable' }, { status: 400 });
+    }
     if (item.category === 'plataforma_trial') {
       return NextResponse.json({ error: 'subscription_items_unavailable' }, { status: 410 });
     }
