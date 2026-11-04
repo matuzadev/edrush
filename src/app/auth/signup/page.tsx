@@ -543,6 +543,17 @@ function SignupForm() {
                   Fazer login
                 </Link>
               </p>
+              <p className="text-center text-slate-500 text-xs leading-5 mt-4">
+                Ao criar sua conta, você concorda com os{' '}
+                <Link href="/termos" className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2">
+                  Termos de Serviço
+                </Link>{' '}
+                e confirma que leu a{' '}
+                <Link href="/privacidade" className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2">
+                  Política de Privacidade
+                </Link>
+                .
+              </p>
             </div>
           </div>
 

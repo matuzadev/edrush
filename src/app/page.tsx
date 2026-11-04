@@ -97,11 +97,19 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="flex flex-col gap-3 border-t border-[var(--border)] py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <footer className="flex flex-col gap-4 border-t border-[var(--border)] py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>EdRush — preparação para concursos, acessível a todos.</p>
-          <Link href="/auth/login" className="transition hover:text-[var(--fg)] no-underline">
-            Já tem uma conta? Entrar
-          </Link>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            <Link href="/privacidade" className="transition hover:text-[var(--fg)] no-underline">
+              Política de Privacidade
+            </Link>
+            <Link href="/termos" className="transition hover:text-[var(--fg)] no-underline">
+              Termos de Serviço
+            </Link>
+            <Link href="/auth/login" className="transition hover:text-[var(--fg)] no-underline">
+              Já tem uma conta? Entrar
+            </Link>
+          </div>
         </footer>
       </div>
     </main>
