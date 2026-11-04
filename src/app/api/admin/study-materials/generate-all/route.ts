@@ -20,7 +20,7 @@ import {
 } from '@/lib/study-materials';
 import { listGeneratableDisciplines } from '@/lib/study-material-generator';
 
-export const maxDuration = 300; // ~13 min (Vercel pro plan limit é 900s)
+export const maxDuration = 300; // Limite máximo do Vercel Hobby: 5 minutos.
 
 interface BatchResult {
   concursoSlug: string;
