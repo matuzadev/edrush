@@ -1,9 +1,6 @@
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
-import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
-import { SEED_CONCURSOS } from '@/data/seed-concursos';
-import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
 import crypto from 'crypto';
 
 const databaseUrl =
@@ -814,6 +811,9 @@ async function seedUFs() {
 // Capítulos: só insere se a tupla (disciplina, numero) ainda não existe.
 async function seedQuestionsBank() {
   try {
+    const { SEED_QUESTIONS, SEED_CHAPTERS } = await import(
+      '@/data/seed-questions'
+    );
     const expectedChapterKeys = new Set(
       SEED_CHAPTERS.map((chapter) => `${chapter.disciplina}|${chapter.numero}`),
     );
@@ -926,6 +926,7 @@ async function seedQuestionsBank() {
 // Alterações ou remoções de registros existentes exigem migração revisada e backup.
 async function seedConcursosBank() {
   try {
+    const { SEED_CONCURSOS } = await import('@/data/seed-concursos');
     if (SEED_CONCURSOS.length === 0) return;
 
     const now = new Date().toISOString();
@@ -1008,6 +1009,7 @@ async function seedConcursosBank() {
 // Só insere se store_items estiver vazio. Para forçar re-seed: TRUNCATE store_items.
 async function seedStoreItems() {
   try {
+    const { STORE_ITEMS_SEED } = await import('@/data/seed-store-items');
     const countRs = await client.execute('SELECT COUNT(*) AS n FROM store_items');
     const count = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
     if (count > 0) return;
