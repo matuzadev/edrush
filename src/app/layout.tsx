@@ -13,6 +13,10 @@ const inter = Inter({ subsets: ["latin"], display: 'swap' });
 export const metadata: Metadata = {
   title: "EdRush | Preparação gratuita para concursos",
   description: "Estude para concursos com questões, simulados e acompanhamento do desempenho. Todos os recursos de estudo são gratuitos.",
+  icons: {
+    icon: "/imagens/edrush-logo-removebg.png",
+    apple: "/imagens/edrush-logo-removebg.png",
+  },
 };
 
 export default function RootLayout({
@@ -26,8 +30,6 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`(function(){try{var t=localStorage.getItem('foco_theme');if(t==='light'){document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}}catch(e){}})();`}
         </Script>
-        <link rel="icon" type="image/png" href="/imagens/favicon.png" />
-        <link rel="apple-touch-icon" href="/imagens/favicon.png" />
       </head>
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider>
