@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { db, lsClient } from '@/lib/db';
@@ -214,22 +214,23 @@ export async function GET() {
 
     const equippedBadges = equippedBadgesResult;
 
-    // Disparar notificações de medalhas em paralelo. Antes era um for-await
-    // sequencial — N writes serializados ao Turso para um endpoint de leitura.
+    // Gravar notificações após a resposta, sem atrasar o endpoint de leitura.
     const notifiedIds = new Set(alreadyNotified.map(n => n.related_id));
     const newMedalsToNotify = unlockedMedals.filter(m => !notifiedIds.has(m.id));
     if (newMedalsToNotify.length > 0) {
-      await Promise.all(
-        newMedalsToNotify.map((medal) =>
-          createNotification({
-            userId,
-            type: 'achievement',
-            title: `${medal.icon} Medalha desbloqueada: ${medal.label}`,
-            body: `${medal.description} · ${medal.tier === 'platinum' ? '💎 Platina' : medal.tier === 'gold' ? '🥇 Ouro' : medal.tier === 'silver' ? '🥈 Prata' : '🥉 Bronze'}`,
-            relatedId: medal.id,
-          }).catch((err) => console.warn('createNotification falhou:', err))
-        )
-      );
+      after(async () => {
+        await Promise.all(
+          newMedalsToNotify.map((medal) =>
+            createNotification({
+              userId,
+              type: 'achievement',
+              title: `${medal.icon} Medalha desbloqueada: ${medal.label}`,
+              body: `${medal.description} · ${medal.tier === 'platinum' ? '💎 Platina' : medal.tier === 'gold' ? '🥇 Ouro' : medal.tier === 'silver' ? '🥈 Prata' : '🥉 Bronze'}`,
+              relatedId: medal.id,
+            }).catch((err) => console.warn('createNotification falhou:', err))
+          )
+        );
+      });
     }
 
     return NextResponse.json({

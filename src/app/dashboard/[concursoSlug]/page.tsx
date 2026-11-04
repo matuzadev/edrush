@@ -484,7 +484,25 @@ export default function PersonalizedDashboardPage() {
               ))}
             </div>
           </div>
-        ) : displaySubjects.length > 0 && (
+        ) : profileError ? (
+          <div className="mb-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-200" role="alert">
+            Não foi possível carregar suas matérias. Tente novamente mais tarde ou revise sua configuração de concurso.
+            <div>
+              <Link href="/onboarding/select-concurso" className="inline-block mt-3 underline underline-offset-4">
+                Revisar configuração
+              </Link>
+            </div>
+          </div>
+        ) : displaySubjects.length === 0 ? (
+          <div className="mb-8 rounded-xl border border-white/10 bg-slate-900/50 p-4 text-sm text-slate-300">
+            Nenhuma matéria válida está selecionada para este painel.
+            <div>
+              <Link href="/onboarding/select-concurso" className="inline-block mt-3 text-emerald-300 underline underline-offset-4">
+                Configurar concurso
+              </Link>
+            </div>
+          </div>
+        ) : (
           <>
             <div className="mb-4">
               <div className="flex items-baseline justify-between mb-4">
@@ -495,6 +513,13 @@ export default function PersonalizedDashboardPage() {
                   {displaySubjects.length} no plano
                 </span>
               </div>
+              <p className="mb-3 text-xs text-slate-500" aria-live="polite">
+                {!completionLoaded
+                  ? 'Carregando progresso dos capítulos...'
+                  : completionError
+                    ? 'Não foi possível carregar o progresso; os capítulos avançados permanecem bloqueados.'
+                    : ''}
+              </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
                 {displaySubjects.map((subjectSlug) => {
                   const subjectData = (subjects as any)[subjectSlug];
