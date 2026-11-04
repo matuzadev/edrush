@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
-import { db } from '@/lib/db';
+import { db, lsClient } from '@/lib/db';
 import { friendships, users, messages } from '@/db/schema';
 import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
+const ONLINE_WINDOW_MS = 2 * 60 * 1000;
+
 // GET /api/messages/threads
-// Retorna lista de conversas: cada amigo aceito com {lastMessage, unreadCount}
+// Retorna conversas, status online dos amigos e solicitações de amizade.
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -16,10 +18,13 @@ export async function GET() {
 
   try {
     // 1) Lista amigos aceitos — Drizzle parametriza ${userId} via tagged template.
-    const friendRows = await db
+    const [friendRows, pendingRows] = await Promise.all([
+      db
       .select({
+        id: friendships.id,
         requester_id: friendships.requester_id,
         receiver_id: friendships.receiver_id,
+        criado_em: friendships.criado_em,
       })
       .from(friendships)
       .where(
@@ -27,16 +32,40 @@ export async function GET() {
           eq(friendships.status, 'accepted'),
           or(eq(friendships.requester_id, userId), eq(friendships.receiver_id, userId)),
         ),
-      );
+      ),
+      db
+        .select({
+          id: friendships.id,
+          requester_id: friendships.requester_id,
+          receiver_id: friendships.receiver_id,
+          criado_em: friendships.criado_em,
+        })
+        .from(friendships)
+        .where(
+          and(
+            eq(friendships.status, 'pending'),
+            or(eq(friendships.requester_id, userId), eq(friendships.receiver_id, userId)),
+          ),
+        ),
+    ]);
     const friendIds = friendRows.map((r) =>
       r.requester_id === userId ? r.receiver_id : r.requester_id,
     );
+    const pendingIds = [...new Set(pendingRows.map((r) =>
+      r.requester_id === userId ? r.receiver_id : r.requester_id,
+    ))];
+    const allOtherIds = [...new Set([...friendIds, ...pendingIds])];
 
-    if (friendIds.length === 0) {
-      return NextResponse.json({ threads: [], totalUnread: 0 });
+    if (allOtherIds.length === 0) {
+      return NextResponse.json({
+        threads: [],
+        totalUnread: 0,
+        pendingReceived: [],
+        pendingSent: [],
+      });
     }
 
-    // 2) Dados básicos de cada amigo — inArray (parametrizado).
+    // 2) Dados básicos dos amigos e solicitantes.
     const friendUsers = await db
       .select({
         id: users.id,
@@ -47,7 +76,7 @@ export async function GET() {
         level: users.level,
       })
       .from(users)
-      .where(inArray(users.id, friendIds));
+      .where(inArray(users.id, allOtherIds));
 
     const userMap = new Map<string, { id: string; nome: string | null; username: string | null; avatar_id: number; xp: number; level: number }>();
     for (const row of friendUsers) {
@@ -61,6 +90,46 @@ export async function GET() {
       });
     }
 
+    const pendingReceived = pendingRows
+      .filter((row) => row.receiver_id === userId)
+      .map((row) => {
+        const requester = userMap.get(row.requester_id);
+        return {
+          friendshipId: row.id,
+          userId: row.requester_id,
+          nome: requester?.nome ?? null,
+          username: requester?.username ?? null,
+          avatar_id: requester?.avatar_id ?? 1,
+          since: row.criado_em,
+        };
+      });
+    const pendingSent = pendingRows
+      .filter((row) => row.requester_id === userId)
+      .map((row) => {
+        const receiver = userMap.get(row.receiver_id);
+        return {
+          friendshipId: row.id,
+          userId: row.receiver_id,
+          nome: receiver?.nome ?? null,
+          username: receiver?.username ?? null,
+          avatar_id: receiver?.avatar_id ?? 1,
+          since: row.criado_em,
+        };
+      });
+
+    const onlineIds = new Set<string>();
+    if (friendIds.length > 0) {
+      const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS).toISOString();
+      const presenceResult = await lsClient.execute({
+        sql: `SELECT user_id FROM student_presence
+              WHERE last_seen >= ? AND user_id IN (${friendIds.map(() => '?').join(',')})`,
+        args: [onlineSince, ...friendIds],
+      });
+      for (const row of presenceResult.rows) {
+        onlineIds.add(String(row.user_id));
+      }
+    }
+
     // 3) Última mensagem por par + unread count
     // Para cada amigo, buscar última msg (em qualquer direção) e count de não lidas (recebidas e não lidas)
     type Thread = {
@@ -70,6 +139,7 @@ export async function GET() {
       avatar_id: number;
       level: number;
       unreadCount: number;
+      isOnline: boolean;
       lastMessage: { id: number; content: string; type: string; mine: boolean; createdAt: string } | null;
     };
     const threads: Thread[] = [];
@@ -123,6 +193,7 @@ export async function GET() {
         avatar_id: u.avatar_id,
         level: u.level,
         unreadCount,
+        isOnline: onlineIds.has(friendId),
         lastMessage: lastMsg ? {
           id: lastMsg.id,
           content: lastMsg.content,
@@ -141,7 +212,9 @@ export async function GET() {
       return b.lastMessage.createdAt.localeCompare(a.lastMessage.createdAt);
     });
 
-    return NextResponse.json({ threads, totalUnread });
+    threads.sort((a, b) => Number(b.isOnline) - Number(a.isOnline));
+
+    return NextResponse.json({ threads, totalUnread, pendingReceived, pendingSent });
   } catch (error) {
     console.error('Erro ao buscar threads:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

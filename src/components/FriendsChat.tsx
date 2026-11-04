@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, X, ChevronLeft, Send, Loader2, Trophy, User as UserIcon } from 'lucide-react';
+import { MessageCircle, X, ChevronLeft, Send, Loader2, Trophy, User as UserIcon, UserCheck, UserX, Users } from 'lucide-react';
 import { getAvatar } from '@/data/avatars';
 import { FriendProfileModal } from './FriendProfileModal';
 
@@ -13,6 +13,7 @@ interface Thread {
   avatar_id: number;
   level: number;
   unreadCount: number;
+  isOnline: boolean;
   lastMessage: {
     id: number;
     content: string;
@@ -20,6 +21,14 @@ interface Thread {
     mine: boolean;
     createdAt: string;
   } | null;
+}
+
+interface FriendRequest {
+  friendshipId: number;
+  userId: string;
+  nome: string | null;
+  username: string | null;
+  avatar_id: number;
 }
 
 interface ChatMessage {
@@ -52,6 +61,8 @@ export function FriendsChat() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [threads, setThreads] = useState<Thread[]>([]);
+  const [pendingReceived, setPendingReceived] = useState<FriendRequest[]>([]);
+  const [pendingSent, setPendingSent] = useState<FriendRequest[]>([]);
   const [totalUnread, setTotalUnread] = useState(0);
   const [activeThread, setActiveThread] = useState<Thread | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -59,6 +70,7 @@ export function FriendsChat() {
   const [isSending, setIsSending] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [viewingProfile, setViewingProfile] = useState<string | null>(null);
+  const [processingRequestId, setProcessingRequestId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<number>(0);
 
@@ -77,6 +89,8 @@ export function FriendsChat() {
       if (!res.ok) return;
       const data = await res.json();
       setThreads(data.threads ?? []);
+      setPendingReceived(data.pendingReceived ?? []);
+      setPendingSent(data.pendingSent ?? []);
       setTotalUnread(data.totalUnread ?? 0);
     } catch {
       /* silencioso */
@@ -148,6 +162,26 @@ export function FriendsChat() {
     setIsLoadingMessages(true);
     await fetchMessages(t.friendId, true);
     setIsLoadingMessages(false);
+  };
+
+  const handleFriendRequest = async (friendshipId: number, action: 'accept' | 'reject') => {
+    setProcessingRequestId(friendshipId);
+    try {
+      const res = await fetch(`/api/friends/${friendshipId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      if (!res.ok) {
+        console.error('Falha ao processar solicitação de amizade:', res.status);
+        return;
+      }
+      await fetchThreads();
+    } catch (error) {
+      console.error('Falha ao processar solicitação de amizade:', error);
+    } finally {
+      setProcessingRequestId(null);
+    }
   };
 
   const handleSend = async () => {
@@ -272,6 +306,11 @@ export function FriendsChat() {
                     {totalUnread} novas
                   </span>
                 )}
+                {pendingReceived.length > 0 && (
+                  <span className="text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                    {pendingReceived.length} pedidos
+                  </span>
+                )}
               </>
             )}
             <button
@@ -285,48 +324,96 @@ export function FriendsChat() {
           {/* Conteúdo */}
           {!activeThread ? (
             <div className="flex-1 overflow-y-auto p-2">
-              {threads.length === 0 ? (
+              {threads.length === 0 && pendingReceived.length === 0 && pendingSent.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center px-6 py-10">
                   <MessageCircle className="w-10 h-10 text-slate-700 mb-3" />
                   <p className="text-slate-400 text-sm font-semibold">Nenhuma conversa ainda</p>
                   <p className="text-slate-600 text-xs mt-1">Adicione amigos no seu perfil para começar a conversar.</p>
                 </div>
               ) : (
-                threads.map(t => (
-                  <button
-                    key={t.friendId}
-                    onClick={() => openThread(t)}
-                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition text-left"
-                  >
-                    <div className="relative shrink-0">
-                      <ThreadAvatar avatarId={t.avatar_id} size={40} />
-                      {t.unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-cyan-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-slate-900">
-                          {t.unreadCount > 9 ? '9+' : t.unreadCount}
-                        </span>
-                      )}
+                <div className="space-y-3">
+                  {pendingReceived.length > 0 && (
+                    <section>
+                      <h4 className="px-2 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest text-cyan-300">
+                        Solicitações recebidas ({pendingReceived.length})
+                      </h4>
+                      {pendingReceived.map((request) => (
+                        <div key={request.friendshipId} className="flex items-center gap-2 rounded-xl p-2.5 hover:bg-white/5">
+                          <ThreadAvatar avatarId={request.avatar_id} size={36} />
+                          <p className="flex-1 min-w-0 truncate text-sm font-semibold text-slate-200">
+                            {request.username ?? request.nome ?? 'Concurseiro'}
+                          </p>
+                          <button
+                            onClick={() => handleFriendRequest(request.friendshipId, 'accept')}
+                            disabled={processingRequestId === request.friendshipId}
+                            aria-label="Aceitar solicitação"
+                            title="Aceitar"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500 hover:text-white disabled:opacity-50"
+                          >
+                            {processingRequestId === request.friendshipId
+                              ? <Loader2 className="h-4 w-4 animate-spin" />
+                              : <UserCheck className="h-4 w-4" />}
+                          </button>
+                          <button
+                            onClick={() => handleFriendRequest(request.friendshipId, 'reject')}
+                            disabled={processingRequestId === request.friendshipId}
+                            aria-label="Recusar solicitação"
+                            title="Recusar"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500 hover:text-white disabled:opacity-50"
+                          >
+                            <UserX className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </section>
+                  )}
+
+                  {pendingSent.length > 0 && (
+                    <section>
+                      <h4 className="px-2 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Solicitações enviadas ({pendingSent.length})
+                      </h4>
+                      {pendingSent.map((request) => (
+                        <div key={request.friendshipId} className="flex items-center gap-2 rounded-xl p-2.5">
+                          <ThreadAvatar avatarId={request.avatar_id} size={34} />
+                          <p className="flex-1 min-w-0 truncate text-sm text-slate-300">
+                            {request.username ?? request.nome ?? 'Concurseiro'}
+                          </p>
+                          <span className="text-[10px] text-slate-500">Aguardando</span>
+                        </div>
+                      ))}
+                    </section>
+                  )}
+
+                  {threads.some((thread) => thread.isOnline) && (
+                    <section>
+                      <h4 className="flex items-center gap-1.5 px-2 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                        Online ({threads.filter((thread) => thread.isOnline).length})
+                      </h4>
+                      {threads.filter((thread) => thread.isOnline).map((t) => (
+                        <ThreadRow key={t.friendId} thread={t} onOpen={openThread} />
+                      ))}
+                    </section>
+                  )}
+
+                  {threads.some((thread) => !thread.isOnline) && (
+                    <section>
+                      <h4 className="flex items-center gap-1.5 px-2 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Offline ({threads.filter((thread) => !thread.isOnline).length})
+                      </h4>
+                      {threads.filter((thread) => !thread.isOnline).map((t) => (
+                        <ThreadRow key={t.friendId} thread={t} onOpen={openThread} />
+                      ))}
+                    </section>
+                  )}
+                  {threads.length === 0 && pendingReceived.length === 0 && pendingSent.length > 0 && (
+                    <div className="py-6 text-center text-xs text-slate-500">
+                      <Users className="mx-auto mb-2 h-5 w-5" />
+                      Seus amigos aparecerão aqui quando aceitarem sua solicitação.
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <p className={`text-sm truncate ${t.unreadCount > 0 ? 'font-black text-white' : 'font-semibold text-slate-200'}`}>
-                          {t.username ?? t.nome ?? 'Concurseiro'}
-                        </p>
-                        {t.lastMessage && (
-                          <span className="text-[10px] text-slate-500 shrink-0">
-                            {timeAgo(t.lastMessage.createdAt)}
-                          </span>
-                        )}
-                      </div>
-                      <p className={`text-xs truncate ${t.unreadCount > 0 ? 'text-slate-300' : 'text-slate-500'}`}>
-                        {t.lastMessage
-                          ? `${t.lastMessage.mine ? 'Você: ' : ''}${
-                              t.lastMessage.type === 'result' ? '📊 Compartilhou um resultado' : t.lastMessage.content
-                            }`
-                          : <span className="italic text-slate-600">Sem mensagens</span>}
-                      </p>
-                    </div>
-                  </button>
-                ))
+                  )}
+                </div>
               )}
             </div>
           ) : (
@@ -425,6 +512,46 @@ function ThreadAvatar({ avatarId, size }: { avatarId: number; size: number }) {
       }}
       dangerouslySetInnerHTML={{ __html: avatar.svg }}
     />
+  );
+}
+
+function ThreadRow({ thread, onOpen }: { thread: Thread; onOpen: (thread: Thread) => void }) {
+  return (
+    <button
+      onClick={() => onOpen(thread)}
+      className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition text-left"
+    >
+      <div className="relative shrink-0">
+        <ThreadAvatar avatarId={thread.avatar_id} size={40} />
+        {thread.isOnline && (
+          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-400" />
+        )}
+        {thread.unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-cyan-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-slate-900">
+            {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
+          </span>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline justify-between gap-2">
+          <p className={`text-sm truncate ${thread.unreadCount > 0 ? 'font-black text-white' : 'font-semibold text-slate-200'}`}>
+            {thread.username ?? thread.nome ?? 'Concurseiro'}
+          </p>
+          {thread.lastMessage && (
+            <span className="text-[10px] text-slate-500 shrink-0">
+              {timeAgo(thread.lastMessage.createdAt)}
+            </span>
+          )}
+        </div>
+        <p className={`text-xs truncate ${thread.unreadCount > 0 ? 'text-slate-300' : 'text-slate-500'}`}>
+          {thread.lastMessage
+            ? `${thread.lastMessage.mine ? 'Você: ' : ''}${
+                thread.lastMessage.type === 'result' ? '📊 Compartilhou um resultado' : thread.lastMessage.content
+              }`
+            : <span className="italic text-slate-600">Iniciar conversa</span>}
+        </p>
+      </div>
+    </button>
   );
 }
 
