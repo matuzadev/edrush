@@ -760,6 +760,7 @@ export async function initializeDatabase() {
     await seedUFs();
     await seedQuestionsBank();
     await seedConcursosBank();
+    await seedDpdfQuestionBank();
     console.log('✅ Banco de dados inicializado com sucesso');
     } catch (error) {
       console.error('❌ Erro ao inicializar banco de dados:', error);
@@ -1004,6 +1005,102 @@ async function seedConcursosBank() {
   } catch (err) {
     console.error('⚠️  Falha ao popular banco de concursos (seed):', err);
     // Não relança: app deve subir mesmo se o seed falhar.
+  }
+}
+
+async function seedDpdfQuestionBank() {
+  try {
+    const { DPDF_CHAPTERS, DPDF_QUESTIONS, DPDF_QUESTION_SOURCE } = await import(
+      '@/data/seed-questions-dpdf'
+    );
+    const contestResult = await client.execute({
+      sql: 'SELECT id FROM concursos WHERE slug = ? LIMIT 1',
+      args: ['dpdf-analista-apoio-assistencia-judiciaria-2027'],
+    });
+    const concursoId = Number(
+      (contestResult.rows[0] as unknown as { id: number } | undefined)?.id,
+    );
+    if (!Number.isSafeInteger(concursoId) || concursoId <= 0) {
+      throw new Error('Concurso DPDF não encontrado para vincular as questões.');
+    }
+
+    const [existingChapters, existingQuestions] = await Promise.all([
+      client.execute('SELECT disciplina, numero FROM chapters'),
+      client.execute({
+        sql: 'SELECT enunciado FROM questions WHERE concurso_id = ? AND fonte = ?',
+        args: [concursoId, DPDF_QUESTION_SOURCE],
+      }),
+    ]);
+    const chapterKeys = new Set(
+      existingChapters.rows.map((row) => {
+        const chapter = row as unknown as { disciplina: string; numero: number };
+        return `${chapter.disciplina}|${chapter.numero}`;
+      }),
+    );
+    const questionPrompts = new Set(
+      existingQuestions.rows.map((row) =>
+        String((row as unknown as { enunciado: string }).enunciado),
+      ),
+    );
+    const now = new Date().toISOString();
+    const statements: { sql: string; args: (string | number | null)[] }[] = [];
+
+    for (const chapter of DPDF_CHAPTERS) {
+      if (chapterKeys.has(`${chapter.disciplina}|${chapter.numero}`)) continue;
+      statements.push({
+        sql: `INSERT INTO chapters (disciplina, numero, titulo, descricao, ordem, is_primeiro, criado_em)
+              VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          chapter.disciplina,
+          chapter.numero,
+          chapter.titulo,
+          chapter.descricao,
+          chapter.numero,
+          chapter.is_primeiro ? 1 : 0,
+          now,
+        ],
+      });
+    }
+
+    let newQuestionCount = 0;
+    for (const question of DPDF_QUESTIONS) {
+      if (questionPrompts.has(question.enunciado)) continue;
+      statements.push({
+        sql: `INSERT INTO questions
+          (titulo, disciplina, capitulo, tipo, enunciado, explicacao, dica, opcoes,
+           resposta_correta, dificuldade, fonte, concurso_id, ano, criado_em, atualizado_em)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          question.titulo,
+          question.disciplina,
+          question.capitulo,
+          question.tipo,
+          question.enunciado,
+          question.explicacao ?? null,
+          question.dica ?? null,
+          question.opcoes ? JSON.stringify(question.opcoes) : null,
+          question.resposta_correta,
+          question.dificuldade,
+          DPDF_QUESTION_SOURCE,
+          concursoId,
+          2027,
+          now,
+          now,
+        ],
+      });
+      questionPrompts.add(question.enunciado);
+      newQuestionCount += 1;
+    }
+
+    for (let offset = 0; offset < statements.length; offset += 50) {
+      await client.batch(statements.slice(offset, offset + 50));
+    }
+    if (newQuestionCount > 0) {
+      console.log(`📚 Seed DPDF: ${newQuestionCount} questões originais vinculadas ao concurso`);
+    }
+  } catch (error) {
+    console.error('⚠️  Falha ao popular banco de questões DPDF:', error);
+    throw error;
   }
 }
 
