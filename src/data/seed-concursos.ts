@@ -1,7 +1,8 @@
 // Banco semente de concursos — carregado idempotentemente em initializeDatabase().
 // A chave de idempotência é o campo `slug`: cada concurso só é inserido se nenhuma
 // linha com aquele slug já existir na tabela. Para reaplicar/atualizar um concurso,
-// apague a linha no banco (DELETE FROM concursos WHERE slug=?) e reinicie o servidor.
+// faça uma migração revisada após backup; a inicialização não atualiza nem exclui
+// registros existentes.
 //
 // Fontes verificadas para PF 2025:
 //   Edital oficial: https://cdn.cebraspe.org.br/concursos/pf_25/arquivos/Ed_1_PF_25_Abertura.pdf
@@ -201,13 +202,4 @@ export const SEED_CONCURSOS: SeedConcurso[] = [
       'Altura mínima: 1,60 m (homens) / 1,55 m (mulheres)',
     ]),
   },
-];
-
-// Slugs descontinuados — limpos no boot por seedConcursosBank() em src/lib/db.ts.
-// Ao remover uma entrada de SEED_CONCURSOS, adicione o slug aqui se quiser que
-// linhas antigas no banco sejam removidas no próximo boot.
-export const DEPRECATED_CONCURSO_SLUGS: string[] = [
-  'pf-perito-criminal-2025',                  // visão geral substituída pela área de Informática Forense
-  'prf-policial-rodoviario-federal-2026',     // placeholder não verificado
-  'perito-criminal-federal',                   // legado sem banca/vagas/datas — substituído por pf-perito-criminal-informatica-forense-2025
 ];
