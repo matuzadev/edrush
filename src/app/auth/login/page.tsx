@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { getGoogleSignInUrl } from '@/lib/google-sign-in';
 import { Suspense } from 'react';
 import {
   Mail, Lock, Eye, EyeOff, ArrowRight, Loader2,
@@ -104,8 +105,15 @@ function LoginForm() {
   };
 
   const handleGoogle = async () => {
+    setError('');
     setIsGoogleLoading(true);
-    await signIn('google', { callbackUrl: redirect });
+    try {
+      const url = await getGoogleSignInUrl(redirect);
+      window.location.assign(url);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Não foi possível iniciar o acesso com Google.');
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
