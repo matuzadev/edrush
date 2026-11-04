@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Lock, Loader2, Check, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { Lock, Loader2, Check, Sparkles, ShoppingBag } from 'lucide-react';
 import { TIER_COLOR, type BorderTier } from '@/data/borders';
 import { AvatarBorder } from './AvatarBorder';
+import { StoreItemPreview, type StoreItemLite } from '@/components/store/StoreItemPreview';
 
 interface BorderItem {
   slug: string;
@@ -32,22 +34,50 @@ interface BordersGalleryProps {
   onEquipped?: (slug: string) => void;
 }
 
+interface StoreBorder extends StoreItemLite {
+  description: string;
+  priceCrystals: number;
+  owned: boolean;
+  equipped: boolean;
+}
+
 const TIER_ORDER: BorderTier[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'mythic'];
 
 export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
   const [borders, setBorders] = useState<BorderItem[]>([]);
+  const [storeBorders, setStoreBorders] = useState<StoreBorder[]>([]);
   const [stats, setStats] = useState<{ totalUnlocked: number; total: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [equippingSlug, setEquippingSlug] = useState<string | null>(null);
   const [activeTier, setActiveTier] = useState<BorderTier | 'all'>('all');
+  const [error, setError] = useState<string | null>(null);
 
   const fetchBorders = useCallback(async () => {
     try {
-      const res = await fetch('/api/borders');
-      if (!res.ok) return;
-      const data = await res.json();
-      setBorders(data.borders ?? []);
-      setStats({ totalUnlocked: data.totalUnlocked ?? 0, total: data.total ?? 0 });
+      setError(null);
+      const [bordersRes, itemsRes] = await Promise.all([
+        fetch('/api/borders', { cache: 'no-store' }),
+        fetch('/api/store/items', { cache: 'no-store' }),
+      ]);
+      const [bordersData, itemsData] = await Promise.all([
+        bordersRes.json(),
+        itemsRes.json(),
+      ]);
+      if (!bordersRes.ok) throw new Error(bordersData.error ?? 'Falha ao carregar bordas');
+      if (!itemsRes.ok) throw new Error(itemsData.error ?? 'Falha ao carregar itens do inventário');
+      const allItems: StoreBorder[] = itemsData.items ?? [];
+      setBorders(bordersData.borders ?? []);
+      setStoreBorders(
+        allItems
+          .filter((item) => item.category === 'borda_perfil' && item.owned)
+          .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+      );
+      setStats({
+        totalUnlocked: bordersData.totalUnlocked ?? 0,
+        total: bordersData.total ?? 0,
+      });
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : 'Falha ao carregar bordas');
     } finally {
       setIsLoading(false);
     }
@@ -60,16 +90,58 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
   const handleEquip = async (slug: string) => {
     if (equippingSlug) return;
     setEquippingSlug(slug);
+    setError(null);
     try {
       const res = await fetch('/api/borders/equip', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug }),
       });
-      if (res.ok) {
-        setBorders(prev => prev.map(b => ({ ...b, equipped: b.slug === slug })));
-        onEquipped?.(slug);
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Não foi possível equipar a borda');
+      setBorders(prev => prev.map(b => ({ ...b, equipped: b.slug === slug })));
+      setStoreBorders(prev => prev.map(b => ({ ...b, equipped: false })));
+      onEquipped?.(slug);
+    } catch (equipError) {
+      setError(equipError instanceof Error ? equipError.message : 'Não foi possível equipar a borda');
+    } finally {
+      setEquippingSlug(null);
+    }
+  };
+
+  const handleEquipStoreBorder = async (item: StoreBorder) => {
+    if (equippingSlug) return;
+    setEquippingSlug(item.id);
+    setError(null);
+    try {
+      const itemsRes = await fetch('/api/store/items', { cache: 'no-store' });
+      const itemsData = await itemsRes.json();
+      if (!itemsRes.ok) throw new Error(itemsData.error ?? 'Falha ao carregar o loadout');
+      const allItems: StoreBorder[] = itemsData.items ?? [];
+      const avatarItemId = allItems.find(
+        (ownedItem) =>
+          (ownedItem.category === 'avatar_orgao' || ownedItem.category === 'avatar_vitoria') &&
+          ownedItem.equipped,
+      )?.id ?? null;
+      const badgeIds = allItems
+        .filter((ownedItem) => ownedItem.category === 'mini_logo_badge' && ownedItem.equipped)
+        .slice(0, 3)
+        .map((badge) => badge.id);
+      const res = await fetch('/api/users/me/loadout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ borderItemId: item.id, avatarItemId, badgeIds }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Não foi possível equipar a borda');
+      setStoreBorders((prev) => prev.map((border) => ({
+        ...border,
+        equipped: border.id === item.id,
+      })));
+      setBorders((prev) => prev.map((border) => ({ ...border, equipped: false })));
+      onEquipped?.(item.slug);
+    } catch (equipError) {
+      setError(equipError instanceof Error ? equipError.message : 'Não foi possível equipar a borda');
     } finally {
       setEquippingSlug(null);
     }
@@ -93,6 +165,67 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
 
   return (
     <div>
+      {error && (
+        <p className="mb-4 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+          {error}
+        </p>
+      )}
+
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles size={14} className="text-emerald-400" />
+            <h3 className="text-xs font-black text-white">Bordas da loja</h3>
+            <span className="text-[10px] text-slate-500">{storeBorders.length} adquiridas</span>
+          </div>
+          <Link
+            href="/dashboard/loja?cat=borda_perfil"
+            className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-emerald-400 transition"
+          >
+            <ShoppingBag size={12} /> Loja
+          </Link>
+        </div>
+        {storeBorders.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {storeBorders.map((border) => (
+              <button
+                type="button"
+                key={border.id}
+                onClick={() => handleEquipStoreBorder(border)}
+                disabled={Boolean(equippingSlug)}
+                className="relative rounded-2xl p-4 flex flex-col items-center text-center transition-all disabled:opacity-60"
+                style={{
+                  background: border.equipped
+                    ? 'linear-gradient(135deg, rgba(16,185,129,0.16), rgba(15,23,42,0.7))'
+                    : 'linear-gradient(135deg, rgba(30,41,59,0.55), rgba(15,23,42,0.35))',
+                  border: `1px solid ${border.equipped ? 'rgba(16,185,129,0.75)' : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: border.equipped ? '0 0 16px rgba(16,185,129,0.25)' : undefined,
+                }}
+              >
+                {border.equipped && (
+                  <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <Check size={12} className="text-slate-950" strokeWidth={3} />
+                  </span>
+                )}
+                <span className="my-2">
+                  <StoreItemPreview item={border} size={64} />
+                </span>
+                <span className="text-xs font-bold text-white">{border.name}</span>
+                <span className={`mt-2 text-[10px] font-bold ${border.equipped ? 'text-emerald-400' : 'text-slate-400'}`}>
+                  {equippingSlug === border.id ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : border.equipped ? 'Em uso' : 'Toque para equipar'}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-xl border border-white/5 bg-slate-900/40 px-4 py-5 text-center text-xs text-slate-500">
+            As bordas compradas aparecerão aqui para equipar.
+          </p>
+        )}
+      </div>
+
       {/* Header com contador + filtro de tiers */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div className="flex items-center gap-2 text-xs">

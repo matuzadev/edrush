@@ -404,9 +404,71 @@ export const BORDER_BY_SLUG: Record<string, BorderDef> = Object.fromEntries(
   BORDERS.map(b => [b.slug, b])
 );
 
+const STORE_BORDER_STYLES: Record<string, BorderStyle> = {
+  'borda-cinza': {
+    ring: 'linear-gradient(135deg, #475569, #cbd5e1, #475569)',
+    glow: 'rgba(148,163,184,0.55)',
+    width: 4,
+  },
+  'borda-prata': {
+    ring: 'linear-gradient(135deg, #f8fafc, #94a3b8, #e2e8f0)',
+    glow: 'rgba(203,213,225,0.65)',
+    width: 4,
+  },
+  'borda-bronze': {
+    ring: 'linear-gradient(135deg, #fcd34d, #b45309, #78350f)',
+    glow: 'rgba(205,127,50,0.6)',
+    width: 4,
+  },
+  'borda-azul': {
+    ring: 'linear-gradient(135deg, #7dd3fc, #1d4ed8, #0e7490)',
+    glow: 'rgba(30,144,255,0.65)',
+    width: 4,
+  },
+  'borda-violeta': {
+    ring: 'linear-gradient(135deg, #e879f9, #7e22ce, #4c1d95)',
+    glow: 'rgba(168,85,247,0.65)',
+    width: 4,
+  },
+  'borda-dourada': {
+    ring: 'linear-gradient(135deg, #fef08a, #eab308, #a16207)',
+    glow: 'rgba(250,204,21,0.7)',
+    width: 5,
+    shimmer: true,
+  },
+  'borda-rubra': {
+    ring: 'linear-gradient(135deg, #fda4af, #dc2626, #7f1d1d)',
+    glow: 'rgba(239,68,68,0.7)',
+    width: 5,
+  },
+  'borda-mistica-celestial': {
+    ring: 'conic-gradient(from 0deg, #ffbb33, #ff44cc, #00ffff, #ffbb33)',
+    glow: 'rgba(217,70,239,0.8)',
+    width: 5,
+    rotate: true,
+    sparkle: true,
+    shimmer: true,
+    breathe: true,
+  },
+};
+
+const STORE_BORDER_BY_SLUG: Record<string, BorderDef> = Object.fromEntries(
+  Object.entries(STORE_BORDER_STYLES).map(([slug, style]) => [
+    slug,
+    {
+      slug,
+      name: slug,
+      description: '',
+      tier: 'gold',
+      criteria: { type: 'special', value: 0 },
+      style,
+    },
+  ])
+);
+
 export function getBorder(slug: string | null | undefined): BorderDef {
   if (!slug) return BORDERS[0];
-  return BORDER_BY_SLUG[slug] ?? BORDERS[0];
+  return BORDER_BY_SLUG[slug] ?? STORE_BORDER_BY_SLUG[slug] ?? BORDERS[0];
 }
 
 export const TIER_COLOR: Record<BorderTier, { color: string; bg: string; border: string; label: string }> = {

@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db, lsClient } from '@/lib/db';
 import { user_borders, users, study_sessions, notifications } from '@/db/schema';
 import { eq, sql, and } from 'drizzle-orm';
 import { computeLevel, computeMedals } from '@/lib/levels';
@@ -178,6 +178,19 @@ export async function equipBorder(userId: string, slug: string): Promise<{ ok: b
     await db.update(users)
       .set({ equipped_border: slug, atualizado_em: new Date().toISOString() })
       .where(eq(users.id, userId));
+    await lsClient.execute({
+      sql: 'UPDATE user_profile_loadout SET border_item_id = NULL, updated_at = ? WHERE user_id = ?',
+      args: [new Date().toISOString(), userId],
+    });
+    await lsClient.execute({
+      sql: `UPDATE user_inventory
+            SET is_equipped = 0
+            WHERE user_id = ?
+              AND store_item_id IN (
+                SELECT id FROM store_items WHERE category = 'borda_perfil'
+              )`,
+      args: [userId],
+    });
     return { ok: true };
   } catch (e) {
     console.error('Erro ao equipar borda:', e);

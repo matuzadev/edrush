@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Loader2, Check, Lock, ShoppingBag, Save, Star } from 'lucide-react';
+import { Loader2, Check, Lock, ShoppingBag, Star } from 'lucide-react';
 import { StoreItemPreview, type StoreItemLite } from '@/components/store/StoreItemPreview';
 
 interface StoreItemFull extends StoreItemLite {
@@ -34,14 +34,15 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
-  const [dirty, setDirty] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await fetch('/api/store/items', { cache: 'no-store' });
-      if (!res.ok) return;
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Falha ao carregar seus selos');
       const all: StoreItemFull[] = data.items ?? [];
 
       // só selos
@@ -64,6 +65,8 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
       );
       setBorderItemId(eqBorder?.id ?? null);
       setAvatarItemId(eqAvatar?.id ?? null);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Falha ao carregar seus selos');
     } finally {
       setLoading(false);
     }
@@ -71,22 +74,20 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  function toggle(id: string) {
+  async function toggle(id: string) {
+    if (saving) return;
     setFeedback(null);
-    setEquippedIds((prev) => {
-      if (prev.includes(id)) {
-        setDirty(true);
-        return prev.filter((x) => x !== id);
-      }
-      if (prev.length >= 3) return prev; // máx 3
-      setDirty(true);
-      return [...prev, id];
-    });
-  }
+    const previousIds = equippedIds;
+    let nextIds: string[];
+    if (equippedIds.includes(id)) {
+      nextIds = equippedIds.filter((x) => x !== id);
+    } else {
+      if (equippedIds.length >= 3) return;
+      nextIds = [...equippedIds, id];
+    }
 
-  async function save() {
+    setEquippedIds(nextIds);
     setSaving(true);
-    setFeedback(null);
     try {
       const res = await fetch('/api/users/me/loadout', {
         method: 'POST',
@@ -94,20 +95,19 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
         body: JSON.stringify({
           borderItemId,
           avatarItemId,
-          badgeIds: equippedIds,
+          badgeIds: nextIds,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
+        setEquippedIds(previousIds);
         setFeedback({ ok: false, text: data.error ?? 'Erro ao salvar' });
         return;
       }
       setFeedback({ ok: true, text: 'Selos atualizados!' });
-      setDirty(false);
       onEquipped?.();
-      // re-fetch para sincronizar flags
-      loadAll();
     } catch (e) {
+      setEquippedIds(previousIds);
       setFeedback({ ok: false, text: e instanceof Error ? e.message : 'Erro' });
     } finally {
       setSaving(false);
@@ -126,6 +126,11 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
 
   return (
     <div>
+      {loadError && (
+        <p className="mb-4 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+          {loadError}
+        </p>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <p className="text-xs text-slate-500 leading-relaxed max-w-md">
@@ -158,7 +163,7 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
               <button
                 key={seal.id}
                 onClick={() => isOwned && toggle(seal.id)}
-                disabled={!isOwned || (reachedMax && !isEquipped)}
+                disabled={saving || !isOwned || (reachedMax && !isEquipped)}
                 className="relative overflow-hidden rounded-2xl flex flex-col text-left transition-all enabled:hover:-translate-y-0.5 disabled:cursor-not-allowed"
                 style={{
                   background: `linear-gradient(180deg, ${tint.bg}, rgba(15,23,42,0.85))`,
@@ -215,7 +220,7 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
         </div>
       )}
 
-      {/* Footer: salvar + ir à loja */}
+      {/* Footer */}
       <div className="flex items-center justify-between gap-3 mt-5 flex-wrap">
         <Link
           href="/dashboard/loja?cat=mini_logo_badge"
@@ -234,18 +239,7 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
               {feedback.text}
             </span>
           )}
-          <button
-            onClick={save}
-            disabled={saving || !dirty}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-slate-950 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              boxShadow: dirty ? '0 0 14px rgba(16,185,129,0.40)' : 'none',
-            }}
-          >
-            {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-            Salvar selos
-          </button>
+          {saving && <Loader2 size={14} className="animate-spin text-emerald-400" aria-label="Salvando selos" />}
         </div>
       </div>
     </div>
