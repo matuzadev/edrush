@@ -142,14 +142,14 @@ export const authOptions: NextAuthOptions = {
             user.concursoSlug = null;
           } else {
             if (existingUser.provider !== 'google' || existingUser.provider_id !== user.id) {
-            await db
-              .update(users)
-              .set({
-                provider: 'google',
-                provider_id: user.id,
-                atualizado_em: new Date().toISOString(),
-              })
-              .where(eq(users.id, userId));
+              await db
+                .update(users)
+                .set({
+                  provider: 'google',
+                  provider_id: user.id,
+                  atualizado_em: new Date().toISOString(),
+                })
+                .where(eq(users.id, userId));
             }
             user.onboardingCompleted = (existingUser.onboarding_completed ?? 0) === 1;
             user.concursoSlug = existingUser.selected_concurso_slug ?? null;
