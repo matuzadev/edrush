@@ -31,7 +31,7 @@ function calcStrength(pwd: string) {
 const PERKS = [
   { icon: BookOpen,  title: '12.000+ questões comentadas', desc: 'Para todos os concursos do Brasil' },
   { icon: BarChart2, title: 'Analytics por matéria',       desc: 'Acompanhe acertos em tempo real' },
-  { icon: Gift,      title: 'Kit de boas-vindas',          desc: '500 cristais, 50 XP e medalha Recruta exclusiva' },
+  { icon: Gift,      title: 'Kit de boas-vindas',          desc: '500 cristais, 50 XP e medalha Recruta de presente' },
   { icon: Target,    title: 'Active Recall ciclo 1-7-30',  desc: 'Revisão espaçada automática' },
 ];
 

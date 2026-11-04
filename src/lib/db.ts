@@ -733,7 +733,7 @@ export async function initializeDatabase() {
       await client.execute(`CREATE INDEX IF NOT EXISTS idx_smd_material ON study_material_downloads(material_id)`);
     } catch { /* já existe */ }
 
-    // Seed de itens da loja (idempotente: só insere se store_items vazio)
+    // Sincroniza itens faltantes do catálogo da loja, inclusive em bancos existentes.
     await seedStoreItems();
 
     // Backfill de cristais (UMA VEZ): se nenhuma transação ainda foi registrada,
@@ -1033,7 +1033,7 @@ async function seedStoreItems() {
         ],
       });
     }
-    console.log(`🛒 Seed loja: ${STORE_ITEMS_SEED.length} itens inseridos`);
+    console.log(`🛒 Catálogo da loja sincronizado: ${STORE_ITEMS_SEED.length} itens verificados`);
   } catch (err) {
     console.error('⚠️  Falha ao popular store_items (seed):', err);
   }
