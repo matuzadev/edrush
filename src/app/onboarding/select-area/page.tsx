@@ -13,7 +13,7 @@ interface Area {
 function SelectAreaContent() {
   const router = useRouter();
   const searchParams = useSearchParams() ?? new URLSearchParams();
-  const { data: session, status, update } = useSession();
+  const { status } = useSession();
 
   const concursoId = searchParams.get('concursoId');
   const concursoTitle = searchParams.get('concursoTitle') || 'Concurso';
@@ -98,75 +98,49 @@ function SelectAreaContent() {
     }
     setError('');
     setIsSaving(true);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
 
     try {
       const res = await fetch('/api/onboarding/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // enviar cookies de sessão para o servidor reconhecer o usuário
+        credentials: 'include',
+        signal: controller.signal,
         body: JSON.stringify({ concursoId: Number(concursoId), selectedAreas: selected, concursoTitle }),
       });
 
-      const data = await res.json();
+      const data: unknown = await res.json();
+      const result = typeof data === 'object' && data !== null
+        ? data as { error?: string; concursoSlug?: string }
+        : {};
 
       if (!res.ok) {
         if (res.status === 401) {
-          // Sessão inválida: tentar fluxo de fallback para dev (criar conta temporária e logar)
-          try {
-            const devEmail = `dev+${Date.now()}@local`;
-            const devPassword = `devpassword123`;
-
-            // Registrar conta dev temporária
-            await fetch('/api/auth/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: devEmail, password: devPassword, name: 'Dev User' }),
-            });
-
-            // Fazer login via Credentials provider (callback)
-            const loginRes = await fetch('/api/auth/callback/credentials', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              credentials: 'include',
-              body: new URLSearchParams({ username: devEmail, password: devPassword }).toString(),
-            });
-
-            if (loginRes.ok) {
-              // Re-tentar o POST de onboarding agora que temos sessão
-              const retry = await fetch('/api/onboarding/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ concursoId: Number(concursoId), selectedAreas: selected, concursoTitle }),
-              });
-
-              if (retry.ok) {
-                const retryData = await retry.json();
-                await update();
-                router.push(`/dashboard/${retryData.concursoSlug}`);
-                return;
-              }
-            }
-          } catch (e) {
-            // ignorar e cair no redirect abaixo
-          }
-
-          // se não conseguiu autenticar automaticamente, redireciona ao login
-          router.push('/auth/login');
+          const loginUrl = `/auth/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+          window.location.replace(loginUrl);
           return;
         }
 
-        setError(data.error || 'Erro ao salvar seleção.');
+        setError(result.error || 'Erro ao salvar seleção.');
         return;
       }
 
-      // Atualizar token JWT com novos dados de onboarding
-      await update();
+      if (!result.concursoSlug) {
+        throw new Error('O servidor não retornou o endereço do painel. Tente novamente.');
+      }
 
-      router.push(`/dashboard/${data.concursoSlug}`);
-    } catch {
-      setError('Erro de conexão. Tente novamente.');
+      window.location.replace(`/dashboard/${encodeURIComponent(result.concursoSlug)}`);
+    } catch (error) {
+      setError(
+        error instanceof DOMException && error.name === 'AbortError'
+          ? 'A configuração demorou demais. Verifique sua conexão e tente novamente.'
+          : error instanceof Error
+            ? error.message
+            : 'Erro de conexão. Tente novamente.',
+      );
     } finally {
+      window.clearTimeout(timeoutId);
       setIsSaving(false);
     }
   }
