@@ -11,6 +11,15 @@ import { DUMMY_BCRYPT_HASH, maskEmail } from '@/lib/sanitize';
 // Mensagem genérica para erros de autenticação. Não diferenciar
 // "usuário não existe" vs "senha incorreta" evita enumeração de e-mails.
 const AUTH_ERROR_GENERIC = 'E-mail ou senha inválidos';
+const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim() ?? '';
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim() ?? '';
+
+if (!googleClientId || !googleClientSecret) {
+  console.error('[AUTH] Google OAuth configuration is incomplete', {
+    googleClientIdConfigured: Boolean(googleClientId),
+    googleClientSecretConfigured: Boolean(googleClientSecret),
+  });
+}
 
 function hasVerifiedGoogleEmail(profile: unknown): boolean {
   return (
@@ -38,8 +47,8 @@ function assertNextAuthSecretSafe(): void {
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      clientId: googleClientId,
+      clientSecret: googleClientSecret,
       allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
