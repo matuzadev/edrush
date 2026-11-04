@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { getGoogleSignInUrl } from '@/lib/google-sign-in';
+import { getGoogleSignInErrorMessage, startGoogleSignIn } from '@/lib/google-sign-in';
 import {
   User, Mail, Lock, CheckCircle2, ArrowRight, Loader2,
   Eye, EyeOff, AlertCircle, Gift, BookOpen, BarChart2,
@@ -41,6 +41,7 @@ type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 function SignupForm() {
   const router       = useRouter();
   const searchParams = useSearchParams() ?? new URLSearchParams();
+  const googleAuthError = getGoogleSignInErrorMessage(searchParams.get('error'));
 
   // ── fields ──
   const [fullName,            setFullName]            = useState('');
@@ -120,8 +121,7 @@ function SignupForm() {
     setError('');
     setIsGoogleLoading(true);
     try {
-      const url = await getGoogleSignInUrl('/onboarding/select-concurso');
-      window.location.assign(url);
+      await startGoogleSignIn('/onboarding/select-concurso');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Não foi possível iniciar o cadastro com Google.');
       setIsGoogleLoading(false);
@@ -293,10 +293,10 @@ function SignupForm() {
               )}
 
               {/* error */}
-              {error && (
+              {(error || (!isGoogleLoading && googleAuthError)) && (
                 <div className="flex items-center gap-3 p-3.5 bg-red-500/10 border border-red-500/30 rounded-2xl mb-5">
                   <AlertCircle size={15} className="text-red-400 flex-shrink-0" />
-                  <p className="text-red-300 text-sm font-medium">{error}</p>
+                  <p className="text-red-300 text-sm font-medium">{error || googleAuthError}</p>
                 </div>
               )}
 

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { getGoogleSignInUrl } from '@/lib/google-sign-in';
+import { getGoogleSignInErrorMessage, startGoogleSignIn } from '@/lib/google-sign-in';
 import { Suspense } from 'react';
 import {
   Mail, Lock, Eye, EyeOff, ArrowRight, Loader2,
@@ -25,6 +25,7 @@ function LoginForm() {
   const searchParams = useSearchParams() ?? new URLSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const justRegistered = searchParams.get('registered') === 'true';
+  const googleAuthError = getGoogleSignInErrorMessage(searchParams.get('error'));
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
   const [presenceStatus, setPresenceStatus] = useState<'loading' | 'live' | 'error'>('loading');
 
@@ -108,8 +109,7 @@ function LoginForm() {
     setError('');
     setIsGoogleLoading(true);
     try {
-      const url = await getGoogleSignInUrl(redirect);
-      window.location.assign(url);
+      await startGoogleSignIn(redirect);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Não foi possível iniciar o acesso com Google.');
       setIsGoogleLoading(false);
@@ -219,10 +219,10 @@ function LoginForm() {
               )}
 
               {/* Error message */}
-              {error && (
+              {(error || (!isGoogleLoading && googleAuthError)) && (
                 <div className="flex items-center gap-3 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl mb-5">
                   <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
-                  <p className="text-red-300 text-sm font-medium">{error}</p>
+                  <p className="text-red-300 text-sm font-medium">{error || googleAuthError}</p>
                 </div>
               )}
 
