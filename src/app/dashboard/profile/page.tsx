@@ -1215,10 +1215,10 @@ export default function ProfilePage() {
                   background: 'linear-gradient(135deg, #22d3ee, #3b82f6)',
                   color: '#020617',
                 }}
-                title="Adicionar amigo"
+                title="Encontrar amigos"
               >
                 <span className="text-base leading-none font-black">+</span>
-                <span className="hidden sm:inline">Adicionar</span>
+                <span className="hidden sm:inline">Encontrar</span>
               </button>
               <button
                 onClick={() => setIsFriendsPopupOpen(false)}
