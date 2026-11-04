@@ -343,6 +343,10 @@ function LoginForm() {
                   Criar conta grátis
                 </Link>
               </p>
+              <nav aria-label="Documentos legais" className="mt-4 flex justify-center gap-4 text-xs text-slate-500">
+                <Link href="/privacidade" className="transition hover:text-white">Privacidade</Link>
+                <Link href="/termos" className="transition hover:text-white">Termos de Serviço</Link>
+              </nav>
             </div>
           </div>
 
