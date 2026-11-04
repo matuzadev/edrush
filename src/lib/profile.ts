@@ -3,6 +3,7 @@ import { db, lsClient } from '@/lib/db';
 import { users, study_sessions, user_responses } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { computeLevel, computeMedals, type Medal } from '@/lib/levels';
+import { FOUNDER_EMAIL, grantFounderBadge } from '@/lib/welcome-rewards';
 
 /**
  * Camada de dados do perfil público.
@@ -191,6 +192,9 @@ export async function getProfileData(username: string): Promise<ProfileData | nu
     where: sql`LOWER(${users.username}) = LOWER(${username}) OR LOWER(${users.nome}) = LOWER(${username})`,
   });
   if (!user) return null;
+  if (user.email.trim().toLowerCase() === FOUNDER_EMAIL) {
+    await grantFounderBadge(user.id, user.email);
+  }
 
   const ninetyAgo = new Date(); ninetyAgo.setDate(ninetyAgo.getDate() - 90);
   const ninetyAgoStr = ninetyAgo.toISOString().split('T')[0];
@@ -279,7 +283,7 @@ export async function getProfileData(username: string): Promise<ProfileData | nu
   const storedXp  = user.xp ?? 0;
   const levelInfo = computeLevel(storedXp);
   const medals = computeMedals({ totalAnswered, totalCorrect, totalSessions, streak, level: levelInfo.level });
-  const isCeo = user.email === 'matheus@gmail.com';
+  const isCeo = user.email.trim().toLowerCase() === FOUNDER_EMAIL;
 
   return {
     id: user.id,

@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { grantWelcomeBadge } from '@/lib/welcome-rewards';
+import { grantFounderBadge, grantWelcomeBadge } from '@/lib/welcome-rewards';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { DUMMY_BCRYPT_HASH, maskEmail } from '@/lib/sanitize';
@@ -103,6 +103,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error(AUTH_ERROR_GENERIC);
         }
 
+        await grantFounderBadge(result.id, result.email);
+
         console.log(`✅ [AUTH] LOGIN SUCESSO para ${email}`);
         return {
           id: result.id,
@@ -158,6 +160,7 @@ export const authOptions: NextAuthOptions = {
             user.onboardingCompleted = (existingUser.onboarding_completed ?? 0) === 1;
             user.concursoSlug = existingUser.selected_concurso_slug ?? null;
           }
+          await grantFounderBadge(userId, email);
           user.id = userId;
         } catch (error) {
           // Não logar `user`/`profile` — contém e-mail.
