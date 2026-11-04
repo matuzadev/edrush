@@ -1,7 +1,7 @@
 // GET  /api/admin/study-materials       — lista todos (qualquer status)
 // POST /api/admin/study-materials       — gera material para (concursoSlug, disciplina)
 //
-// Admin gate: requireAdmin(userId).
+// Admin gate: requireAdmin(userId, session).
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
