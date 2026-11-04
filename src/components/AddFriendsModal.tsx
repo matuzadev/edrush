@@ -36,14 +36,16 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
   const [results, setResults] = useState<SearchUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [sendingTo, setSendingTo] = useState<string | null>(null);
-  const [sentTo, setSentTo] = useState<Set<string>>(new Set());
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
 
   const loadUsers = useCallback(async (tab: 'online' | 'new' | 'search', q: string) => {
+    const requestId = ++requestIdRef.current;
     if (tab === 'search' && q.trim().length < 2) {
       setResults([]);
       setSearchError(null);
+      setIsSearching(false);
       return;
     }
     setIsSearching(true);
@@ -55,12 +57,14 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('Erro na busca');
       const data = await res.json();
-      setResults(data.users ?? []);
+      if (requestId === requestIdRef.current) setResults(data.users ?? []);
     } catch {
-      setSearchError('Não foi possível carregar estudantes. Tente novamente.');
-      setResults([]);
+      if (requestId === requestIdRef.current) {
+        setSearchError('Não foi possível carregar estudantes. Tente novamente.');
+        setResults([]);
+      }
     } finally {
-      setIsSearching(false);
+      if (requestId === requestIdRef.current) setIsSearching(false);
     }
   }, []);
 
@@ -73,17 +77,6 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
     };
   }, [searchTerm, activeTab, isOpen, loadUsers]);
 
-  // Resetar ao fechar
-  useEffect(() => {
-    if (!isOpen) {
-      setSearchTerm('');
-      setActiveTab('online');
-      setResults([]);
-      setSearchError(null);
-      setSentTo(new Set());
-    }
-  }, [isOpen]);
-
   const handleSendRequest = async (userId: string) => {
     setSendingTo(userId);
     try {
@@ -94,7 +87,6 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
       });
 
       if (res.ok) {
-        setSentTo(prev => new Set(prev).add(userId));
         // Atualizar o status no resultado localmente
         setResults(prev =>
           prev.map(u =>
