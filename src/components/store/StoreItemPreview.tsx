@@ -192,6 +192,19 @@ function BorderPreview({ slug, meta, size }: { slug: string; meta: unknown; size
 function BadgePreview({ kind, size }: { kind: string; size: number }) {
   const s = size;
   switch (kind) {
+    case 'recruta':
+      return (
+        <svg width={s} height={s} viewBox="0 0 64 64" fill="none">
+          <defs>
+            <linearGradient id="rookie" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#34d399" />
+              <stop offset="100%" stopColor="#047857" />
+            </linearGradient>
+          </defs>
+          <path d="M32 4 L42 10 L54 10 L56 22 L62 32 L56 42 L54 54 L42 54 L32 60 L22 54 L10 54 L8 42 L2 32 L8 22 L10 10 L22 10 Z" fill="url(#rookie)" stroke="#a7f3d0" strokeWidth="2" />
+          <path d="M21 33 L28 40 L43 24" stroke="#ecfdf5" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
     case 'verified':
       return (
         <svg width={s} height={s} viewBox="0 0 64 64" fill="none">

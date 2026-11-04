@@ -54,7 +54,14 @@ export async function PATCH(req: NextRequest) {
 
   const userId = (session.user as any).id as string;
 
-  let body: { username?: string; bio?: string; birthday?: string; location?: string; avatar_id?: number };
+  let body: {
+    username?: string;
+    bio?: string;
+    birthday?: string;
+    location?: string;
+    avatar_id?: number;
+    foto_url?: string | null;
+  };
   try {
     body = await req.json();
   } catch {
@@ -74,12 +81,28 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Bio deve ter no máximo 160 caracteres' }, { status: 400 });
   }
 
+  if (body.foto_url !== undefined && body.foto_url !== null) {
+    try {
+      const photoUrl = new URL(body.foto_url);
+      if (
+        photoUrl.protocol !== 'https:' ||
+        !photoUrl.hostname.endsWith('.public.blob.vercel-storage.com')
+      ) {
+        return NextResponse.json({ error: 'URL de foto inválida' }, { status: 400 });
+      }
+      body.foto_url = photoUrl.toString();
+    } catch {
+      return NextResponse.json({ error: 'URL de foto inválida' }, { status: 400 });
+    }
+  }
+
   const updates: Record<string, unknown> = { atualizado_em: new Date().toISOString() };
   if (body.username !== undefined) updates.username = body.username;
   if (body.bio !== undefined) updates.bio = body.bio;
   if (body.birthday !== undefined) updates.birthday = body.birthday || null;
   if (body.location !== undefined) updates.location = body.location;
   if (body.avatar_id !== undefined) updates.avatar_id = body.avatar_id;
+  if (body.foto_url !== undefined) updates.foto_url = body.foto_url;
 
   try {
     await db.update(users).set(updates).where(eq(users.id, userId));

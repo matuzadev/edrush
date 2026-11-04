@@ -14,11 +14,12 @@ interface AvatarSelectorProps {
   selectedId?: number;
   onSelect?: (id: number) => void;
   size?: 'sm' | 'md' | 'lg';
+  imageUrl?: string | null;
 }
 
 const SIZE_PX: Record<string, number> = { sm: 32, md: 48, lg: 96 };
 
-function AvatarCircle({ avatar, size }: { avatar: AvatarDef; size: number }) {
+function AvatarCircle({ avatar, size, imageUrl }: { avatar: AvatarDef; size: number; imageUrl?: string | null }) {
   return (
     <div
       style={{
@@ -34,18 +35,18 @@ function AvatarCircle({ avatar, size }: { avatar: AvatarDef; size: number }) {
         flexShrink: 0,
       }}
     >
-      <Avatar avatar={avatar} size={Math.round(size * 0.78)} />
+      <Avatar avatar={avatar} url={imageUrl} size={Math.round(size * 0.78)} />
     </div>
   );
 }
 
-export function AvatarSelector({ selectedId = 1, onSelect, size = 'md' }: AvatarSelectorProps) {
+export function AvatarSelector({ selectedId = 1, onSelect, size = 'md', imageUrl }: AvatarSelectorProps) {
   const [tab, setTab] = useState<'character' | 'orgao'>('character');
   const avatar = getAvatar(selectedId);
   const sizePx = SIZE_PX[size] ?? 48;
 
   if (!onSelect) {
-    return <AvatarCircle avatar={avatar} size={sizePx} />;
+    return <AvatarCircle avatar={avatar} size={sizePx} imageUrl={imageUrl} />;
   }
 
   const list = tab === 'character' ? CHARACTER_AVATARS : ORGAO_AVATARS;
@@ -54,7 +55,7 @@ export function AvatarSelector({ selectedId = 1, onSelect, size = 'md' }: Avatar
     <div className="space-y-4">
       {/* Preview do avatar selecionado */}
       <div className="flex justify-center">
-        <AvatarCircle avatar={avatar} size={sizePx} />
+        <AvatarCircle avatar={avatar} size={sizePx} imageUrl={imageUrl} />
       </div>
 
       {/* Abas */}

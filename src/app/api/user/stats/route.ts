@@ -104,6 +104,7 @@ export async function GET() {
       platformByDiscRs,
       equippedBadgesResult,
       alreadyNotified,
+      welcomeKitResult,
     ] = await Promise.all([
       db.query.users.findFirst({ where: eq(users.id, userId) }),
       db
@@ -142,6 +143,11 @@ export async function GET() {
         .select({ related_id: notifications.related_id })
         .from(notifications)
         .where(and(eq(notifications.user_id, userId), eq(notifications.type, 'achievement'))),
+      lsClient.execute({
+        sql: `SELECT id FROM crystal_transactions
+              WHERE user_id = ? AND reference_id = 'welcome-kit-v1' LIMIT 1`,
+        args: [userId],
+      }),
     ]);
 
     if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
@@ -238,6 +244,7 @@ export async function GET() {
       nome: user.nome,
       email: user.email,
       foto_url: user.foto_url,
+      hasWelcomeKit: welcomeKitResult.rows.length > 0,
       username: user.username ?? user.nome ?? 'Concurseiro',
       bio: user.bio ?? null,
       birthday: user.birthday ?? null,

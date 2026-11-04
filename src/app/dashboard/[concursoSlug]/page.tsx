@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
-  Crown,
+  Sparkles,
   Lock,
   PlayCircle,
   Target,
@@ -224,64 +224,62 @@ export default function PersonalizedDashboardPage() {
         <div className="flex items-center gap-3">
           <NotificationBell />
           <UserMenu onLogout={handleLogout} />
-          {/* Badge de destaque com gradient dourado e brilho sutil no hover */}
+          {/* Indicador de jornada, sem referência a plano de assinatura. */}
           <div
-            className="pro-badge hidden md:flex relative items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden cursor-default group"
+            className="journey-badge hidden md:flex relative items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden cursor-default group"
             style={{
-              background: 'linear-gradient(135deg, rgba(120,53,15,0.22) 0%, rgba(15,23,42,0.92) 50%, rgba(120,53,15,0.22) 100%)',
-              border: '1px solid rgba(251,191,36,0.32)',
-              boxShadow: 'inset 0 1px 0 rgba(253,230,138,0.06), 0 4px 14px -4px rgba(251,191,36,0.18)',
+              background: 'linear-gradient(135deg, rgba(6,78,59,0.35), rgba(15,23,42,0.92), rgba(8,47,73,0.35))',
+              border: '1px solid rgba(52,211,153,0.3)',
+              boxShadow: 'inset 0 1px 0 rgba(110,231,183,0.06), 0 4px 14px -4px rgba(16,185,129,0.16)',
               transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
             }}
-            title="Plano Pro ativo"
+            title="Sua jornada rumo à aprovação está ativa"
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(253,230,138,0.10), 0 0 18px -2px rgba(251,191,36,0.40)';
-              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.55)';
+              e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(110,231,183,0.1), 0 0 18px -2px rgba(16,185,129,0.35)';
+              e.currentTarget.style.borderColor = 'rgba(52,211,153,0.55)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(253,230,138,0.06), 0 4px 14px -4px rgba(251,191,36,0.18)';
-              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.32)';
+              e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(110,231,183,0.06), 0 4px 14px -4px rgba(16,185,129,0.16)';
+              e.currentTarget.style.borderColor = 'rgba(52,211,153,0.3)';
             }}
           >
-            {/* Glow sutil no canto */}
             <span
               aria-hidden
               className="absolute -top-2 -right-2 w-8 h-8 rounded-full pointer-events-none opacity-40 blur-lg"
-              style={{ background: '#fbbf24' }}
+              style={{ background: '#34d399' }}
             />
-            {/* Shine sweep no hover */}
             <span
               aria-hidden
-              className="pro-shine absolute top-0 left-0 h-full w-1/3 pointer-events-none"
+              className="journey-shine absolute top-0 left-0 h-full w-1/3 pointer-events-none"
               style={{
-                background: 'linear-gradient(90deg, transparent, rgba(253,230,138,0.22), transparent)',
+                background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.2), transparent)',
                 transform: 'translateX(-150%) skewX(-12deg)',
               }}
             />
-            <Crown
+            <Sparkles
               size={13}
               strokeWidth={2.5}
               className="relative z-10 shrink-0"
-              style={{ color: '#fbbf24', filter: 'drop-shadow(0 0 3px rgba(251,191,36,0.55))' }}
+              style={{ color: '#6ee7b7', filter: 'drop-shadow(0 0 3px rgba(52,211,153,0.55))' }}
             />
             <span
               className="relative z-10 text-[11px] font-black tracking-[0.22em]"
               style={{
-                background: 'linear-gradient(180deg, #fef3c7 0%, #fbbf24 50%, #d97706 100%)',
+                background: 'linear-gradient(180deg, #d1fae5 0%, #34d399 50%, #0891b2 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}
             >
-              PRO
+              FOCO TOTAL
             </span>
             <style jsx>{`
-              @keyframes pro-shine-sweep {
+              @keyframes journey-shine-sweep {
                 0%   { transform: translateX(-150%) skewX(-12deg); }
                 100% { transform: translateX(420%)  skewX(-12deg); }
               }
-              .pro-badge:hover .pro-shine {
-                animation: pro-shine-sweep 1.1s ease-out;
+              .journey-badge:hover .journey-shine {
+                animation: journey-shine-sweep 1.1s ease-out;
               }
             `}</style>
           </div>

@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { grantWelcomeBadge } from '@/lib/welcome-rewards';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { DUMMY_BCRYPT_HASH, maskEmail } from '@/lib/sanitize';
@@ -135,9 +136,12 @@ export const authOptions: NextAuthOptions = {
               foto_url: user.image || '',
               provider: 'google',
               provider_id: user.id,
+              xp: 50,
+              crystals: 500,
               criado_em: now,
               atualizado_em: now,
             });
+            await grantWelcomeBadge(userId);
             user.onboardingCompleted = false;
             user.concursoSlug = null;
           } else {

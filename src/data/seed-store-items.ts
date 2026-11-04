@@ -220,6 +220,15 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
 
   // ── 5 MEDALHAS / MINI-LOGO BADGES ─────────────────────────────────
   {
+    slug: 'badge-recruta',
+    name: 'Medalha Recruta',
+    description: 'Seu primeiro distintivo: boas-vindas à jornada EdRush.',
+    category: 'mini_logo_badge',
+    priceCrystals: 1200,
+    rarity: 'rare',
+    metadata: { kind: 'recruta' },
+  },
+  {
     slug: 'badge-verificado',
     name: 'Selo Verificado',
     description: 'Tique azul ao lado do seu nome — autenticidade comprovada.',

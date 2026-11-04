@@ -1005,21 +1005,17 @@ async function seedConcursosBank() {
   }
 }
 
-// Seed idempotente do catálogo de itens da loja.
-// Só insere se store_items estiver vazio. Para forçar re-seed: TRUNCATE store_items.
+// Seed idempotente do catálogo; itens novos também entram em bancos já populados.
 async function seedStoreItems() {
   try {
     const { STORE_ITEMS_SEED } = await import('@/data/seed-store-items');
-    const countRs = await client.execute('SELECT COUNT(*) AS n FROM store_items');
-    const count = Number((countRs.rows[0] as unknown as { n: number })?.n ?? 0);
-    if (count > 0) return;
-
     const now = new Date().toISOString();
     for (const item of STORE_ITEMS_SEED) {
       await client.execute({
         sql: `INSERT INTO store_items
           (id, slug, name, description, category, price_crystals, rarity, image_url, metadata, is_active, stock, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(slug) DO NOTHING`,
         args: [
           crypto.randomUUID(),
           item.slug,

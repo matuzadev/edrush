@@ -18,6 +18,7 @@ export interface UserProfile {
   email: string;
   nome: string | null;
   foto_url: string | null;
+  hasWelcomeKit?: boolean;
   avatar_id: number;
   equippedBorder: string;
   concursoSlug: string | null;
@@ -170,6 +171,7 @@ export const usUserProfile = () => {
     birthday?: string;
     location?: string;
     avatar_id?: number;
+    foto_url?: string | null;
   }) => {
     try {
       const res = await fetch('/api/user/profile', {

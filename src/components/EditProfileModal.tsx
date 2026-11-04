@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
 import { SealsGallery } from './profile/SealsGallery';
@@ -31,7 +31,8 @@ interface EditProfileModalProps {
     location: string;
     bio: string;
     avatar: number;
-  }) => void;
+    foto_url?: string | null;
+  }) => Promise<void>;
   onBorderEquipped?: () => void;
   onSealsEquipped?: () => void;
   initialData: {
@@ -40,6 +41,7 @@ interface EditProfileModalProps {
     location?: string;
     bio?: string;
     avatar: number;
+    foto_url?: string | null;
   };
 }
 
@@ -56,6 +58,11 @@ export function EditProfileModal({
   const [formData, setFormData] = useState(initialData);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<ModalTab>('identity');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(initialData.foto_url ?? null);
+  const [photoChanged, setPhotoChanged] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const initialParsed = useMemo(() => parseLocation(initialData.location), [initialData.location]);
   const [selectedUf, setSelectedUf] = useState<string>(initialParsed.uf);
@@ -68,10 +75,27 @@ export function EditProfileModal({
   useEffect(() => {
     if (!isOpen) return;
     setFormData(initialData);
+    setPhotoFile(null);
+    setPhotoPreview(initialData.foto_url ?? null);
+    setPhotoChanged(false);
+    setActionError(null);
     const parsed = parseLocation(initialData.location);
     setSelectedUf(parsed.uf);
     setSelectedCidade(parsed.cidade);
-  }, [isOpen, initialData]);
+  }, [
+    isOpen,
+    initialData.username,
+    initialData.birthday,
+    initialData.location,
+    initialData.bio,
+    initialData.avatar,
+    initialData.foto_url,
+  ]);
+
+  useEffect(() => {
+    if (!photoPreview?.startsWith('blob:')) return;
+    return () => URL.revokeObjectURL(photoPreview);
+  }, [photoPreview]);
 
   // Busca cidades quando UF muda — IBGE garante todos os 5570+ municípios do Brasil
   useEffect(() => {
@@ -137,16 +161,37 @@ export function EditProfileModal({
       return;
     }
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    onSave({
-      username: usernameTrimmed,
-      birthday: formData.birthday ?? '',
-      location: formattedLocation,
-      bio: formData.bio ?? '',
-      avatar: formData.avatar,
-    });
-    setIsSaving(false);
-    onClose();
+    setActionError(null);
+    try {
+      let fotoUrl = photoPreview;
+      if (photoFile) {
+        const uploadData = new FormData();
+        uploadData.set('file', photoFile);
+        const response = await fetch('/api/posts/upload-image', {
+          method: 'POST',
+          body: uploadData,
+        });
+        const result = await response.json();
+        if (!response.ok || typeof result.url !== 'string') {
+          throw new Error(result.message ?? 'Não foi possível enviar a foto.');
+        }
+        fotoUrl = result.url;
+      }
+
+      await onSave({
+        username: usernameTrimmed,
+        birthday: formData.birthday ?? '',
+        location: formattedLocation,
+        bio: formData.bio ?? '',
+        avatar: formData.avatar,
+        ...(photoChanged ? { foto_url: fotoUrl } : {}),
+      });
+      onClose();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'Não foi possível salvar as alterações.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -194,7 +239,7 @@ export function EditProfileModal({
               filter: `drop-shadow(0 0 12px ${selectedAvatar.colors.primary}66)`,
             }}
           >
-            <AvatarSelector selectedId={formData.avatar} size="lg" />
+            <AvatarSelector selectedId={formData.avatar} size="lg" imageUrl={photoPreview} />
           </div>
 
           {/* Título */}
@@ -413,11 +458,70 @@ export function EditProfileModal({
           )}
 
           {activeTab === 'avatar' && (
-            <AvatarSelector
-              selectedId={formData.avatar}
-              onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
-              size="lg"
-            />
+            <div className="space-y-5">
+              <div className="flex items-center gap-4 rounded-2xl border border-cyan-400/20 bg-gradient-to-r from-cyan-500/10 via-slate-900/50 to-emerald-500/10 p-4">
+                <AvatarSelector selectedId={formData.avatar} size="md" imageUrl={photoPreview} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-bold text-white">Sua foto, seu estilo</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                    Envie uma foto própria (JPG, PNG ou WebP, até 5 MB) ou escolha um avatar da coleção.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-bold text-cyan-200 transition hover:bg-cyan-400/20"
+                    >
+                      <ImagePlus className="h-3.5 w-3.5" />
+                      Enviar foto
+                    </button>
+                    {photoPreview && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPhotoFile(null);
+                          setPhotoPreview(null);
+                          setPhotoChanged(true);
+                          setActionError(null);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-400 transition hover:border-rose-400/30 hover:text-rose-300"
+                      >
+                        Usar avatar EdRush
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      event.target.value = '';
+                      if (!file) return;
+                      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                        setActionError('Escolha uma imagem JPG, PNG ou WebP.');
+                        return;
+                      }
+                      if (file.size > 5 * 1024 * 1024) {
+                        setActionError('A foto deve ter no máximo 5 MB.');
+                        return;
+                      }
+                      setActionError(null);
+                      setPhotoFile(file);
+                      setPhotoPreview(URL.createObjectURL(file));
+                      setPhotoChanged(true);
+                    }}
+                  />
+                </div>
+              </div>
+              <AvatarSelector
+                selectedId={formData.avatar}
+                onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
+                size="lg"
+                imageUrl={photoPreview}
+              />
+            </div>
           )}
 
           {activeTab === 'borders' && (
@@ -440,6 +544,11 @@ export function EditProfileModal({
           className="flex gap-3 px-6 py-5 shrink-0"
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
+          {actionError && (
+            <p className="absolute bottom-[5.5rem] left-6 right-6 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+              {actionError}
+            </p>
+          )}
           <button
             onClick={onClose}
             className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
