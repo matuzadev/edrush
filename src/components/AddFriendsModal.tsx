@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Search, UserPlus, Loader, Check, Clock } from 'lucide-react';
+import { X, Search, UserPlus, Loader, Clock, Users, Sparkles, Circle } from 'lucide-react';
 
 interface SearchUser {
   id: string;
   nome: string | null;
   username: string | null;
   avatar_id: number;
+  isOnline?: boolean;
+  isNew?: boolean;
   relationship: {
     id: number;
     status: string;
@@ -30,6 +32,7 @@ function getAvatarLabel(avatarId: number): string {
 
 export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<'online' | 'new' | 'search'>('online');
   const [results, setResults] = useState<SearchUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [sendingTo, setSendingTo] = useState<string | null>(null);
@@ -37,20 +40,24 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const doSearch = useCallback(async (q: string) => {
-    if (q.trim().length < 2) {
+  const loadUsers = useCallback(async (tab: 'online' | 'new' | 'search', q: string) => {
+    if (tab === 'search' && q.trim().length < 2) {
       setResults([]);
+      setSearchError(null);
       return;
     }
     setIsSearching(true);
     setSearchError(null);
     try {
-      const res = await fetch(`/api/users/search?q=${encodeURIComponent(q)}`);
+      const url = tab === 'search'
+        ? `/api/users/search?q=${encodeURIComponent(q)}`
+        : `/api/users/discover?mode=${tab}`;
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('Erro na busca');
       const data = await res.json();
       setResults(data.users ?? []);
     } catch {
-      setSearchError('Erro ao buscar usuários. Tente novamente.');
+      setSearchError('Não foi possível carregar estudantes. Tente novamente.');
       setResults([]);
     } finally {
       setIsSearching(false);
@@ -59,16 +66,18 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => doSearch(searchTerm), 350);
+    if (!isOpen) return;
+    debounceRef.current = setTimeout(() => loadUsers(activeTab, searchTerm), activeTab === 'search' ? 350 : 0);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [searchTerm, doSearch]);
+  }, [searchTerm, activeTab, isOpen, loadUsers]);
 
   // Resetar ao fechar
   useEffect(() => {
     if (!isOpen) {
       setSearchTerm('');
+      setActiveTab('online');
       setResults([]);
       setSearchError(null);
       setSentTo(new Set());
@@ -84,7 +93,7 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
         body: JSON.stringify({ receiverId: userId }),
       });
 
-      if (res.ok || res.status === 409) {
+      if (res.ok) {
         setSentTo(prev => new Set(prev).add(userId));
         // Atualizar o status no resultado localmente
         setResults(prev =>
@@ -94,9 +103,12 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
               : u
           )
         );
+      } else {
+        const data = await res.json().catch(() => null);
+        setSearchError(data?.error ?? 'Não foi possível enviar a solicitação.');
       }
     } catch {
-      // ignorar
+      setSearchError('Não foi possível enviar a solicitação. Verifique sua conexão.');
     } finally {
       setSendingTo(null);
     }
@@ -157,14 +169,38 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
       <div className="bg-slate-900 border border-white/10 rounded-2xl max-w-md w-full shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/5">
-          <h2 className="text-xl font-bold text-white">Adicionar Amigos</h2>
+          <div>
+            <h2 className="text-xl font-bold text-white">Encontrar amigos</h2>
+            <p className="text-xs text-slate-400 mt-1">Conheça outros concurseiros da plataforma</p>
+          </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white transition">
             <X className="w-5 h-5" />
           </button>
         </div>
 
+        <div className="grid grid-cols-3 gap-1 p-2 mx-6 mt-4 rounded-xl bg-slate-800/80">
+          <button
+            onClick={() => setActiveTab('online')}
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${activeTab === 'online' ? 'bg-emerald-500/15 text-emerald-300' : 'text-slate-400 hover:text-white'}`}
+          >
+            <Circle className="h-2.5 w-2.5 fill-current" /> Online
+          </button>
+          <button
+            onClick={() => setActiveTab('new')}
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${activeTab === 'new' ? 'bg-cyan-500/15 text-cyan-300' : 'text-slate-400 hover:text-white'}`}
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Novatos
+          </button>
+          <button
+            onClick={() => setActiveTab('search')}
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${activeTab === 'search' ? 'bg-violet-500/15 text-violet-300' : 'text-slate-400 hover:text-white'}`}
+          >
+            <Search className="h-3.5 w-3.5" /> Buscar
+          </button>
+        </div>
+
         {/* Search Input */}
-        <div className="p-6 border-b border-white/5">
+        {activeTab === 'search' && <div className="p-6 pb-3 border-b border-white/5">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             {isSearching && (
@@ -185,17 +221,28 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
           {searchError && (
             <p className="text-red-400 text-xs mt-2">{searchError}</p>
           )}
-        </div>
+        </div>}
 
         {/* Users List */}
         <div className="p-6 space-y-3 max-h-80 overflow-y-auto">
-          {searchTerm.length < 2 ? (
+          {isSearching ? (
+            <div className="flex items-center justify-center gap-2 py-8 text-slate-400 text-sm">
+              <Loader className="h-4 w-4 animate-spin" /> Procurando estudantes...
+            </div>
+          ) : searchError ? (
+            <div className="text-center py-8 text-red-400 text-sm">{searchError}</div>
+          ) : results.length === 0 && activeTab === 'search' && searchTerm.trim().length < 2 ? (
             <div className="text-center py-8 text-slate-500 text-sm">
+              <Users className="mx-auto mb-2 h-6 w-6 opacity-60" />
               Busque por nome ou username de outros concurseiros
             </div>
-          ) : results.length === 0 && !isSearching ? (
+          ) : results.length === 0 ? (
             <div className="text-center py-8 text-slate-500 text-sm">
-              Nenhum usuário encontrado para "{searchTerm}"
+              {activeTab === 'online'
+                ? 'Ninguém online neste momento. Que tal conhecer quem chegou recentemente?'
+                : activeTab === 'new'
+                  ? 'Ainda não há novos estudantes para mostrar. Tente novamente mais tarde.'
+                  : `Nenhum usuário encontrado para "${searchTerm}"`}
             </div>
           ) : (
             results.map((user) => (
@@ -214,6 +261,11 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
                     {user.username && user.nome && user.username !== user.nome && (
                       <p className="text-slate-500 text-xs">{user.nome}</p>
                     )}
+                    <p className={`mt-0.5 flex items-center gap-1 text-[10px] ${user.isOnline ? 'text-emerald-400' : 'text-cyan-300'}`}>
+                      {user.isOnline
+                        ? <><Circle className="h-1.5 w-1.5 fill-current" /> Online agora</>
+                        : user.isNew ? '✨ Chegou recentemente' : null}
+                    </p>
                   </div>
                 </div>
                 {renderButton(user)}
