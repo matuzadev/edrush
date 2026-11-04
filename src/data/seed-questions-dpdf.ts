@@ -160,6 +160,21 @@ const SPECIALTY_FACTS: SubjectFacts[] = [
           ['Prioridade absoluta', 'Determina preferência na efetivação de direitos de crianças e adolescentes, conforme a Constituição e o ECA.', 'Um serviço organiza atendimento prioritário para criança em situação de risco e justifica a medida na proteção legal.'],
         ],
       },
+      {
+        chapter: 'Três questões discursivas específicas de Direito e Legislação',
+        facts: [
+          ['Enquadramento jurídico', 'Identifica fatos juridicamente relevantes e relaciona-os às normas aplicáveis sem presumir elementos ausentes.', 'A resposta separa fatos comprovados de alegações antes de indicar as regras que podem incidir no caso.'],
+          ['Fundamentação normativa', 'Expõe a regra jurídica pertinente e explica sua relação com os fatos apresentados.', 'A manifestação cita a norma aplicável e demonstra como os elementos do caso satisfazem seus requisitos.'],
+          ['Distinção entre direito material e processual', 'Diferencia regras que definem direitos e obrigações daquelas que disciplinam a atuação em juízo.', 'A análise separa a existência do direito alegado do procedimento adequado para buscá-lo.'],
+          ['Adequação da tutela', 'Relaciona a medida jurídica pretendida ao direito ameaçado ou violado e aos requisitos legais.', 'A proposta seleciona providência capaz de impedir dano iminente sem exceder o pedido ou a competência.'],
+          ['Proporcionalidade', 'Avalia adequação, necessidade e proporcionalidade em sentido estrito de uma medida restritiva de direitos.', 'Uma resposta compara a eficácia de alternativas e escolhe a menos gravosa que atenda à finalidade legítima.'],
+          ['Tutela coletiva e origem comum', 'Reconhece quando uma lesão compartilhada pode justificar defesa coletiva, conforme a natureza do direito e a lei.', 'Vários consumidores sofrem a mesma prática e a análise considera a via coletiva adequada.'],
+          ['Proteção prioritária de crianças', 'Interpreta medidas relativas a crianças e adolescentes à luz da prioridade e da proteção integral previstas em lei.', 'A conclusão considera segurança, desenvolvimento e o melhor interesse da criança nos fatos descritos.'],
+          ['Solução consensual', 'Avalia a possibilidade de composição voluntária sem renunciar a direitos indisponíveis ou afastar garantias legais.', 'A resposta propõe mediação para conflito disponível e prevê orientação clara sobre os efeitos do acordo.'],
+          ['Uso de precedente', 'Aplica entendimento jurisprudencial pertinente após verificar similitude dos fatos e alcance da decisão.', 'A análise compara os fundamentos de precedente citado com a situação concreta antes de utilizá-lo.'],
+          ['Conclusão jurídica', 'Apresenta resposta objetiva e coerente com fatos, fundamentos e limites da questão proposta.', 'Ao final, a manifestação indica medida cabível e ressalva requisito que ainda depende de prova.'],
+        ],
+      },
     ],
   },
   {
