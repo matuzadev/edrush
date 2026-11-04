@@ -253,11 +253,13 @@ export function AddFriendsModal({ isOpen, onClose }: AddFriendsModalProps) {
                     {user.username && user.nome && user.username !== user.nome && (
                       <p className="text-slate-500 text-xs">{user.nome}</p>
                     )}
-                    <p className={`mt-0.5 flex items-center gap-1 text-[10px] ${user.isOnline ? 'text-emerald-400' : 'text-cyan-300'}`}>
-                      {user.isOnline
-                        ? <><Circle className="h-1.5 w-1.5 fill-current" /> Online agora</>
-                        : user.isNew ? '✨ Chegou recentemente' : null}
-                    </p>
+                    {(user.isOnline || user.isNew) && (
+                      <p className={`mt-0.5 flex items-center gap-1 text-[10px] ${user.isOnline ? 'text-emerald-400' : 'text-cyan-300'}`}>
+                        {user.isOnline
+                          ? <><Circle className="h-1.5 w-1.5 fill-current" /> Online agora</>
+                          : '✨ Chegou recentemente'}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {renderButton(user)}
