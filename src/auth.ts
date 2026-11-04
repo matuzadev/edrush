@@ -108,6 +108,8 @@ export const authOptions: NextAuthOptions = {
           email: result.email,
           name: result.nome,
           image: result.foto_url,
+          onboardingCompleted: (result.onboarding_completed ?? 0) === 1,
+          concursoSlug: result.selected_concurso_slug ?? null,
         };
       },
     }),
@@ -136,7 +138,10 @@ export const authOptions: NextAuthOptions = {
               criado_em: now,
               atualizado_em: now,
             });
+            user.onboardingCompleted = false;
+            user.concursoSlug = null;
           } else {
+            if (existingUser.provider !== 'google' || existingUser.provider_id !== user.id) {
             await db
               .update(users)
               .set({
@@ -145,6 +150,9 @@ export const authOptions: NextAuthOptions = {
                 atualizado_em: new Date().toISOString(),
               })
               .where(eq(users.id, userId));
+            }
+            user.onboardingCompleted = (existingUser.onboarding_completed ?? 0) === 1;
+            user.concursoSlug = existingUser.selected_concurso_slug ?? null;
           }
           user.id = userId;
         } catch (error) {
@@ -158,12 +166,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account, trigger }) {
       if (user) {
         token.id = user.id;
-        // Carregar dados de onboarding do banco na primeira autenticação
-        const dbUser = await db.query.users.findFirst({
-          where: eq(users.id, user.id as string),
-        });
-        token.onboardingCompleted = (dbUser?.onboarding_completed ?? 0) === 1;
-        token.concursoSlug = dbUser?.selected_concurso_slug ?? null;
+        token.onboardingCompleted = user.onboardingCompleted ?? false;
+        token.concursoSlug = user.concursoSlug ?? null;
       }
       if (account) {
         token.provider = account.provider;
