@@ -433,7 +433,7 @@ function SignupForm() {
                 </div>
 
                 {/* ④ Data de nascimento + Localidade */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   <Field label="Data de nascimento" hint="Opcional">
                     <div className="relative">
                       <Calendar size={15} className={icon(focusedField === 'birthday')} />
@@ -566,7 +566,7 @@ function SignupForm() {
 // ─── tiny helpers to keep JSX clean ──────────────────────────────────────────
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
+    <div className="min-w-0 space-y-1.5">
       <div className="flex items-center justify-between">
         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</label>
         {hint && <span className="text-[10px] text-slate-600">{hint}</span>}
@@ -585,7 +585,7 @@ function icon(focused: boolean, error?: boolean) {
 }
 
 function input(state?: string) {
-  const base = 'w-full pl-11 pr-4 py-3.5 bg-white/[0.03] border rounded-xl text-white text-sm outline-none transition-all placeholder:text-slate-600 ';
+  const base = 'block min-w-0 w-full max-w-full pl-11 pr-4 py-3.5 bg-white/[0.03] border rounded-xl text-white text-sm outline-none transition-all placeholder:text-slate-600 ';
   if (state === 'error') return base + 'border-red-500/40 bg-red-500/5';
   return base + 'border-white/8 focus:border-emerald-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-emerald-500/20';
 }
