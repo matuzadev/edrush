@@ -35,6 +35,16 @@ interface ProgressStats {
   accuracy: number;
   subjectsDone: number;
   loaded: boolean;
+  error: boolean;
+}
+
+const isValidConcursoSlug = (slug: unknown): slug is string =>
+  typeof slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug.trim());
+
+async function fetchJsonWithTimeout(url: string, signal: AbortSignal): Promise<unknown> {
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+  return response.json();
 }
 
 export default function PersonalizedDashboardPage() {
@@ -46,17 +56,21 @@ export default function PersonalizedDashboardPage() {
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [activeSubject, setActiveSubject] = useState<string>('');
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [profileError, setProfileError] = useState(false);
   const [stats, setStats] = useState<ProgressStats>({
     totalAnswered: 0,
     totalCorrect: 0,
     accuracy: 0,
     subjectsDone: 0,
     loaded: false,
+    error: false,
   });
   // Capítulos completados: chave "subject:chapterId" → true.
   // Alimentado por /api/user/chapter-completion. Usado para liberar o próximo
   // capítulo na trilha (estilo Duolingo).
   const [completedSet, setCompletedSet] = useState<Set<string>>(new Set());
+  const [completionLoaded, setCompletionLoaded] = useState(false);
+  const [completionError, setCompletionError] = useState(false);
   // Modal de "iniciar bloco rápido"
   const [blockModalOpen, setBlockModalOpen] = useState(false);
 
@@ -64,66 +78,97 @@ export default function PersonalizedDashboardPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/auth/login');
+      router.replace('/auth/login');
       return;
     }
-    if (status === 'authenticated' && user) {
-      // Validar que o slug da URL corresponde ao concurso salvo do usuário
-      if (user.concursoSlug && user.concursoSlug !== slug) {
-        router.replace(`/dashboard/${user.concursoSlug}`);
+    if (status === 'authenticated') {
+      if (!user || !user.onboardingCompleted || !isValidConcursoSlug(user.concursoSlug)) {
+        router.replace('/onboarding/select-concurso');
         return;
       }
 
-      loadUserData();
+      if (user.concursoSlug !== slug) {
+        router.replace(`/dashboard/${encodeURIComponent(user.concursoSlug)}`);
+        return;
+      }
+
+      let cancelled = false;
+      const controllers = [
+        new AbortController(),
+        new AbortController(),
+        new AbortController(),
+      ];
+      const timeoutIds = controllers.map((controller) =>
+        window.setTimeout(() => controller.abort(), 10_000),
+      );
+      const request = (url: string, controller: AbortController) =>
+        fetchJsonWithTimeout(url, controller.signal);
+
+      void request('/api/user/profile', controllers[0])
+        .then((result) => {
+          if (cancelled) return;
+          const profile = result as { selectedAreas?: unknown };
+          const areas = Array.isArray(profile.selectedAreas)
+            ? profile.selectedAreas.filter(
+                (area): area is string => typeof area === 'string' && Boolean((subjects as any)[area]),
+              )
+            : [];
+          setSelectedAreas(areas);
+          setActiveSubject(areas[0] ?? '');
+          setProfileError(false);
+        })
+        .catch(() => {
+          if (!cancelled) setProfileError(true);
+        })
+        .finally(() => {
+          window.clearTimeout(timeoutIds[0]);
+          if (!cancelled) setProfileLoaded(true);
+        });
+
+      void request('/api/user/stats', controllers[1])
+        .then((result) => {
+          if (cancelled) return;
+          const data = result as {
+            totalQuestionsAnswered?: number;
+            totalQuestionsCorrect?: number;
+            accuracy?: number;
+            byDisciplina?: { disciplina: string; answered: number }[];
+          };
+          const totalAnswered = Number(data.totalQuestionsAnswered ?? 0);
+          const totalCorrect = Number(data.totalQuestionsCorrect ?? 0);
+          const accuracy = Number(data.accuracy ?? 0);
+          const byDisciplina = Array.isArray(data.byDisciplina) ? data.byDisciplina : [];
+          const subjectsDone = byDisciplina.filter((item) => Number(item.answered) > 0).length;
+          setStats({ totalAnswered, totalCorrect, accuracy, subjectsDone, loaded: true, error: false });
+        })
+        .catch(() => {
+          if (!cancelled) setStats((prev) => ({ ...prev, loaded: true, error: true }));
+        })
+        .finally(() => window.clearTimeout(timeoutIds[1]));
+
+      void request('/api/user/chapter-completion', controllers[2])
+        .then((result) => {
+          if (cancelled) return;
+          const data = result as { completed?: { subject: string; chapterId: number }[] };
+          const list = Array.isArray(data.completed) ? data.completed : [];
+          setCompletedSet(new Set(list.map((item) => `${item.subject}:${item.chapterId}`)));
+          setCompletionError(false);
+        })
+        .catch(() => {
+          if (!cancelled) setCompletionError(true);
+        })
+        .finally(() => {
+          window.clearTimeout(timeoutIds[2]);
+          if (!cancelled) setCompletionLoaded(true);
+        });
+
+      return () => {
+        cancelled = true;
+        controllers.forEach((controller) => controller.abort());
+        timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      };
     }
   }, [status, user, slug, router]);
-
-  async function loadUserData() {
-    try {
-      const [profileRes, statsRes, completionRes] = await Promise.all([
-        fetch('/api/user/profile'),
-        fetch('/api/user/stats'),
-        fetch('/api/user/chapter-completion'),
-      ]);
-
-      if (completionRes.ok) {
-        const cdata = await completionRes.json();
-        const list: { subject: string; chapterId: number }[] = cdata.completed ?? [];
-        setCompletedSet(new Set(list.map((c) => `${c.subject}:${c.chapterId}`)));
-      }
-
-      let areas: string[] = [];
-      if (profileRes.ok) {
-        const profile = await profileRes.json();
-        areas = profile.selectedAreas ?? [];
-        setSelectedAreas(areas);
-        if (areas.length > 0) setActiveSubject(areas[0]);
-        else setActiveSubject(Object.keys(subjects)[0]);
-      }
-      setProfileLoaded(true);
-
-      if (statsRes.ok) {
-        const data = await statsRes.json();
-        const totalAnswered = Number(data.totalQuestionsAnswered ?? 0);
-        const totalCorrect = Number(data.totalQuestionsCorrect ?? 0);
-        const accuracy = Number(data.accuracy ?? 0);
-
-        // "Matérias feitas" = disciplinas distintas em que o usuário já respondeu pelo menos 1 questão
-        const byDisciplina: { disciplina: string; answered: number }[] = data.byDisciplina ?? [];
-        const subjectsDone = byDisciplina.filter((d) => d.answered > 0).length;
-
-        setStats({ totalAnswered, totalCorrect, accuracy, subjectsDone, loaded: true });
-      } else {
-        setStats((prev) => ({ ...prev, loaded: true }));
-      }
-    } catch {
-      const allSlugs = Object.keys(subjects);
-      setSelectedAreas(allSlugs);
-      setActiveSubject(allSlugs[0]);
-      setStats((prev) => ({ ...prev, loaded: true }));
-      setProfileLoaded(true);
-    }
-  }
 
   async function handleLogout() {
     const { signOut } = await import('next-auth/react');
@@ -144,11 +189,9 @@ export default function PersonalizedDashboardPage() {
   // Determinar matérias a exibir: apenas as selecionadas no onboarding.
   // Enquanto o perfil não carrega, retorna [] para evitar flash de TODAS as
   // matérias do subjects.json (Perito + ESFCEX + …) misturadas.
-  const displaySubjects = !profileLoaded
+  const displaySubjects = !profileLoaded || profileError
     ? []
-    : selectedAreas.length > 0
-      ? selectedAreas.filter((s) => (subjects as any)[s])
-      : Object.keys(subjects);
+    : selectedAreas;
 
   const activeSubjectData = activeSubject
     ? (subjects as any)[activeSubject]
