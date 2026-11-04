@@ -31,8 +31,16 @@ async function setupDatabase() {
     try {
       return await originalExecute.apply(client, args);
     } catch (error) {
-      const statement = args[0];
-      const sql = typeof statement === 'string' ? statement : statement.sql;
+      const statement: unknown = args[0];
+      const sql =
+        typeof statement === 'string'
+          ? statement
+          : typeof statement === 'object' &&
+              statement !== null &&
+              'sql' in statement &&
+              typeof statement.sql === 'string'
+            ? statement.sql
+            : '';
       const message = error instanceof Error ? error.message : String(error);
       const isExistingColumn =
         /^\s*ALTER\s+TABLE\b[\s\S]*?\bADD\s+COLUMN\b/i.test(sql) &&
