@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useCallback, useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CheckCircle2, Circle, ArrowLeft, ArrowRight, Loader2, BookOpen, Layers } from 'lucide-react';
@@ -24,17 +24,7 @@ function SelectAreaContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/login');
-      return;
-    }
-    if (status === 'authenticated' && concursoId) {
-      fetchAreasAndSelection();
-    }
-  }, [status, concursoId, router]);
-
-  async function fetchAreasAndSelection() {
+  const fetchAreasAndSelection = useCallback(async () => {
     try {
       // Em paralelo: lista de áreas para o concurso + áreas já salvas no perfil.
       // Pré-marca os checkboxes com a seleção persistida no Turso, permitindo
@@ -75,7 +65,17 @@ function SelectAreaContent() {
     } finally {
       setIsLoadingAreas(false);
     }
-  }
+  }, [concursoId]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+      return;
+    }
+    if (status === 'authenticated' && concursoId) {
+      void fetchAreasAndSelection();
+    }
+  }, [status, concursoId, fetchAreasAndSelection, router]);
 
   function toggleArea(slug: string) {
     setSelected((prev) =>
