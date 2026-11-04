@@ -1,5 +1,4 @@
-// Catálogo seed da loja de cristais.
-// Inserido em store_items na primeira inicialização (ver seedStoreItems em db.ts).
+// Catálogo da loja de cristais, sincronizado idempotentemente por slug.
 // Para alterar preços/itens em produção: editar diretamente a tabela ou
 // adicionar nova entry com slug único (idempotência por slug).
 
@@ -218,7 +217,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     },
   },
 
-  // ── 5 MEDALHAS / MINI-LOGO BADGES ─────────────────────────────────
+  // ── MEDALHAS / MINI-LOGO BADGES ───────────────────────────────────
   {
     slug: 'badge-recruta',
     name: 'Medalha Recruta',
