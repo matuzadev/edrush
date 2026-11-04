@@ -926,6 +926,8 @@ async function seedQuestionsBank() {
 // Alterações ou remoções de registros existentes exigem migração revisada e backup.
 async function seedConcursosBank() {
   try {
+    if (SEED_CONCURSOS.length === 0) return;
+
     const now = new Date().toISOString();
     const existingRows = await client.execute({
       sql: `SELECT slug FROM concursos WHERE slug IN (${SEED_CONCURSOS.map(() => '?').join(', ')})`,
