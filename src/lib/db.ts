@@ -804,19 +804,46 @@ async function seedUFs() {
   ];
 
   const now = new Date().toISOString();
-  for (const uf of ufData) {
-    await client.execute({
-      sql: 'INSERT OR IGNORE INTO ufs (codigo_ibge, sigla, nome, regiao, criado_em) VALUES (?, ?, ?, ?, ?)',
-      args: [uf.codigo_ibge, uf.sigla, uf.nome, uf.regiao, now],
-    });
-  }
+  await client.batch(ufData.map((uf) => ({
+    sql: 'INSERT OR IGNORE INTO ufs (codigo_ibge, sigla, nome, regiao, criado_em) VALUES (?, ?, ?, ?, ?)',
+    args: [uf.codigo_ibge, uf.sigla, uf.nome, uf.regiao, now],
+  })));
 }
 
 // Seed idempotente do banco de questões e dos capítulos correspondentes.
-// Por (disciplina, capítulo): só insere questões se nenhuma existe naquele par.
 // Capítulos: só insere se a tupla (disciplina, numero) ainda não existe.
 async function seedQuestionsBank() {
   try {
+    const expectedChapterKeys = new Set(
+      SEED_CHAPTERS.map((chapter) => `${chapter.disciplina}|${chapter.numero}`),
+    );
+    const expectedQuestionKeys = new Set(
+      SEED_QUESTIONS.map((question) => `${question.disciplina}|${question.capitulo}`),
+    );
+    const [existingChapters, existingQuestionGroups] = await Promise.all([
+      client.execute('SELECT disciplina, numero FROM chapters'),
+      client.execute('SELECT DISTINCT disciplina, capitulo FROM questions'),
+    ]);
+    const existingChapterKeys = new Set(
+      existingChapters.rows.map((row) => {
+        const chapter = row as unknown as { disciplina: string; numero: number };
+        return `${chapter.disciplina}|${chapter.numero}`;
+      }),
+    );
+    const existingQuestionKeys = new Set(
+      existingQuestionGroups.rows.map((row) => {
+        const questionGroup = row as unknown as { disciplina: string; capitulo: string };
+        return `${questionGroup.disciplina}|${questionGroup.capitulo}`;
+      }),
+    );
+
+    if (
+      [...expectedChapterKeys].every((key) => existingChapterKeys.has(key)) &&
+      [...expectedQuestionKeys].every((key) => existingQuestionKeys.has(key))
+    ) {
+      return;
+    }
+
     // 1) Capítulos
     for (const ch of SEED_CHAPTERS) {
       const existing = await client.execute({
@@ -900,12 +927,16 @@ async function seedQuestionsBank() {
 async function seedConcursosBank() {
   try {
     const now = new Date().toISOString();
+    const existingRows = await client.execute({
+      sql: `SELECT slug FROM concursos WHERE slug IN (${SEED_CONCURSOS.map(() => '?').join(', ')})`,
+      args: SEED_CONCURSOS.map((concurso) => concurso.slug),
+    });
+    const existingSlugs = new Set(
+      existingRows.rows.map((row) => (row as unknown as { slug: string }).slug),
+    );
+
     for (const c of SEED_CONCURSOS) {
-      const existing = await client.execute({
-        sql: 'SELECT id FROM concursos WHERE slug = ? LIMIT 1',
-        args: [c.slug],
-      });
-      if (existing.rows.length > 0) continue; // já existe, não duplica
+      if (existingSlugs.has(c.slug)) continue;
 
       await client.execute({
         sql: `INSERT INTO concursos (
