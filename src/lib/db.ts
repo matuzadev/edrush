@@ -2,7 +2,7 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
 import { SEED_QUESTIONS, SEED_CHAPTERS } from '@/data/seed-questions';
-import { SEED_CONCURSOS, DEPRECATED_CONCURSO_SLUGS } from '@/data/seed-concursos';
+import { SEED_CONCURSOS } from '@/data/seed-concursos';
 import { STORE_ITEMS_SEED } from '@/data/seed-store-items';
 import crypto from 'crypto';
 
@@ -887,34 +887,9 @@ async function seedQuestionsBank() {
 
 // Seed idempotente do catálogo de concursos.
 // Chave de idempotência: slug. Só insere se nenhuma linha com aquele slug existir.
-// Para forçar re-seed de um concurso: DELETE FROM concursos WHERE slug=? e reinicie.
+// Alterações ou remoções de registros existentes exigem migração revisada e backup.
 async function seedConcursosBank() {
   try {
-    // Limpa slugs descontinuados (ver DEPRECATED_CONCURSO_SLUGS em seed-concursos.ts).
-    // Roda em todo boot — barato e idempotente: se já não existe, o DELETE é no-op.
-    // Cascateia em tabelas-filhas (editais, concurso_candidato, questions) para
-    // evitar erro de FK silencioso.
-    for (const slug of DEPRECATED_CONCURSO_SLUGS) {
-      try {
-        const idRs = await client.execute({
-          sql: 'SELECT id FROM concursos WHERE slug = ?',
-          args: [slug],
-        });
-        const ids = idRs.rows.map((r) => Number((r as unknown as { id: number }).id));
-        for (const id of ids) {
-          await client.execute({ sql: 'DELETE FROM editais WHERE concurso_id = ?', args: [id] });
-          await client.execute({ sql: 'DELETE FROM concurso_candidato WHERE concurso_id = ?', args: [id] });
-          await client.execute({ sql: 'UPDATE questions SET concurso_id = NULL WHERE concurso_id = ?', args: [id] });
-        }
-        await client.execute({
-          sql: 'DELETE FROM concursos WHERE slug = ?',
-          args: [slug],
-        });
-      } catch (err) {
-        console.warn(`⚠️  Falha ao limpar slug deprecated "${slug}":`, err);
-      }
-    }
-
     const now = new Date().toISOString();
     for (const c of SEED_CONCURSOS) {
       const existing = await client.execute({
