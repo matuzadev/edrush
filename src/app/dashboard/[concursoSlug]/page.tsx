@@ -82,13 +82,14 @@ export default function PersonalizedDashboardPage() {
       return;
     }
     if (status === 'authenticated') {
-      if (!user || !user.onboardingCompleted || !isValidConcursoSlug(user.concursoSlug)) {
+      const userSlug = user?.concursoSlug?.trim();
+      if (!user || !user.onboardingCompleted || !isValidConcursoSlug(userSlug)) {
         router.replace('/onboarding/select-concurso');
         return;
       }
 
-      if (user.concursoSlug !== slug) {
-        router.replace(`/dashboard/${encodeURIComponent(user.concursoSlug)}`);
+      if (userSlug !== slug) {
+        router.replace(`/dashboard/${encodeURIComponent(userSlug)}`);
         return;
       }
 
