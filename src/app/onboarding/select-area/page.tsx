@@ -73,7 +73,7 @@ function SelectAreaContent() {
       return;
     }
     if (status === 'authenticated' && concursoId) {
-      void fetchAreasAndSelection();
+      void Promise.resolve().then(fetchAreasAndSelection);
     }
   }, [status, concursoId, fetchAreasAndSelection, router]);
 
