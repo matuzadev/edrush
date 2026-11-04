@@ -44,6 +44,7 @@ export const users = sqliteTable(
     selected_concurso_id: integer('selected_concurso_id'),
     selected_concurso_slug: text('selected_concurso_slug'),
     selected_areas: text('selected_areas'), // JSON array of disciplina strings
+    selected_specialty: text('selected_specialty'),
     // Perfil customizável
     username: text('username'),
     bio: text('bio'),

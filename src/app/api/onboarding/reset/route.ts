@@ -21,6 +21,7 @@ export async function POST() {
         selected_concurso_id: null,
         selected_concurso_slug: null,
         selected_areas: null,
+        selected_specialty: null,
         atualizado_em: new Date().toISOString(),
       })
       .where(eq(users.id, userId));

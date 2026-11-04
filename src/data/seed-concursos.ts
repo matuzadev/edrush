@@ -99,6 +99,56 @@ const PF_2025_BASE: Omit<SeedConcurso, 'cargo' | 'area_especialidade' | 'vagas_c
 };
 
 export const SEED_CONCURSOS: SeedConcurso[] = [
+  {
+    titulo: 'DPDF 2027 — Analista de Apoio à Assistência Judiciária',
+    organizador: 'Instituto ACCESS',
+    orgao: 'Defensoria Pública do Distrito Federal',
+    descricao:
+      'Nível superior. Uma dissertação sobre tema atual de relevância social, jurídica ou administrativa e três questões discursivas da especialidade escolhida. ' +
+      'Prova objetiva com 70 questões: 21 de conhecimentos básicos comuns e 49 específicos. ' +
+      'São 346 vagas imediatas e 700 para cadastro de reserva (1.046 oportunidades no total). ' +
+      'Especialidades: Direito e Legislação (250 vagas imediatas + 500 CR); Contabilidade (24 + 50 CR); ' +
+      'Informática — Banco de Dados (24 + 50 CR), Desenvolvimento de Sistemas (24 + 50 CR) e Redes (24 + 50 CR). ' +
+      'Remuneração inicial informada: R$ 11.514,95, além de auxílio-alimentação de R$ 1.701,41. Taxa: R$ 110,00. ' +
+      'Inscrições de 03/12/2026 a 07/01/2027, com pagamento até 08/01/2027; prova objetiva e discursiva em 21/02/2027.',
+    slug: 'dpdf-analista-apoio-assistencia-judiciaria-2027',
+    vagas_total: 1046,
+    vagas_por_funcao: JSON.stringify({
+      'Direito e Legislação — imediatas': 250,
+      'Direito e Legislação — cadastro de reserva': 500,
+      'Contabilidade — imediatas': 24,
+      'Contabilidade — cadastro de reserva': 50,
+      'Informática - Banco de Dados — imediatas': 24,
+      'Informática - Banco de Dados — cadastro de reserva': 50,
+      'Informática - Desenvolvimento de Sistemas — imediatas': 24,
+      'Informática - Desenvolvimento de Sistemas — cadastro de reserva': 50,
+      'Informática - Redes — imediatas': 24,
+      'Informática - Redes — cadastro de reserva': 50,
+    }),
+    status: 'previsto',
+    data_publicacao_edital: null,
+    data_abertura_inscricoes: '2026-12-03',
+    data_fechamento_inscricoes: '2027-01-07',
+    data_prova_objetiva: '2027-02-21',
+    data_prova_discursiva: '2027-02-21',
+    data_resultado_final: null,
+    url_edital: null,
+    url_site_oficial: 'https://www.defensoria.df.gov.br/',
+    banca: 'Instituto ACCESS',
+    remuneracao_inicial: 11514.95,
+    nivel_escolaridade: 'Superior Completo',
+    fonte_scrape: 'Dados fornecidos pelo usuário; edital não informado',
+    logo_url: null,
+    cargo: 'Analista de Apoio à Assistência Judiciária',
+    area_especialidade: '5 especialidades',
+    edital_numero: null,
+    edital_ano: 2026,
+    vagas_cargo: 1046,
+    url_inscricao: null,
+    requisitos: JSON.stringify(['Nível superior; formação exigida conforme a especialidade e o edital']),
+    destaque: 1,
+  },
+
   // ── PF 2025: Perito Criminal Federal — Área 3: Informática Forense ───────
   {
     ...PF_2025_BASE,

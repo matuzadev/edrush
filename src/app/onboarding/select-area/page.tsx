@@ -10,6 +10,11 @@ interface Area {
   title: string;
 }
 
+interface Specialty {
+  slug: string;
+  title: string;
+}
+
 function SelectAreaContent() {
   const router = useRouter();
   const searchParams = useSearchParams() ?? new URLSearchParams();
@@ -19,6 +24,8 @@ function SelectAreaContent() {
   const concursoTitle = searchParams.get('concursoTitle') || 'Concurso';
 
   const [areas, setAreas] = useState<Area[]>([]);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -34,32 +41,45 @@ function SelectAreaContent() {
         fetch('/api/user/profile'),
       ]);
 
-      if (areasRes.ok) {
-        const data = await areasRes.json();
-        const areasList = (data.areas ?? []) as Area[];
-        setAreas(areasList);
-
-        if (profileRes.ok) {
-          const profile = await profileRes.json();
-          const savedAreas: string[] = Array.isArray(profile.selectedAreas)
-            ? profile.selectedAreas
-            : [];
-
-          // Filtra apenas slugs que ainda existem na lista atual de áreas
-          // (caso o currículo do concurso tenha mudado entre visitas).
-          const validSelection = savedAreas.filter((slug) =>
-            areasList.some((a) => a.slug === slug),
-          );
-
-          if (validSelection.length > 0) {
-            setSelected(validSelection);
-          } else {
-            // Se nada foi salvo ainda, pré-marca todas as áreas como sugestão
-            // (alinhado com a recomendação do edital — usuário pode desmarcar).
-            setSelected(areasList.map((a) => a.slug));
-          }
-        }
+      if (!areasRes.ok) {
+        throw new Error('Erro ao carregar matérias.');
       }
+      const data = await areasRes.json() as {
+        areas?: Area[];
+        specialties?: Specialty[];
+      };
+      const options = data.specialties ?? [];
+      setSpecialties(options);
+
+      const profile = profileRes.ok ? await profileRes.json() as {
+        selectedAreas?: unknown;
+        selectedSpecialty?: unknown;
+      } : {};
+      const savedSpecialty = typeof profile.selectedSpecialty === 'string'
+        ? profile.selectedSpecialty
+        : '';
+      const initialSpecialty = options.some((option) => option.slug === savedSpecialty)
+        ? savedSpecialty
+        : '';
+      setSelectedSpecialty(initialSpecialty);
+
+      let areasList = data.areas ?? [];
+      if (initialSpecialty) {
+        const params = new URLSearchParams({ concursoId: concursoId ?? '', specialty: initialSpecialty });
+        const specialtyRes = await fetch(`/api/onboarding/areas?${params.toString()}`);
+        if (!specialtyRes.ok) throw new Error('Erro ao carregar matérias da especialidade.');
+        const specialtyData = await specialtyRes.json() as { areas?: Area[] };
+        areasList = specialtyData.areas ?? [];
+      }
+      setAreas(areasList);
+
+      const savedAreas = Array.isArray(profile.selectedAreas)
+        ? profile.selectedAreas.filter((area): area is string => typeof area === 'string')
+        : [];
+      const validSelection = savedAreas.filter((slug) =>
+        areasList.some((area) => area.slug === slug),
+      );
+      setSelected(validSelection.length > 0 ? validSelection : areasList.map((area) => area.slug));
     } catch {
       setError('Erro ao carregar matérias.');
     } finally {
@@ -91,7 +111,31 @@ function SelectAreaContent() {
     setSelected([]);
   }
 
+  async function handleSpecialtyChange(specialtySlug: string) {
+    if (!concursoId) return;
+    setIsLoadingAreas(true);
+    setError('');
+    try {
+      const params = new URLSearchParams({ concursoId, specialty: specialtySlug });
+      const res = await fetch(`/api/onboarding/areas?${params.toString()}`);
+      if (!res.ok) throw new Error('Erro ao carregar matérias da especialidade.');
+      const data = await res.json() as { areas?: Area[] };
+      const areasList = data.areas ?? [];
+      setSelectedSpecialty(specialtySlug);
+      setAreas(areasList);
+      setSelected(areasList.map((area) => area.slug));
+    } catch {
+      setError('Não foi possível carregar as matérias dessa especialidade. Tente novamente.');
+    } finally {
+      setIsLoadingAreas(false);
+    }
+  }
+
   async function handleConfirm() {
+    if (specialties.length > 0 && !selectedSpecialty) {
+      setError('Selecione a especialidade que você vai prestar.');
+      return;
+    }
     if (selected.length === 0) {
       setError('Selecione pelo menos uma matéria para continuar.');
       return;
@@ -107,7 +151,12 @@ function SelectAreaContent() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         signal: controller.signal,
-        body: JSON.stringify({ concursoId: Number(concursoId), selectedAreas: selected, concursoTitle }),
+        body: JSON.stringify({
+          concursoId: Number(concursoId),
+          selectedAreas: selected,
+          selectedSpecialty: selectedSpecialty || null,
+          concursoTitle,
+        }),
       });
 
       const data: unknown = await res.json();
@@ -201,6 +250,29 @@ function SelectAreaContent() {
           </p>
         </div>
 
+        {specialties.length > 0 && (
+          <div className="mb-8 rounded-2xl border border-cyan-500/25 bg-cyan-500/5 p-5">
+            <label htmlFor="concurso-specialty" className="mb-2 block text-sm font-bold text-white">
+              Escolha sua especialidade
+            </label>
+            <select
+              id="concurso-specialty"
+              value={selectedSpecialty}
+              onChange={(event) => void handleSpecialtyChange(event.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400"
+            >
+              <option value="">Selecione uma área</option>
+              {specialties.map((specialty) => (
+                <option key={specialty.slug} value={specialty.slug}>{specialty.title}</option>
+              ))}
+            </select>
+            <p className="mt-2 text-xs leading-5 text-slate-400">
+              A trilha inclui os conhecimentos básicos comuns (21 questões) e o conteúdo da área selecionada
+              (49 questões). As matérias específicas e o treino discursivo ficam restritos à sua especialidade.
+            </p>
+          </div>
+        )}
+
         {/* Controles de seleção */}
         <div className="flex items-center justify-between mb-4">
           <span className="text-sm text-slate-400">
@@ -268,7 +340,7 @@ function SelectAreaContent() {
         {/* Botão de confirmação */}
         <button
           onClick={handleConfirm}
-          disabled={isSaving || selected.length === 0}
+          disabled={isSaving || isLoadingAreas || selected.length === 0 || (specialties.length > 0 && !selectedSpecialty)}
           className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:from-slate-700 disabled:to-slate-800 disabled:opacity-40 text-white font-black rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/40 flex items-center justify-center gap-2.5"
         >
           {isSaving ? (

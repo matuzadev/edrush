@@ -649,5 +649,78 @@
       { "id": 5, "title": "Logs e auditoria de sistemas" },
       { "id": 6, "title": "Conceitos iniciais de forense digital" }
     ]
+  },
+
+  "dpdf-conhecimentos-basicos": {
+    "title": "DPDF — Conhecimentos Básicos (21 questões + dissertação)",
+    "chapters": [
+      { "id": 1, "title": "Língua Portuguesa" },
+      { "id": 2, "title": "Organização e legislação aplicada à DPDF" },
+      { "id": 3, "title": "Noções de Direito Constitucional e Administrativo" },
+      { "id": 4, "title": "Realidade étnica, social, histórica, geográfica, cultural e político-econômica do DF e da RIDE" },
+      { "id": 5, "title": "Ética no serviço público" },
+      { "id": 6, "title": "Dissertação sobre tema atual de relevância social, jurídica ou administrativa" }
+    ]
+  },
+
+  "dpdf-direito-legislacao": {
+    "title": "DPDF — Direito e Legislação (49 questões + 3 discursivas)",
+    "chapters": [
+      { "id": 1, "title": "Direito Constitucional aprofundado" },
+      { "id": 2, "title": "Direito Administrativo aprofundado" },
+      { "id": 3, "title": "Direito Civil e Direito Processual Civil" },
+      { "id": 4, "title": "Direito Penal e Direito Processual Penal" },
+      { "id": 5, "title": "Direitos Humanos e tutela coletiva" },
+      { "id": 6, "title": "Direito do Consumidor e Estatuto da Criança e do Adolescente (ECA)" },
+      { "id": 7, "title": "Três questões discursivas específicas de Direito e Legislação" }
+    ]
+  },
+
+  "dpdf-contabilidade": {
+    "title": "DPDF — Contabilidade (49 questões + 3 discursivas)",
+    "chapters": [
+      { "id": 1, "title": "Contabilidade Geral e Avançada" },
+      { "id": 2, "title": "Contabilidade Pública e CASP" },
+      { "id": 3, "title": "Administração Financeira e Orçamentária (AFO)" },
+      { "id": 4, "title": "Auditoria Governamental e Controle Interno e Externo" },
+      { "id": 5, "title": "Legislação Fiscal e Tributária" },
+      { "id": 6, "title": "Três questões discursivas específicas de Contabilidade" }
+    ]
+  },
+
+  "dpdf-banco-de-dados": {
+    "title": "DPDF — Informática: Banco de Dados (49 questões + 3 discursivas)",
+    "chapters": [
+      { "id": 1, "title": "Modelagem relacional e não relacional (NoSQL)" },
+      { "id": 2, "title": "SQL avançada, otimização, tuning e indexação" },
+      { "id": 3, "title": "Administração e arquitetura de PostgreSQL, Oracle, MySQL e SQL Server" },
+      { "id": 4, "title": "Data Warehouse, Business Intelligence e Big Data" },
+      { "id": 5, "title": "Governança de dados, segurança da informação e LGPD" },
+      { "id": 6, "title": "Três questões discursivas específicas de Banco de Dados" }
+    ]
+  },
+
+  "dpdf-desenvolvimento-sistemas": {
+    "title": "DPDF — Informática: Desenvolvimento de Sistemas (49 questões + 3 discursivas)",
+    "chapters": [
+      { "id": 1, "title": "Engenharia de Software e metodologias ágeis (Scrum e Kanban)" },
+      { "id": 2, "title": "Programação Orientada a Objetos e Java, Python, C#, PHP e JavaScript" },
+      { "id": 3, "title": "Desenvolvimento Web, APIs RESTful e microsserviços" },
+      { "id": 4, "title": "Arquitetura de Software e padrões de projeto" },
+      { "id": 5, "title": "Testes de Software, CI/CD e DevSecOps" },
+      { "id": 6, "title": "Três questões discursivas específicas de Desenvolvimento de Sistemas" }
+    ]
+  },
+
+  "dpdf-redes": {
+    "title": "DPDF — Informática: Redes (49 questões + 3 discursivas)",
+    "chapters": [
+      { "id": 1, "title": "Arquitetura de redes e modelos OSI e TCP/IP" },
+      { "id": 2, "title": "Roteamento, switching e protocolos de rede" },
+      { "id": 3, "title": "Segurança de redes: firewalls, IDS/IPS, VPN e Zero Trust" },
+      { "id": 4, "title": "Administração de Linux e Windows Server" },
+      { "id": 5, "title": "Computação em nuvem (AWS e Azure) e virtualização" },
+      { "id": 6, "title": "Três questões discursivas específicas de Redes" }
+    ]
   }
 }

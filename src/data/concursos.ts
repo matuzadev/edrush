@@ -57,6 +57,15 @@ const SVG_ESFCEX = `
 </svg>
 `.trim();
 
+const SVG_DPDF = `
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <path d="M32 4 L54 12 L54 32 Q54 50 32 60 Q10 50 10 32 L10 12 Z"
+        fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="32" y="37" text-anchor="middle" font-weight="900" font-size="16"
+        font-family="Arial, sans-serif" fill="#7dd3fc">DPDF</text>
+</svg>
+`.trim();
+
 export const CONCURSOS: ConcursoDef[] = [
   {
     slug: 'perito-criminal-federal-informatica',
@@ -78,6 +87,21 @@ export const CONCURSOS: ConcursoDef[] = [
     iconoColor: '#fbbf24',
     svg: SVG_PERITO_PF,
     tagline: 'Forense computacional na Polícia Federal',
+  },
+
+  {
+    slug: 'dpdf-analista-apoio-assistencia-judiciaria-2027',
+    aliases: ['dpdf-analista-apoio-assistencia-judiciaria'],
+    nome: 'Analista de Apoio à Assistência Judiciária',
+    nomeCompleto: 'Concurso DPDF 2027 — Analista de Apoio à Assistência Judiciária',
+    area: '5 especialidades',
+    organizador: 'Instituto ACCESS',
+    orgao: 'Defensoria Pública do Distrito Federal',
+    cor: '#38bdf8',
+    corAccent: '#0284c7',
+    iconoColor: '#7dd3fc',
+    svg: SVG_DPDF,
+    tagline: 'Concurso da Defensoria Pública do Distrito Federal',
   },
 
   {

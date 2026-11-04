@@ -1,5 +1,5 @@
 /**
- * Mapeamento de concursos para suas matérias com base em editais reais.
+ * Mapeamento de concursos para suas matérias conforme os currículos cadastrados.
  * A chave é um padrão (substring) do título do concurso em lowercase sem acentos.
  * As matérias são slugs de src/data/subjects.json.
  */
@@ -8,6 +8,26 @@ export interface ConcursoAreaMap {
   match: string[];   // padrões que identificam o concurso (titulo lowercase, sem acento)
   areas: string[];   // slugs das matérias correspondentes
 }
+
+export interface ConcursoSpecialty {
+  slug: string;
+  title: string;
+  area: string;
+}
+
+const DPDF_COMMON_AREAS = ['dpdf-conhecimentos-basicos'];
+
+export const DPDF_SPECIALTIES: ConcursoSpecialty[] = [
+  { slug: 'direito-legislacao', title: 'Direito e Legislação', area: 'dpdf-direito-legislacao' },
+  { slug: 'contabilidade', title: 'Contabilidade', area: 'dpdf-contabilidade' },
+  { slug: 'banco-de-dados', title: 'Informática - Banco de Dados', area: 'dpdf-banco-de-dados' },
+  {
+    slug: 'desenvolvimento-sistemas',
+    title: 'Informática - Desenvolvimento de Sistemas',
+    area: 'dpdf-desenvolvimento-sistemas',
+  },
+  { slug: 'redes', title: 'Informática - Redes', area: 'dpdf-redes' },
+];
 
 export const CONCURSO_AREAS: ConcursoAreaMap[] = [
   // ─── POLÍCIA FEDERAL ───────────────────────────────────────────────────────
@@ -364,6 +384,9 @@ function normalize(str: string): string {
  */
 export function getAreasForConcurso(titulo: string): string[] | null {
   const normalized = normalize(titulo);
+  if (normalized.includes('dpdf') || normalized.includes('defensoria publica do distrito federal')) {
+    return DPDF_COMMON_AREAS;
+  }
   for (const entry of CONCURSO_AREAS) {
     for (const pattern of entry.match) {
       if (normalized.includes(normalize(pattern))) {
@@ -372,4 +395,19 @@ export function getAreasForConcurso(titulo: string): string[] | null {
     }
   }
   return null;
+}
+
+export function getSpecialtiesForConcurso(titulo: string): ConcursoSpecialty[] {
+  const normalized = normalize(titulo);
+  return normalized.includes('dpdf') || normalized.includes('defensoria publica do distrito federal')
+    ? DPDF_SPECIALTIES
+    : [];
+}
+
+export function getAreasForConcursoSpecialty(titulo: string, specialtySlug: string | null): string[] | null {
+  const specialties = getSpecialtiesForConcurso(titulo);
+  if (specialties.length === 0) return getAreasForConcurso(titulo);
+
+  const specialty = specialties.find((item) => item.slug === specialtySlug);
+  return specialty ? [...DPDF_COMMON_AREAS, specialty.area] : DPDF_COMMON_AREAS;
 }
