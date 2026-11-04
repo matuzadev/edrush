@@ -71,7 +71,11 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
     }
   }, []);
 
-  useEffect(() => { loadAll(); }, [loadAll]);
+  useEffect(() => {
+    // Load persisted inventory after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadAll();
+  }, [loadAll]);
 
   async function toggle(id: string) {
     if (saving) return;
