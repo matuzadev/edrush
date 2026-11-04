@@ -95,6 +95,8 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
   }, []);
 
   useEffect(() => {
+    // Load persisted inventory after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchBorders();
   }, [fetchBorders]);
 
@@ -330,7 +332,7 @@ function BorderCard({
 }) {
   const tier = TIER_COLOR[item.tier];
   const isLocked = !item.unlocked;
-  const _ = avatarId; // eslint-disable-line @typescript-eslint/no-unused-vars
+  const _ = avatarId;
 
   return (
     <div

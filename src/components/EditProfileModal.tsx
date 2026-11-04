@@ -539,10 +539,7 @@ export function EditProfileModal({
               </p>
               <BordersGallery
                 avatarId={formData.avatar}
-                onEquipped={() => {
-                  onBorderEquipped?.();
-                  onSealsEquipped?.();
-                }}
+                onEquipped={() => onBorderEquipped?.()}
               />
             </div>
           )}
