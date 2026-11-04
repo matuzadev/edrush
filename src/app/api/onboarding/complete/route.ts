@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { users, concursos } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { slugify } from '@/lib/slugify';
+import { getAreasForConcursoSpecialty, getSpecialtiesForConcurso } from '@/lib/concurso-areas';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -23,9 +24,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Dados de onboarding inválidos.' }, { status: 400 });
     }
 
-    const { concursoId, selectedAreas, concursoTitle } = body as {
+    const { concursoId, selectedAreas, selectedSpecialty, concursoTitle } = body as {
       concursoId?: unknown;
       selectedAreas?: unknown;
+      selectedSpecialty?: unknown;
       concursoTitle?: unknown;
     };
     const selectedConcursoId = Number(concursoId);
@@ -43,6 +45,21 @@ export async function POST(request: NextRequest) {
     const concurso = await db.query.concursos.findFirst({
       where: eq(concursos.id, selectedConcursoId),
     });
+    const specialties = concurso ? getSpecialtiesForConcurso(concurso.titulo) : [];
+    const specialtySlug = typeof selectedSpecialty === 'string' ? selectedSpecialty : null;
+
+    if (specialties.length > 0) {
+      const validSpecialty = specialties.some((specialty) => specialty.slug === specialtySlug);
+      const allowedAreas = concurso
+        ? getAreasForConcursoSpecialty(concurso.titulo, specialtySlug) ?? []
+        : [];
+      if (!validSpecialty || !selectedAreas.every((area) => allowedAreas.includes(area))) {
+        return NextResponse.json(
+          { error: 'Selecione uma especialidade válida e matérias correspondentes.' },
+          { status: 400 },
+        );
+      }
+    }
 
     const titleForSlug = concurso?.titulo ?? (
       typeof concursoTitle === 'string' && concursoTitle.trim()
@@ -61,6 +78,7 @@ export async function POST(request: NextRequest) {
         selected_concurso_id: selectedConcursoId,
         selected_concurso_slug: concursoSlug,
         selected_areas: JSON.stringify(selectedAreas),
+        selected_specialty: specialties.length > 0 ? specialtySlug : null,
         atualizado_em: new Date().toISOString(),
       })
       .where(eq(users.id, userId));

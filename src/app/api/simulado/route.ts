@@ -35,17 +35,23 @@ export async function GET() {
 
   try {
     const userResult = await lsClient.execute({
-      sql: 'SELECT selected_concurso_id, selected_concurso_slug FROM users WHERE id = ? LIMIT 1',
+      sql: 'SELECT selected_concurso_id, selected_concurso_slug, selected_areas FROM users WHERE id = ? LIMIT 1',
       args: [userId],
     });
     const user = userResult.rows[0] as unknown as {
       selected_concurso_id: number | null;
       selected_concurso_slug: string | null;
+      selected_areas: string | null;
     } | undefined;
 
     if (!user) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
+
+    const parsedAreas: unknown = user.selected_areas ? JSON.parse(user.selected_areas) : [];
+    const selectedAreas = Array.isArray(parsedAreas)
+      ? parsedAreas.filter((area): area is string => typeof area === 'string')
+      : [];
 
     let concursoId = user.selected_concurso_id ? Number(user.selected_concurso_id) : null;
     let concursoTitle: string | null = null;
@@ -70,6 +76,18 @@ export async function GET() {
       }
     }
 
+    const conditions: string[] = [];
+    const args: (string | number)[] = [userId];
+    if (concursoId !== null) {
+      conditions.push('q.concurso_id = ?');
+      args.push(concursoId);
+    }
+    if (selectedAreas.length > 0) {
+      conditions.push(`q.disciplina IN (${selectedAreas.map(() => '?').join(', ')})`);
+      args.push(...selectedAreas);
+    }
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
     const rowsResult = await lsClient.execute({
       sql: `SELECT q.disciplina AS discipline,
                    q.dificuldade AS difficulty,
@@ -80,10 +98,10 @@ export async function GET() {
               ON ur.question_id = q.id
               AND ur.user_id = ?
               AND ur.origem = 'simulado'
-            ${concursoId === null ? '' : 'WHERE q.concurso_id = ?'}
+            ${whereClause}
             GROUP BY q.disciplina, q.dificuldade
             ORDER BY q.disciplina COLLATE NOCASE`,
-      args: concursoId === null ? [userId] : [userId, concursoId],
+      args,
     });
 
     const rows = rowsResult.rows as unknown as DisciplineRow[];

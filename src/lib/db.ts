@@ -73,6 +73,7 @@ export async function initializeDatabase() {
           selected_concurso_id INTEGER,
           selected_concurso_slug TEXT,
           selected_areas TEXT,
+          selected_specialty TEXT,
           criado_em TEXT NOT NULL,
           atualizado_em TEXT NOT NULL,
           FOREIGN KEY (uf_id) REFERENCES ufs(id),
@@ -241,6 +242,7 @@ export async function initializeDatabase() {
 
     // Adicionar colunas novas em users (safe: try/catch por coluna)
     const newUserColumns = [
+      `ALTER TABLE users ADD COLUMN selected_specialty TEXT`,
       `ALTER TABLE users ADD COLUMN username TEXT`,
       `ALTER TABLE users ADD COLUMN bio TEXT`,
       `ALTER TABLE users ADD COLUMN birthday TEXT`,

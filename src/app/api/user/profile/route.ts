@@ -39,6 +39,7 @@ export async function GET() {
       selectedConcursoId: user.selected_concurso_id,
       selectedConcursoSlug: user.selected_concurso_slug,
       selectedAreas: user.selected_areas ? JSON.parse(user.selected_areas) : [],
+      selectedSpecialty: user.selected_specialty ?? null,
     });
   } catch (error) {
     console.error('Erro ao buscar perfil:', error);

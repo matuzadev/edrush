@@ -39,6 +39,7 @@ const KNOWN_CONCURSOS: { slug: string; label: string }[] = [
   { slug: 'rfb', label: 'Receita Federal' },
   { slug: 'inss', label: 'INSS' },
   { slug: 'esfcex', label: 'EsFCEx' },
+  { slug: 'dpdf-analista-apoio-assistencia-judiciaria-2027', label: 'DPDF — Analista de Apoio à Assistência Judiciária' },
   { slug: 'tcu', label: 'TCU' },
   { slug: 'pc', label: 'Polícia Civil' },
 ];
