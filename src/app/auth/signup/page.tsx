@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { getGoogleSignInUrl } from '@/lib/google-sign-in';
 import {
   User, Mail, Lock, CheckCircle2, ArrowRight, Loader2,
   Eye, EyeOff, AlertCircle, Gift, BookOpen, BarChart2,
@@ -116,8 +117,15 @@ function SignupForm() {
 
   // ── Google ──
   const handleGoogle = async () => {
+    setError('');
     setIsGoogleLoading(true);
-    await signIn('google', { callbackUrl: '/onboarding/select-concurso' });
+    try {
+      const url = await getGoogleSignInUrl('/onboarding/select-concurso');
+      window.location.assign(url);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Não foi possível iniciar o cadastro com Google.');
+      setIsGoogleLoading(false);
+    }
   };
 
   // ── submit ──
