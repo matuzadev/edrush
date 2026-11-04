@@ -24,6 +24,8 @@ function LoginForm() {
   const searchParams = useSearchParams() ?? new URLSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const justRegistered = searchParams.get('registered') === 'true';
+  const [onlineCount, setOnlineCount] = useState<number | null>(null);
+  const [presenceStatus, setPresenceStatus] = useState<'loading' | 'live' | 'error'>('loading');
 
   const [email, setEmail]               = useState('');
   const [password, setPassword]         = useState('');
@@ -32,6 +34,49 @@ function LoginForm() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    let intervalId: number;
+
+    const loadPresence = async () => {
+      try {
+        const response = await fetch('/api/presence', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data: unknown = await response.json();
+        if (
+          typeof data !== 'object' ||
+          data === null ||
+          !('count' in data) ||
+          typeof data.count !== 'number' ||
+          !Number.isSafeInteger(data.count) ||
+          data.count < 0
+        ) {
+          throw new Error('Resposta inválida ao consultar presença.');
+        }
+
+        if (active) {
+          setOnlineCount(data.count);
+          setPresenceStatus('live');
+        }
+      } catch (error) {
+        if (active) {
+          console.error('Não foi possível carregar a contagem de estudantes online:', error);
+          setOnlineCount(null);
+          setPresenceStatus('error');
+        }
+      }
+    };
+
+    void loadPresence();
+    intervalId = window.setInterval(loadPresence, 30 * 1000);
+
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -125,11 +170,18 @@ function LoginForm() {
                 ))}
               </div>
               <p className="text-sm text-slate-400">
-                <span className="text-white font-bold">847 estudantes</span> ativos na plataforma agora
+                <span className="text-white font-bold">
+                  {onlineCount === null ? '—' : onlineCount.toLocaleString('pt-BR')} estudantes
+                </span>{' '}
+                ativos na plataforma agora
               </p>
-              <span className="ml-auto flex items-center gap-1 text-xs text-emerald-400 font-semibold flex-shrink-0">
-                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                ao vivo
+              <span className={`ml-auto flex items-center gap-1 text-xs font-semibold flex-shrink-0 ${
+                presenceStatus === 'live' ? 'text-emerald-400' : 'text-slate-500'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  presenceStatus === 'live' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+                }`} />
+                {presenceStatus === 'live' ? 'ao vivo' : presenceStatus === 'error' ? 'indisponível' : 'atualizando'}
               </span>
             </div>
           </div>
