@@ -28,8 +28,9 @@ Guia rápido para publicar quando as alterações locais estiverem prontas. **Es
 
 1. Envie as alterações revisadas para o repositório GitHub.
 2. Na Vercel, escolha **Add New → Project**, importe o repositório EdRush e confirme **Next.js** como framework.
-3. Antes de implantar, abra **Settings → Environment Variables** e cadastre as variáveis abaixo em **Production**. Confira se estão presentes no ambiente correto, sem expor seus valores em screenshots, logs ou mensagens.
-4. Em **Settings → Build and Deployment → Build Command**, use `npm run build`. O Next.js 16 não executa ESLint durante o build; valide o lint localmente com `npm run lint`.
+3. Antes de implantar, abra **Settings → Environment Variables** e cadastre as variáveis abaixo nos ambientes **Production** e **Preview**. Use uma URL/token de Turso separados para Preview; não compartilhe credenciais de produção com esse ambiente.
+4. Em **Settings → Build and Deployment → Build Command**, defina exatamente `npm run vercel-build`. Esse comando executa `npm run db:setup` antes de `npm run build`; a configuração explícita evita depender do build padrão do Next.js. O setup exige URL/token Turso remotos e interrompe o deploy se a configuração estiver ausente ou qualquer operação SQL de migração/seed falhar.
+5. O Next.js 16 não executa ESLint durante o build; valide o lint localmente com `npm run lint`.
 
 ## 3. Cadastrar variáveis de produção
 
@@ -52,6 +53,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 Use a primeira saída para `NEXTAUTH_SECRET` e a segunda para `QUESTION_SECRET`. Cadastre também as credenciais OAuth do Google; elas não estão configuradas no ambiente local verificado.
+
+Para Preview, configure `TURSO_DB_URL` e `TURSO_AUTH_TOKEN` no escopo **Preview**, apontando para um banco de teste separado. Cada build Vercel executa o setup no banco configurado para aquele ambiente, então não use o banco de produção em Preview.
 
 ## 4. Configurar login Google
 
@@ -93,4 +96,5 @@ As variáveis, a configuração OAuth e o fluxo de Preview precisam ser verifica
 - Nunca use `NEXT_PUBLIC_` para segredos. As variáveis acima devem permanecer somente no servidor.
 - Variáveis locais em `.env.local` não são copiadas automaticamente para a Vercel.
 - A configuração da hospedagem, as variáveis da Vercel, as credenciais Google e o banco de produção ainda precisam ser verificados nos painéis; um build local não comprova esses itens nem substitui o backup e o teste em Preview.
-- O build validado usa `npm run build`; rode também `npm run lint` antes de liberar o site.
+- Para implantação Vercel, o Build Command deve ser `npm run vercel-build`; rode `npm run lint` e `npx tsc --noEmit` localmente antes de liberar o site.
+- `npm run build` continua sendo o build local sem setup antecipado; a inicialização do banco permanece no runtime durante o desenvolvimento local. Para testar o setup isoladamente sem banco externo, use `TURSO_DB_URL=file::memory: npm run db:setup` (PowerShell: `$env:TURSO_DB_URL='file::memory:'; npm run db:setup`).
