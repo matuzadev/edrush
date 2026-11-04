@@ -147,6 +147,22 @@ export async function POST(req: NextRequest) {
               WHERE user_id = ? AND store_item_id IN (${placeholders})`,
         args: [userId, ...ids],
       });
+
+      await client.execute({
+        sql: `UPDATE users
+              SET equipped_border = COALESCE(
+                (SELECT slug FROM store_items WHERE id = ? AND category = 'borda_perfil'),
+                CASE
+                  WHEN equipped_border IN (
+                    SELECT slug FROM store_items WHERE category = 'borda_perfil'
+                  ) THEN 'recruta'
+                  ELSE equipped_border
+                END
+              ),
+              atualizado_em = ?
+              WHERE id = ?`,
+        args: [body.borderItemId, now, userId],
+      });
     }
 
     return NextResponse.json({

@@ -537,7 +537,13 @@ export function EditProfileModal({
                 Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você
                 e seus amigos no chat e nos perfis.
               </p>
-              <BordersGallery avatarId={formData.avatar} onEquipped={onBorderEquipped} />
+              <BordersGallery
+                avatarId={formData.avatar}
+                onEquipped={() => {
+                  onBorderEquipped?.();
+                  onSealsEquipped?.();
+                }}
+              />
             </div>
           )}
 
