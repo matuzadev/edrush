@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-
-type DashboardState = 'checking' | 'redirecting' | 'error';
 
 const isValidConcursoSlug = (slug: unknown): slug is string =>
   typeof slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug.trim());
@@ -13,16 +11,10 @@ const isValidConcursoSlug = (slug: unknown): slug is string =>
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [dashboardState, setDashboardState] = useState<DashboardState>('checking');
 
   useEffect(() => {
-    if (status === 'loading') {
-      setDashboardState('checking');
-      return;
-    }
-
+    if (status === 'loading') return;
     if (status === 'unauthenticated') {
-      setDashboardState('redirecting');
       router.replace('/auth/login');
       return;
     }
@@ -31,26 +23,21 @@ export default function DashboardPage() {
       | { onboardingCompleted?: boolean; concursoSlug?: string | null }
       | undefined;
 
-    if (!user) {
-      setDashboardState('error');
-      return;
-    }
+    if (!user) return;
 
     const concursoSlug = user.concursoSlug?.trim();
     if (user.onboardingCompleted && isValidConcursoSlug(concursoSlug)) {
-      setDashboardState('redirecting');
       router.replace(`/dashboard/${encodeURIComponent(concursoSlug)}`);
       return;
     }
 
-    setDashboardState('redirecting');
     router.replace('/onboarding/select-concurso');
   }, [status, session, router]);
 
-  const isError = dashboardState === 'error';
+  const isError = status === 'authenticated' && !session?.user;
   const message = isError
     ? 'Não foi possível verificar os dados da sua conta.'
-    : dashboardState === 'checking'
+    : status === 'loading'
       ? 'Verificando sua conta...'
       : 'Redirecionando você para o destino correto...';
 
