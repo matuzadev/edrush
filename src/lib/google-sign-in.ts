@@ -3,17 +3,16 @@ import { signIn } from 'next-auth/react';
 const SIGN_IN_TIMEOUT_MS = 15_000;
 
 export async function startGoogleSignIn(callbackUrl: string): Promise<never> {
-  try {
-    await signIn('google', { callbackUrl });
-  } catch {
-    throw new Error('Não foi possível iniciar o acesso com Google. Tente novamente ou entre com e-mail.');
-  }
-
   return new Promise<never>((_, reject) => {
-    window.setTimeout(
+    const timeoutId = window.setTimeout(
       () => reject(new Error('O redirecionamento para o Google demorou demais. Tente novamente.')),
       SIGN_IN_TIMEOUT_MS,
     );
+
+    void signIn('google', { callbackUrl }).catch(() => {
+      window.clearTimeout(timeoutId);
+      reject(new Error('Não foi possível iniciar o acesso com Google. Tente novamente ou entre com e-mail.'));
+    });
   });
 }
 
