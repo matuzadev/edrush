@@ -122,9 +122,14 @@ export function FriendsChat() {
   // Polling de threads (varia conforme aberto/fechado)
   useEffect(() => {
     if (shouldHide) return;
-    fetchThreads();
+    const initialFetch = window.setTimeout(() => {
+      void fetchThreads();
+    }, 0);
     const interval = setInterval(fetchThreads, open ? POLL_OPEN_MS : POLL_CLOSED_MS);
-    return () => clearInterval(interval);
+    return () => {
+      window.clearTimeout(initialFetch);
+      clearInterval(interval);
+    };
   }, [open, shouldHide, fetchThreads]);
 
   // Polling da conversa ativa (só quando aberta)
@@ -238,9 +243,12 @@ export function FriendsChat() {
         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-30 blur-lg transition-all" />
         <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg hover:shadow-cyan-500/50 hover:shadow-2xl transition-all duration-200 flex items-center justify-center hover:scale-110 active:scale-95">
           <MessageCircle className="w-6 h-6 text-white" />
-          {totalUnread > 0 && !open && (
-            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-slate-950">
-              {totalUnread > 99 ? '99+' : totalUnread}
+          {(totalUnread > 0 || pendingReceived.length > 0) && !open && (
+            <span
+              className={`absolute -top-1 -right-1 min-w-[20px] h-5 px-1 ${totalUnread > 0 ? 'bg-red-500' : 'bg-amber-500'} text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-slate-950`}
+              title={`${totalUnread} mensagens não lidas e ${pendingReceived.length} solicitações de amizade`}
+            >
+              {totalUnread > 0 ? (totalUnread > 99 ? '99+' : totalUnread) : pendingReceived.length}
             </span>
           )}
         </div>
