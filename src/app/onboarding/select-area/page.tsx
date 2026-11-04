@@ -18,7 +18,7 @@ interface Specialty {
 function SelectAreaContent() {
   const router = useRouter();
   const searchParams = useSearchParams() ?? new URLSearchParams();
-  const { status } = useSession();
+  const { status, update } = useSession();
 
   const concursoId = searchParams.get('concursoId');
   const concursoTitle = searchParams.get('concursoTitle') || 'Concurso';
@@ -177,6 +177,14 @@ function SelectAreaContent() {
 
       if (!result.concursoSlug) {
         throw new Error('O servidor não retornou o endereço do painel. Tente novamente.');
+      }
+
+      const refreshedSession = await update();
+      if (
+        !refreshedSession?.user?.onboardingCompleted ||
+        refreshedSession.user.concursoSlug !== result.concursoSlug
+      ) {
+        throw new Error('Sua configuração foi salva, mas a sessão não atualizou. Recarregue a página e tente novamente.');
       }
 
       window.location.replace(`/dashboard/${encodeURIComponent(result.concursoSlug)}`);
