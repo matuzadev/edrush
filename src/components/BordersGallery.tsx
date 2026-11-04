@@ -51,10 +51,11 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
   const [equippingSlug, setEquippingSlug] = useState<string | null>(null);
   const [activeTier, setActiveTier] = useState<BorderTier | 'all'>('all');
   const [error, setError] = useState<string | null>(null);
+  const [avatarItemId, setAvatarItemId] = useState<string | null>(null);
+  const [badgeIds, setBadgeIds] = useState<string[]>([]);
 
   const fetchBorders = useCallback(async () => {
     try {
-      setError(null);
       const [bordersRes, itemsRes] = await Promise.all([
         fetch('/api/borders', { cache: 'no-store' }),
         fetch('/api/store/items', { cache: 'no-store' }),
@@ -67,11 +68,21 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
       if (!itemsRes.ok) throw new Error(itemsData.error ?? 'Falha ao carregar itens do inventário');
       const allItems: StoreBorder[] = itemsData.items ?? [];
       setBorders(bordersData.borders ?? []);
+      setError(null);
       setStoreBorders(
         allItems
           .filter((item) => item.category === 'borda_perfil' && item.owned)
           .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
       );
+      setAvatarItemId(allItems.find(
+        (item) =>
+          (item.category === 'avatar_orgao' || item.category === 'avatar_vitoria') &&
+          item.equipped,
+      )?.id ?? null);
+      setBadgeIds(allItems
+        .filter((item) => item.category === 'mini_logo_badge' && item.equipped)
+        .slice(0, 3)
+        .map((badge) => badge.id));
       setStats({
         totalUnlocked: bordersData.totalUnlocked ?? 0,
         total: bordersData.total ?? 0,
@@ -114,19 +125,6 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
     setEquippingSlug(item.id);
     setError(null);
     try {
-      const itemsRes = await fetch('/api/store/items', { cache: 'no-store' });
-      const itemsData = await itemsRes.json();
-      if (!itemsRes.ok) throw new Error(itemsData.error ?? 'Falha ao carregar o loadout');
-      const allItems: StoreBorder[] = itemsData.items ?? [];
-      const avatarItemId = allItems.find(
-        (ownedItem) =>
-          (ownedItem.category === 'avatar_orgao' || ownedItem.category === 'avatar_vitoria') &&
-          ownedItem.equipped,
-      )?.id ?? null;
-      const badgeIds = allItems
-        .filter((ownedItem) => ownedItem.category === 'mini_logo_badge' && ownedItem.equipped)
-        .slice(0, 3)
-        .map((badge) => badge.id);
       const res = await fetch('/api/users/me/loadout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -134,6 +132,7 @@ export function BordersGallery({ avatarId, onEquipped }: BordersGalleryProps) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Não foi possível equipar a borda');
+      setError(null);
       setStoreBorders((prev) => prev.map((border) => ({
         ...border,
         equipped: border.id === item.id,

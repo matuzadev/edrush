@@ -37,13 +37,12 @@ export function SealsGallery({ onEquipped }: SealsGalleryProps) {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadAll = useCallback(async () => {
-    setLoading(true);
-    setLoadError(null);
     try {
       const res = await fetch('/api/store/items', { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Falha ao carregar seus selos');
       const all: StoreItemFull[] = data.items ?? [];
+      setLoadError(null);
 
       // só selos
       const sealsList = all
