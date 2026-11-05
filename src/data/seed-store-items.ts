@@ -11,6 +11,8 @@ export type StoreItemCategory =
 
 export type StoreItemRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
+export const BETA_TESTER_BADGE_IMAGE_URL = '/imagens/badge-beta-tester.webp';
+
 export interface StoreItemSeed {
   slug: string;
   name: string;
@@ -264,7 +266,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 7500,
     rarity: 'epic',
-    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23663399"/><path d="M40 35 L40 65 L60 50 Z" fill="%23FFD700"/><text x="50" y="80" text-anchor="middle" font-size="10" fill="%23FFD700" font-weight="bold">BETA</text></svg>',
+    imageUrl: BETA_TESTER_BADGE_IMAGE_URL,
     metadata: { kind: 'beta-tester' },
   },
   {
