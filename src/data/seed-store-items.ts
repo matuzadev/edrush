@@ -12,6 +12,7 @@ export type StoreItemCategory =
 export type StoreItemRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 export const BETA_TESTER_BADGE_IMAGE_URL = '/imagens/badge-beta-tester.webp';
+export const FOUNDER_BADGE_IMAGE_URL = '/imagens/badge-fundador.webp';
 
 export interface StoreItemSeed {
   slug: string;
@@ -276,7 +277,7 @@ export const STORE_ITEMS_SEED: StoreItemSeed[] = [
     category: 'mini_logo_badge',
     priceCrystals: 10000,
     rarity: 'legendary',
-    imageUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="founderGrad"><stop offset="0%" style="stop-color:%23FFFF00;stop-opacity:1"/><stop offset="100%" style="stop-color:%23FFD700;stop-opacity:1"/></radialGradient></defs><circle cx="50" cy="50" r="45" fill="url(%23founderGrad)"/><circle cx="50" cy="50" r="35" fill="%23FF1493"/><path d="M50 30 L58 45 L75 45 L62 56 L70 70 L50 60 L30 70 L38 56 L25 45 L42 45 Z" fill="%23FFD700"/></svg>',
+    imageUrl: FOUNDER_BADGE_IMAGE_URL,
     metadata: { kind: 'founder' },
   },
   {

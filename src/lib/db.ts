@@ -1107,7 +1107,11 @@ async function seedDpdfQuestionBank() {
 // Seed idempotente do catálogo; itens novos também entram em bancos já populados.
 async function seedStoreItems() {
   try {
-    const { STORE_ITEMS_SEED, BETA_TESTER_BADGE_IMAGE_URL } = await import('@/data/seed-store-items');
+    const {
+      STORE_ITEMS_SEED,
+      BETA_TESTER_BADGE_IMAGE_URL,
+      FOUNDER_BADGE_IMAGE_URL,
+    } = await import('@/data/seed-store-items');
     const now = new Date().toISOString();
     for (const item of STORE_ITEMS_SEED) {
       await client.execute({
@@ -1135,6 +1139,10 @@ async function seedStoreItems() {
     await client.execute({
       sql: 'UPDATE store_items SET image_url = ? WHERE slug = ?',
       args: [BETA_TESTER_BADGE_IMAGE_URL, 'badge-beta-tester'],
+    });
+    await client.execute({
+      sql: 'UPDATE store_items SET image_url = ? WHERE slug = ?',
+      args: [FOUNDER_BADGE_IMAGE_URL, 'badge-membro-fundador'],
     });
     console.log(`🛒 Catálogo da loja sincronizado: ${STORE_ITEMS_SEED.length} itens verificados`);
   } catch (err) {
