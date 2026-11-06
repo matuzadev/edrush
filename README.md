@@ -87,7 +87,7 @@ O repositório contém geração assistida de questões com Anthropic e geraçã
 npm install
 ```
 
-Copie [`.env.example`](./.env.example) para `.env.local` e substitua os valores de exemplo. A configuração inicial usa SQLite local; o arquivo do banco é criado em `data/` e não deve ser enviado ao Git.
+A configuração inicial usa SQLite local. Integrações externas podem exigir configuração local antes de serem ativadas.
 
 ```bash
 npm run dev
@@ -108,24 +108,7 @@ Abra `http://localhost:3000`.
 
 ## Configuração e deploy
 
-Para produção, configure variáveis de ambiente diretamente na plataforma de hospedagem. O setup de deploy requer `TURSO_DB_URL` (ou `TURSO_DATABASE_URL`) e `TURSO_AUTH_TOKEN`; use um banco distinto para Preview e produção.
-
-Variáveis opcionais dependem das funcionalidades ativadas:
-
-- `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`: login Google.
-- `ADMIN_EMAILS`: contas administrativas.
-- `BLOB_READ_WRITE_TOKEN`: upload de imagens no Vercel Blob.
-- `ANTHROPIC_API_KEY`: scripts auxiliares de geração por IA.
-- `FOUNDER_EMAIL`: identificação privada da conta fundadora para recursos especiais.
-
-Nunca use valores reais no [`.env.example`](./.env.example), no código ou em commits. Para detalhes operacionais de Vercel, OAuth, banco e checklist de publicação, consulte [`VERCEL-DEPLOY.md`](./VERCEL-DEPLOY.md).
-
-## Segurança antes de tornar o repositório público
-
-- O [`.gitignore`](./.gitignore) impede que configurações locais, bancos SQLite e artefatos de desenvolvimento sejam adicionados novamente, mas **não remove arquivos que já estão versionados**.
-- Antes da publicação, retire do índice Git arquivos locais/sensíveis já rastreados e confira todo o histórico de commits. Apagar um arquivo em um commit novo não remove seu conteúdo de commits anteriores.
-- Como versões anteriores do repositório podem conter configuração ou credenciais, revogue e gere novamente tokens que tenham sido usados ou publicados; reescreva o histórico antes de divulgar o repositório caso ele contenha segredos.
-- Não configure credenciais de produção em ambientes locais, scripts ou Preview. Use segredos diferentes por ambiente.
+Configure integrações e credenciais no ambiente seguro da plataforma de hospedagem. Não inclua segredos em código ou commits.
 
 ## Autoria e licenciamento
 
