@@ -44,6 +44,7 @@ Guia rápido para publicar quando as alterações locais estiverem prontas. **Es
 | `GOOGLE_CLIENT_ID` | Client ID do OAuth Web do Google. |
 | `GOOGLE_CLIENT_SECRET` | Client Secret correspondente. |
 | `ADMIN_EMAILS` | E-mails de administração separados por vírgula, sem espaços desnecessários. |
+| `FOUNDER_EMAIL` | E-mail privado usado para identificar a conta fundadora e liberar itens exclusivos. |
 
 Gere **segredos diferentes** no seu computador e cole-os diretamente na Vercel — não compartilhe nem salve os valores neste arquivo:
 
@@ -52,7 +53,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Use a primeira saída para `NEXTAUTH_SECRET` e a segunda para `QUESTION_SECRET`. Cadastre também as credenciais OAuth do Google; elas não estão configuradas no ambiente local verificado.
+Use a primeira saída para `NEXTAUTH_SECRET` e a segunda para `QUESTION_SECRET`. Cadastre também as credenciais OAuth do Google diretamente na Vercel.
 
 Para Preview, configure `TURSO_DB_URL` e `TURSO_AUTH_TOKEN` no escopo **Preview**, apontando para um banco de teste separado. Cada build Vercel executa o setup no banco configurado para aquele ambiente, então não use o banco de produção em Preview.
 

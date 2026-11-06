@@ -43,13 +43,8 @@ dist/
 *.sqlite
 *.db3
 *.sqlite3
-*.js
-*.mjs
 supabase/
 next-env.d.ts
-next.config.ts
-middleware.ts
-tailwind.config.ts
 /src/api/
 
 # Local-only settings, databases and generated state
