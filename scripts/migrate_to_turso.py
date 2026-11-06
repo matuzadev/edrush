@@ -23,14 +23,10 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # -- Config Turso (from populate_questions.py) --------------------------------
-TURSO_URL = os.environ.get(
-    "TURSO_DATABASE_URL",
-    "libsql://foco-federal-db-matheusz-dev.aws-ap-south-1.turso.io",
-)
-TURSO_TOKEN = os.environ.get(
-    "TURSO_AUTH_TOKEN",
-    "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzc1MTg0MzQsImlkIjoiMDE5ZGRjNTktZmYwMS03MzMxLWE2NjUtMjRlMWY3NjY0ZWY4IiwicmlkIjoiMDZlYzEwNzItNGFlNC00Y2NhLTgzOGQtNTY3NTJiNDA3MWU3In0.6gHq9q_j5F_Wx30kmQwRcLLerEZtQ9NWw8gF8Uojauki2wHq_QqL-YAQWsttklct3vOsUCILU2iJcqhBxwzoDQ",
-)
+TURSO_URL = os.environ.get("TURSO_DATABASE_URL", "").strip()
+TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN", "").strip()
+if not TURSO_URL or not TURSO_TOKEN:
+    raise RuntimeError("Defina TURSO_DATABASE_URL e TURSO_AUTH_TOKEN no ambiente.")
 TURSO_HTTP_URL = TURSO_URL.replace("libsql://", "https://")
 
 # -- Local DB -----------------------------------------------------------------
@@ -40,7 +36,6 @@ DB_LOCAL = PROJECT_ROOT / "data" / "foco-federal.db"
 
 NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-log.info(f"🌍 Turso URL: {TURSO_HTTP_URL}")
 log.info(f"📁 Local DB: {DB_LOCAL}")
 
 # -- Turso HTTP API -----------------------------------------------------------
@@ -310,7 +305,7 @@ def main():
         log.info("\n" + "="*70)
         log.info(f"✅ SUCESSO! {inserted} questões migradas para Turso")
         log.info(f"✅ Total no Turso: {total_turso} questões")
-        log.info(f"✅ URL: {TURSO_HTTP_URL}")
+        log.info("Migration completed.")
         log.info("="*70)
         
         return 0

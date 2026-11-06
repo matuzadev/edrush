@@ -25,14 +25,10 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # -- Configuracao -------------------------------------------------------------
-TURSO_URL = os.environ.get(
-    "TURSO_DATABASE_URL",
-    "libsql://foco-federal-db-matheush-dev.aws-ap-south-1.turso.io",
-)
-TURSO_TOKEN = os.environ.get(
-    "TURSO_AUTH_TOKEN",
-    "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzc1MTg0MzQsImlkIjoiMDE5ZGRjNTktZmYwMS03MzMxLWE2NjUtMjRlMWY3NjY0ZWY4IiwicmlkIjoiMDZlYzEwNzItNGFlNC00Y2NhLTgzOGQtNTY3NTJiNDA3MWU3In0.6gHq9q_j5F_Wx30kmQwRcLLerEZtQ9NWw8gF8Uojauki2wHq_QqL-YAQWsttklct3vOsUCILU2iJcqhBxwzoDQ",
-)
+TURSO_URL = os.environ.get("TURSO_DATABASE_URL", "").strip()
+TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN", "").strip()
+if not TURSO_URL or not TURSO_TOKEN:
+    raise RuntimeError("Defina TURSO_DATABASE_URL e TURSO_AUTH_TOKEN no ambiente.")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 TURSO_HTTP_URL = TURSO_URL.replace("libsql://", "https://")
 
@@ -1402,7 +1398,7 @@ def main():
     log.info("=" * 60)
     log.info("POPULATE QUESTIONS — Perito Criminal Federal")
     log.info("=" * 60)
-    log.info(f"Turso: {TURSO_HTTP_URL}")
+    log.info("Turso: banco remoto configurado.")
     log.info(f"Claude API: {'DISPONIVEL' if ANTHROPIC_API_KEY else 'NAO configurada'}")
 
     # Teste conexao
