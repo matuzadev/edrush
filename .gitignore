@@ -23,6 +23,7 @@ dist/
 *.swo
 *.swn
 *.md
+!/README.md
 !/VERCEL-DEPLOY.md
 *.yml
 *.yaml
@@ -50,3 +51,16 @@ next.config.ts
 middleware.ts
 tailwind.config.ts
 /src/api/
+
+# Local-only settings, databases and generated state
+.claude/
+*.db-shm
+*.db-wal
+*.sqlite-shm
+*.sqlite-wal
+*.tsbuildinfo
+
+# Private working notes and unsafe local bootstrap utility
+/FLUXO_DESBLOQUEIO.txt
+/plan_future.txt
+/criar_conta_pro_admin.py

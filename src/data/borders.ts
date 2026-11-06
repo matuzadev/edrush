@@ -31,13 +31,8 @@ export interface BorderDef {
   tier: BorderTier;
   criteria: { type: BorderCriteriaType; value: number; minQuestions?: number };
   style: BorderStyle;
-  exclusive?: boolean; // se true, só os e-mails em EXCLUSIVE_OWNERS podem ver/equipar
+  exclusive?: boolean;
 }
-
-// Bordas exclusivas — slug → e-mails autorizados (lowercased)
-export const EXCLUSIVE_OWNERS: Record<string, string[]> = {
-  'foco-ceo': ['matheus@gmail.com'],
-};
 
 export const BORDERS: BorderDef[] = [
   // ─────────────────────── BRONZE — primeiros passos ───────────────────────
@@ -502,14 +497,11 @@ export function meetsCriteria(border: BorderDef, stats: UserBorderStats): boolea
   }
 }
 
-// True se o usuário (por e-mail) está autorizado a ver/equipar essa borda.
+// True se o usuário atual está autorizado a ver/equipar essa borda.
 // Bordas não-exclusivas: sempre true.
-// Bordas exclusivas: true só se o e-mail estiver em EXCLUSIVE_OWNERS[slug].
-export function canUserAccessBorder(border: BorderDef, userEmail: string | null | undefined): boolean {
+export function canUserAccessBorder(border: BorderDef, isFounder: boolean): boolean {
   if (!border.exclusive) return true;
-  const allowed = EXCLUSIVE_OWNERS[border.slug] ?? [];
-  if (!userEmail) return false;
-  return allowed.includes(userEmail.toLowerCase().trim());
+  return isFounder;
 }
 
 export function describeCriteria(border: BorderDef): string {

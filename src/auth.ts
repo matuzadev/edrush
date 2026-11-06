@@ -60,52 +60,36 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         assertNextAuthSecretSafe();
         if (!credentials?.email || !credentials?.password) {
-          console.error('❌ [AUTH] Credenciais vazias');
           throw new Error(AUTH_ERROR_GENERIC);
         }
 
         const email = (credentials.email as string).toLowerCase().trim();
         const password = credentials.password as string;
 
-        console.log(`🔐 [AUTH] Tentando login com email: ${email}`);
-
         const result = await db.query.users.findFirst({
           where: eq(users.email, email),
         });
-
-        console.log(`📊 [AUTH] Usuário encontrado: ${!!result} (${result?.email || 'N/A'})`);
-        if (result) {
-          console.log(`   ID: ${result.id}`);
-          console.log(`   Nome: ${result.nome}`);
-          console.log(`   Tem senha_hash: ${!!result.senha_hash}`);
-        }
 
         // Sempre roda bcrypt.compare — mesmo quando usuário não existe — contra
         // um hash dummy. Isso elimina o oracle de tempo entre "não existe" e
         // "senha errada", e a mensagem de erro é a mesma nos dois casos.
         const hashToCheck = result?.senha_hash || DUMMY_BCRYPT_HASH;
-        console.log(`🔑 [AUTH] Verificando senha com bcrypt...`);
         const isPasswordValid = await bcrypt.compare(password, hashToCheck);
-        console.log(`✓ [AUTH] Senha válida: ${isPasswordValid}`);
 
         if (!result) {
-          console.error('❌ [AUTH] FALHA: Usuário não encontrado');
           throw new Error(AUTH_ERROR_GENERIC);
         }
 
         if (!isPasswordValid) {
-          console.error('❌ [AUTH] FALHA: Senha inválida');
           throw new Error(AUTH_ERROR_GENERIC);
         }
 
         if (!result.senha_hash) {
-          console.error('❌ [AUTH] FALHA: Usuário sem hash de senha');
           throw new Error(AUTH_ERROR_GENERIC);
         }
 
         await grantFounderBadge(result.id, result.email);
 
-        console.log(`✅ [AUTH] LOGIN SUCESSO para ${email}`);
         return {
           id: result.id,
           email: result.email,
