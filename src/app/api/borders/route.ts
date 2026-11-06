@@ -6,6 +6,7 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { BORDERS, describeCriteria, canUserAccessBorder } from '@/data/borders';
 import { getUserBorderStats, getUnlockedBorderSlugs, getEquippedBorderSlug, checkAndUnlockBorders } from '@/lib/borders';
+import { isFounderEmail } from '@/lib/welcome-rewards';
 
 // GET /api/borders
 // Retorna o catálogo completo + status (unlocked, equipped) e stats agregados.
@@ -28,8 +29,9 @@ export async function GET() {
       db.query.users.findFirst({ where: eq(users.id, userId), columns: { email: true } }),
     ]);
     const userEmail = userRow?.email ?? null;
+    const isFounder = userEmail ? isFounderEmail(userEmail) : false;
 
-    const visibleBorders = BORDERS.filter(b => canUserAccessBorder(b, userEmail));
+    const visibleBorders = BORDERS.filter(b => canUserAccessBorder(b, isFounder));
 
     const items = visibleBorders.map(b => ({
       slug: b.slug,
