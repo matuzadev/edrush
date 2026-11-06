@@ -56,9 +56,12 @@ tailwind.config.ts
 .claude/
 *.db-shm
 *.db-wal
+*.db-journal
 *.sqlite-shm
 *.sqlite-wal
 *.tsbuildinfo
+__pycache__/
+*.py[cod]
 
 # Private working notes and unsafe local bootstrap utility
 /FLUXO_DESBLOQUEIO.txt

@@ -71,7 +71,7 @@ O schema cobre, entre outros domínios, usuários e perfis, concursos e editais,
 
 A IA foi uma ferramenta de apoio de engenharia para acelerar a implementação e a evolução de partes mais complexas do sistema. Ela complementa — não substitui — a autoria, a definição dos requisitos, as decisões de arquitetura e a validação do código.
 
-O repositório também contém scripts opcionais de geração de questões e materiais com integração a provedores de IA. Esses fluxos de geração são ferramentas auxiliares; exigem credenciais próprias e revisão do conteúdo antes de qualquer uso.
+O repositório contém geração assistida de questões com Anthropic e geração de materiais com Ollama local. São ferramentas auxiliares, exigem configuração própria e revisão do conteúdo antes de qualquer uso.
 
 ## Executar localmente
 

@@ -2,6 +2,7 @@ import { db, lsClient } from '@/lib/db';
 import { user_borders, users, study_sessions, notifications } from '@/db/schema';
 import { eq, sql, and } from 'drizzle-orm';
 import { computeLevel, computeMedals } from '@/lib/levels';
+import { isFounderEmail } from '@/lib/welcome-rewards';
 import { BORDERS, BORDER_BY_SLUG, meetsCriteria, canUserAccessBorder, type UserBorderStats, type BorderDef } from '@/data/borders';
 
 export type { UserBorderStats } from '@/data/borders';
@@ -80,6 +81,7 @@ export async function checkAndUnlockBorders(userId: string): Promise<BorderDef[]
     columns: { email: true },
   });
   const userEmail = userRow?.email ?? null;
+  const isFounder = userEmail ? isFounderEmail(userEmail) : false;
 
   const [stats, unlocked] = await Promise.all([
     getUserBorderStats(userId),
@@ -92,9 +94,9 @@ export async function checkAndUnlockBorders(userId: string): Promise<BorderDef[]
   for (const border of BORDERS) {
     if (unlocked.has(border.slug)) continue;
 
-    // Bordas exclusivas: só desbloqueiam para os e-mails autorizados (sem critérios numéricos)
+    // Bordas exclusivas são autorizadas no servidor, sem expor o e-mail na resposta.
     if (border.exclusive) {
-      if (!canUserAccessBorder(border, userEmail)) continue;
+      if (!canUserAccessBorder(border, isFounder)) continue;
       // se autorizado, desbloqueio imediato
     } else if (!meetsCriteria(border, stats)) {
       continue;
@@ -156,13 +158,14 @@ export async function equipBorder(userId: string, slug: string): Promise<{ ok: b
     return { ok: false, error: 'Borda inexistente' };
   }
 
-  // Bordas exclusivas: além do unlock, valida o e-mail do usuário
+  // Bordas exclusivas: valida a identidade do fundador somente no servidor.
   if (border.exclusive) {
     const userRow = await db.query.users.findFirst({
       where: eq(users.id, userId),
       columns: { email: true },
     });
-    if (!canUserAccessBorder(border, userRow?.email ?? null)) {
+    const isFounder = userRow?.email ? isFounderEmail(userRow.email) : false;
+    if (!canUserAccessBorder(border, isFounder)) {
       return { ok: false, error: 'Esta borda é exclusiva' };
     }
   }
