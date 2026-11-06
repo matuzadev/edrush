@@ -1,7 +1,10 @@
 import { lsClient } from '@/lib/db';
 import crypto from 'crypto';
 
-export const FOUNDER_EMAIL = 'matheus@gmail.com';
+export function isFounderEmail(email: string): boolean {
+  const founderEmail = process.env.FOUNDER_EMAIL?.trim().toLowerCase();
+  return Boolean(founderEmail && email.trim().toLowerCase() === founderEmail);
+}
 
 const WELCOME_BADGE_SLUG = 'badge-beta-tester';
 const WELCOME_REWARD_REFERENCE = 'welcome-kit-v1';
@@ -62,7 +65,7 @@ export async function grantWelcomeBadge(userId: string): Promise<void> {
 }
 
 export async function grantFounderBadge(userId: string, email: string): Promise<void> {
-  if (email.trim().toLowerCase() !== FOUNDER_EMAIL) return;
+  if (!isFounderEmail(email)) return;
 
   const itemResult = await lsClient.execute({
     sql: 'SELECT id FROM store_items WHERE slug = ? LIMIT 1',
