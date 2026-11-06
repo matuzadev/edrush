@@ -44,7 +44,7 @@ Guia rápido para publicar quando as alterações locais estiverem prontas. **Es
 | `GOOGLE_CLIENT_ID` | Client ID do OAuth Web do Google. |
 | `GOOGLE_CLIENT_SECRET` | Client Secret correspondente. |
 | `ADMIN_EMAILS` | E-mails de administração separados por vírgula, sem espaços desnecessários. |
-| `FOUNDER_EMAIL` | E-mail privado usado para identificar a conta fundadora e liberar itens exclusivos. |
+| `FOUNDER_EMAIL` | Opcional; e-mail privado da conta fundadora para liberar itens exclusivos. |
 
 Gere **segredos diferentes** no seu computador e cole-os diretamente na Vercel — não compartilhe nem salve os valores neste arquivo:
 

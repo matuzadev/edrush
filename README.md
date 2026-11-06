@@ -37,7 +37,7 @@ O EdRush organiza a preparação em torno dos objetivos de cada estudante. A apl
 | Qualidade | ESLint · TypeScript |
 | Automação de conteúdo | Scripts Python e geração assistida por IA, configurável com Anthropic |
 
-As versões exatas das dependências ficam registradas em `package.json` e `package-lock.json`.
+As versões exatas das dependências ficam registradas em [`package.json`](./package.json) e [`package-lock.json`](./package-lock.json).
 
 ## Arquitetura e organização
 
@@ -61,7 +61,7 @@ public/                  # Imagens, ícones, avatares e fontes
 1. O Next.js entrega páginas e componentes React pelo App Router.
 2. Operações de servidor passam por Route Handlers em `src/app/api/`.
 3. A autenticação usa NextAuth; credenciais locais são verificadas com `bcryptjs`.
-4. As regras de negócio consultam o banco por meio de `src/lib/db.ts` e do schema Drizzle em `src/db/schema.ts`.
+4. As regras de negócio consultam o banco por meio de [`src/lib/db.ts`](./src/lib/db.ts) e do schema Drizzle em [`src/db/schema.ts`](./src/db/schema.ts).
 5. Em desenvolvimento, o cliente pode usar SQLite local. Em produção na Vercel, o banco deve ser remoto e persistente, como Turso/libSQL.
 6. Imagens enviadas pela comunidade podem ser armazenadas no Vercel Blob.
 
@@ -77,7 +77,7 @@ O repositório contém geração assistida de questões com Anthropic e geraçã
 
 ### Requisitos
 
-- Node.js 20.9 ou superior.
+- Node.js 20.9 ou superior, conforme os requisitos do [`package.json`](./package.json).
 - npm.
 - Python 3 apenas para os scripts auxiliares de dados/IA.
 
@@ -87,7 +87,7 @@ O repositório contém geração assistida de questões com Anthropic e geraçã
 npm install
 ```
 
-Copie `.env.example` para `.env.local` e substitua os valores de exemplo. A configuração inicial usa SQLite local; o arquivo do banco é criado em `data/` e não deve ser enviado ao Git.
+Copie [`.env.example`](./.env.example) para `.env.local` e substitua os valores de exemplo. A configuração inicial usa SQLite local; o arquivo do banco é criado em `data/` e não deve ser enviado ao Git.
 
 ```bash
 npm run dev
@@ -118,11 +118,11 @@ Variáveis opcionais dependem das funcionalidades ativadas:
 - `ANTHROPIC_API_KEY`: scripts auxiliares de geração por IA.
 - `FOUNDER_EMAIL`: identificação privada da conta fundadora para recursos especiais.
 
-Nunca use valores reais no `.env.example`, no código ou em commits. Para detalhes operacionais de Vercel, OAuth, banco e checklist de publicação, consulte [`VERCEL-DEPLOY.md`](./VERCEL-DEPLOY.md).
+Nunca use valores reais no [`.env.example`](./.env.example), no código ou em commits. Para detalhes operacionais de Vercel, OAuth, banco e checklist de publicação, consulte [`VERCEL-DEPLOY.md`](./VERCEL-DEPLOY.md).
 
 ## Segurança antes de tornar o repositório público
 
-- O `.gitignore` impede que configurações locais, bancos SQLite e artefatos de desenvolvimento sejam adicionados novamente, mas **não remove arquivos que já estão versionados**.
+- O [`.gitignore`](./.gitignore) impede que configurações locais, bancos SQLite e artefatos de desenvolvimento sejam adicionados novamente, mas **não remove arquivos que já estão versionados**.
 - Antes da publicação, retire do índice Git arquivos locais/sensíveis já rastreados e confira todo o histórico de commits. Apagar um arquivo em um commit novo não remove seu conteúdo de commits anteriores.
 - Como versões anteriores do repositório podem conter configuração ou credenciais, revogue e gere novamente tokens que tenham sido usados ou publicados; reescreva o histórico antes de divulgar o repositório caso ele contenha segredos.
 - Não configure credenciais de produção em ambientes locais, scripts ou Preview. Use segredos diferentes por ambiente.
