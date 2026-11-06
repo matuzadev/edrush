@@ -77,7 +77,7 @@ O repositório contém geração assistida de questões com Anthropic e geraçã
 
 ### Requisitos
 
-- Node.js compatível com a versão de Next.js definida no `package.json`.
+- Node.js 20.9 ou superior.
 - npm.
 - Python 3 apenas para os scripts auxiliares de dados/IA.
 
