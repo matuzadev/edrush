@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { NotificationBell } from '@/components/NotificationBell';
-import { UserMenu } from '@/components/UserMenu';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { StoreItemPreview } from '@/components/store/StoreItemPreview';
 import {
   ChevronLeft,
@@ -160,21 +159,11 @@ export default function LojaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
-      {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition shrink-0" aria-label="Voltar">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <Link href="/dashboard" className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            EDRUSH
-          </Link>
-          <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="text-sm text-slate-400 font-medium truncate">Loja de Cristais</span>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Saldo de cristais */}
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      <UnifiedNavbar
+        title="Loja de Cristais"
+        showBack
+        rightSlot={
           <div
             className="flex items-center gap-2 px-3 py-1.5 rounded-full"
             style={{
@@ -187,12 +176,10 @@ export default function LojaPage() {
             <Gem size={14} className="text-fuchsia-300" />
             <span className="text-sm font-black text-white tabular-nums">{balance.toLocaleString('pt-BR')}</span>
           </div>
-          <NotificationBell />
-          <UserMenu onLogout={() => { router.push('/auth/login'); }} />
-        </div>
-      </nav>
+        }
+      />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-black text-white">Loja de Cristais</h1>

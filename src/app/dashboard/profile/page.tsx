@@ -13,7 +13,7 @@ import { AddFriendsModal } from '@/components/AddFriendsModal';
 import { EditProfileModal } from '@/components/EditProfileModal';
 import { FriendRequests } from '@/components/FriendRequests';
 import { FriendProfileModal } from '@/components/FriendProfileModal';
-import { NotificationBell } from '@/components/NotificationBell';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';
 import {
@@ -197,32 +197,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
-      {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-          >
-            EDRUSH
-          </Link>
-          <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="hidden sm:inline text-sm text-slate-400 font-medium">Meu Perfil</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <button
-            onClick={() => { signOut(); router.push('/'); }}
-            className="text-slate-400 hover:text-red-400 transition"
-            aria-label="Sair da conta"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      <UnifiedNavbar title="Meu Perfil" />
 
-      <main className="max-w-5xl mx-auto px-4 py-10">
+      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-10">
         {profileLoading ? (
           <div className="flex items-center justify-center py-32">
             <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />

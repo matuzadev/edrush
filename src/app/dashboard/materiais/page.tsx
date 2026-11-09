@@ -93,27 +93,27 @@ export default async function MateriaisPage() {
   const expectedDisciplinas = userAreas.filter((a) => !publishedSet.has(a));
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link href={`/dashboard/${concursoSlug}`} className="text-slate-400 hover:text-white transition shrink-0">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <Link
-            href="/dashboard"
-            className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-          >
-            EDRUSH
-          </Link>
-          <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="text-sm text-slate-400 font-medium truncate flex items-center gap-1.5">
-            <BookOpen size={14} className="text-emerald-400" />
-            Materiais de estudo
-          </span>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      {/* Navbar inline (server component — sem hooks client-side) */}
+      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm">
+        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href={`/dashboard/${concursoSlug}`} className="shrink-0 text-slate-400 transition hover:text-[var(--fg)]">
+              <ChevronLeft className="w-5 h-5" />
+            </Link>
+            <Link href="/dashboard" className="text-xl font-bold tracking-tight no-underline shrink-0">
+              Ed<span className="text-emerald-500">Rush</span>
+            </Link>
+            <span className="hidden sm:inline text-slate-600" aria-hidden>·</span>
+            <span className="hidden sm:inline-flex text-sm font-medium text-slate-500 truncate items-center gap-1.5">
+              <BookOpen size={14} className="text-emerald-500" />
+              Materiais de estudo
+            </span>
+          </div>
+        </nav>
+      </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-8 sm:py-10">
         <header className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-black text-white">
             Materiais completos por disciplina

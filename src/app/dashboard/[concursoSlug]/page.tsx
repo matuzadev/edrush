@@ -16,8 +16,7 @@ import {
   ChevronRight,
   Zap,
 } from 'lucide-react';
-import { NotificationBell } from '@/components/NotificationBell';
-import { UserMenu } from '@/components/UserMenu';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { BlockSetupModal } from '@/components/study/BlockSetupModal';
 import subjects from '@/data/subjects.json';
 
@@ -132,7 +131,7 @@ export default function PersonalizedDashboardPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Carregando painel...</p>
@@ -161,26 +160,11 @@ export default function PersonalizedDashboardPage() {
     .join(' ');
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
-      {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-          >
-            EDRUSH
-          </Link>
-          <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="hidden sm:inline text-sm text-slate-400 font-medium truncate max-w-xs">
-            {concursoDisplayName}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <UserMenu onLogout={handleLogout} />
-          {/* Badge de destaque com gradient dourado e brilho sutil no hover */}
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      <UnifiedNavbar
+        title={concursoDisplayName}
+        onLogout={handleLogout}
+        rightSlot={
           <div
             className="pro-badge hidden md:flex relative items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden cursor-default group"
             style={{
@@ -199,13 +183,11 @@ export default function PersonalizedDashboardPage() {
               e.currentTarget.style.borderColor = 'rgba(251,191,36,0.32)';
             }}
           >
-            {/* Glow sutil no canto */}
             <span
               aria-hidden
               className="absolute -top-2 -right-2 w-8 h-8 rounded-full pointer-events-none opacity-40 blur-lg"
               style={{ background: '#fbbf24' }}
             />
-            {/* Shine sweep no hover */}
             <span
               aria-hidden
               className="pro-shine absolute top-0 left-0 h-full w-1/3 pointer-events-none"
@@ -241,10 +223,10 @@ export default function PersonalizedDashboardPage() {
               }
             `}</style>
           </div>
-        </div>
-      </nav>
+        }
+      />
 
-      <main className="max-w-4xl mx-auto px-4 py-10">
+      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-10">
         {/* Cabeçalho personalizado */}
         <div className="mb-6 relative overflow-hidden rounded-2xl bg-slate-900/80 border border-white/8 p-6">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 via-transparent to-cyan-500/5 pointer-events-none" />

@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { NotificationBell } from '@/components/NotificationBell';
-import { Search, LogOut, Zap } from 'lucide-react';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
+import { Search, Zap } from 'lucide-react';
 
 interface Question {
   id: number;

@@ -12,8 +12,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { NotificationBell } from '@/components/NotificationBell';
-import { UserMenu } from '@/components/UserMenu';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { PostCard } from '@/components/community/PostCard';
 import { PostComposer } from '@/components/community/PostComposer';
 import type { Post, FeedResponse } from '@/components/community/types';
@@ -103,27 +102,11 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
-      {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition shrink-0">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <Link href="/dashboard" className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            EDRUSH
-          </Link>
-          <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="text-sm text-slate-400 font-medium truncate">Comunidade</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <UserMenu onLogout={() => router.push('/auth/login')} />
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      <UnifiedNavbar title="Comunidade" showBack />
 
       {/* Layout 3 colunas no desktop, 1 no mobile */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-[224px_1fr_280px] gap-6">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-[224px_1fr_280px] gap-6">
         {/* SIDEBAR ESQUERDA */}
         <aside className="hidden lg:block">
           <div className="sticky top-20 space-y-1">
