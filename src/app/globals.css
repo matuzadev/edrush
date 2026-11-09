@@ -46,10 +46,10 @@
 
 /* ── CSS Theme Variables ───────────────────────────────── */
 :root {
-  --bg: #020617;
-  --fg: #f8fafc;
-  --card: #0f172a;
-  --border: rgba(255,255,255,0.05);
+  --bg: #0d1411;
+  --fg: #f3f5f1;
+  --card: #0d1411;
+  --border: rgba(222,219,208,0.15);
 }
 
 html.light {
