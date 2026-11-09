@@ -203,7 +203,7 @@ function SignupForm() {
 
   // ── render ──
   return (
-    <div className="min-h-screen bg-[#020617] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#0d1411] text-[#f3f5f1] overflow-hidden relative">
 
       {/* bg blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
