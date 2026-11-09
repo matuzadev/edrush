@@ -197,259 +197,183 @@ export function EditProfileModal({
 
   if (!isOpen) return null;
 
-  const bioColor = bioLength > BIO_MAX ? '#FF4D00' : bioLength > 140 ? '#E6FF00' : '#FFFFFF';
+  const bioProgress = bioLength / BIO_MAX;
+  const bioColor = bioLength > BIO_MAX ? '#f87171' : bioLength > 140 ? '#fbbf24' : '#10b981';
 
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6"
       style={{
-        background: 'rgba(10, 10, 10, 0.95)',
-        backdropFilter: 'blur(4px)'
+        background: 'rgba(2, 6, 23, 0.85)',
+        backdropFilter: 'blur(12px)'
       }}
       role="dialog"
       aria-modal="true"
       aria-label="Editar Perfil"
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
-
-        @keyframes modalSlideIn {
-          from { opacity: 0; transform: translate(16px, 16px) scale(0.98); }
-          to { opacity: 1; transform: translate(0, 0) scale(1); }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
         }
-
-        .font-display { font-family: 'Space Grotesk', sans-serif; }
-        .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
-
-        .brutal-input {
-          background: transparent;
-          border: 2px solid #333333;
-          border-radius: 0px;
-          padding: 12px 16px;
-          color: #FFFFFF;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 14px;
-          transition: all 0.15s ease;
-          outline: none;
-          width: 100%;
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
         }
-        .brutal-input:focus {
-          border-color: #FF4D00;
-          background: rgba(255, 77, 0, 0.05);
+        .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .glass-card {
+          background: rgba(15, 23, 42, 0.7);
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.5);
         }
-        .brutal-input::placeholder {
-          color: #666666;
+        .glass-card:hover {
+          border-color: rgba(255, 255, 255, 0.12);
         }
-
-        .brutal-btn {
-          border: 2px solid #FFFFFF;
-          background: transparent;
-          color: #FFFFFF;
-          font-family: 'Space Grotesk', sans-serif;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          padding: 12px 24px;
-          border-radius: 0px;
-          box-shadow: 4px 4px 0px 0px #FFFFFF;
-          transition: all 0.15s ease;
-          cursor: pointer;
+        .text-gradient {
+          background: linear-gradient(135deg, #10b981, #06b6d4);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
-        .brutal-btn:hover:not(:disabled) {
-          transform: translate(2px, 2px);
-          box-shadow: 2px 2px 0px 0px #FFFFFF;
-          background: #FFFFFF;
-          color: #0A0A0A;
+        .btn-gradient {
+          background: linear-gradient(135deg, #10b981, #06b6d4);
+          background-size: 200% 200%;
+          animation: gradient-shift 3s ease infinite;
+          box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
         }
-        .brutal-btn:active:not(:disabled) {
-          transform: translate(4px, 4px);
-          box-shadow: 0px 0px 0px 0px #FFFFFF;
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
-        .brutal-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          box-shadow: 2px 2px 0px 0px #333333;
-          border-color: #333333;
-          color: #666666;
+        .input-modern {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .brutal-btn-primary {
-          background: #FF4D00;
-          border-color: #FF4D00;
-          color: #0A0A0A;
-          box-shadow: 4px 4px 0px 0px #E6FF00;
+        .input-modern:focus {
+          border-color: #10b981;
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+          background: rgba(255, 255, 255, 0.05);
         }
-        .brutal-btn-primary:hover:not(:disabled) {
-          background: #E6FF00;
-          border-color: #E6FF00;
-          color: #0A0A0A;
-          box-shadow: 2px 2px 0px 0px #FF4D00;
-          transform: translate(2px, 2px);
+        .hover-lift {
+          transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .brutal-btn-primary:active:not(:disabled) {
-          transform: translate(4px, 4px);
-          box-shadow: 0px 0px 0px 0px #FF4D00;
+        .hover-lift:hover {
+          transform: translateY(-2px);
         }
-
-        .tab-zine {
-          border: 2px solid #333333;
-          background: transparent;
-          color: #666666;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 12px;
-          font-weight: 700;
-          text-transform: uppercase;
-          padding: 8px 16px;
-          border-radius: 0px;
-          transition: all 0.15s ease;
-          cursor: pointer;
+        .badge-neon-emerald {
+          background: rgba(16, 185, 129, 0.15);
+          border: 1px solid rgba(16, 185, 129, 0.4);
+          color: #34d399;
+          box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
         }
-        .tab-zine:hover {
-          border-color: #FFFFFF;
-          color: #FFFFFF;
-        }
-        .tab-zine.active {
-          background: #FF4D00;
-          border-color: #FF4D00;
-          color: #0A0A0A;
-          box-shadow: 3px 3px 0px 0px #E6FF00;
-        }
-
-        .brutal-select {
-          appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FF4D00' stroke-width='3' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-          padding-right: 36px;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .brutal-btn, .brutal-btn-primary, .tab-zine, .brutal-input {
-            transition: none;
-          }
-          @keyframes modalSlideIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
+        .divider-gradient {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), rgba(6, 182, 212, 0.5), transparent);
         }
       `}</style>
 
       <div
-        className="relative w-full max-w-6xl max-h-[95vh] flex flex-col lg:flex-row overflow-hidden"
-        style={{
-          background: '#0A0A0A',
-          border: '2px solid #FFFFFF',
-          boxShadow: '8px 8px 0px 0px #FF4D00',
-          animation: 'modalSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}
+        className="relative w-full max-w-5xl max-h-[95vh] flex flex-col lg:flex-row overflow-hidden rounded-[20px] glass-card animate-scale-in"
       >
-        {/* Painel Esquerdo — Avatar e Stats (Assimétrico) */}
-        <div
-          className="hidden lg:flex lg:w-96 flex-col p-8 relative"
-          style={{
-            borderRight: '2px solid #333333',
-            background: 'linear-gradient(180deg, #0A0A0A 0%, #111111 100%)',
-          }}
-        >
-          {/* Elemento decorativo de canto */}
-          <div className="absolute top-0 left-0 w-16 h-16 border-r-2 border-b-2 border-[#E6FF00]" />
+        {/* Elementos decorativos de fundo */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[20px]">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }} />
+          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        </div>
 
-          {/* Avatar Gigante */}
-          <div className="relative mb-8 group">
+        {/* Painel Esquerdo — Preview do Perfil */}
+        <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col p-8 relative z-10 border-r border-white/5">
+          <div className="absolute top-0 left-0 right-0 h-px divider-gradient" />
+
+          <div className="flex-1 flex flex-col items-center text-center space-y-6">
+            {/* Avatar com glow */}
             <div
-              className="w-48 h-48 mx-auto relative"
-              style={{
-                border: '4px solid #E6FF00',
-                boxShadow: '6px 6px 0px 0px #FF4D00',
-                transition: 'transform 0.2s ease',
-              }}
+              className="relative group cursor-pointer animate-float"
+              onClick={() => { setActiveTab('avatar'); fileInputRef.current?.click(); }}
             >
-              {photoPreview ? (
-                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-[#111111]">
-                  <User className="w-20 h-20 text-[#333333]" />
+              <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] group-hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300">
+                <div className="w-full h-full rounded-full overflow-hidden bg-slate-900">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User className="w-16 h-16 text-slate-600" />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+              <div className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center group-hover:bg-emerald-500/20 group-hover:border-emerald-500/50 transition-all">
+                <ImagePlus className="w-4 h-4 text-emerald-400" />
+              </div>
             </div>
 
-            {/* Botão de upload sobreposto */}
-            <button
-              onClick={() => { setActiveTab('avatar'); fileInputRef.current?.click(); }}
-              className="absolute -bottom-4 -right-4 w-12 h-12 flex items-center justify-center border-2 border-[#FFFFFF] bg-[#0A0A0A] hover:bg-[#FF4D00] hover:border-[#FF4D00] transition-all"
-              style={{ boxShadow: '3px 3px 0px 0px #E6FF00' }}
-              aria-label="Alterar foto"
-            >
-              <ImagePlus className="w-5 h-5 text-[#FFFFFF] group-hover:text-[#0A0A0A]" />
-            </button>
-          </div>
-
-          {/* Preview de Dados */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="font-display text-3xl font-bold text-[#FFFFFF] uppercase tracking-tighter leading-none mb-2">
-                {formData.username || 'SEU NOME'}
+            {/* Dados do Preview */}
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gradient">
+                {formData.username || 'Seu Nome'}
               </h2>
               {formData.bio && (
-                <p className="font-mono-custom text-sm text-[#999999] leading-relaxed border-l-2 border-[#FF4D00] pl-3">
-                  {formData.bio}
+                <p className="text-sm text-slate-400 italic px-4 leading-relaxed">
+                  "{formData.bio}"
                 </p>
               )}
             </div>
 
-            {/* Stats em estilo terminal */}
-            <div className="grid grid-cols-3 gap-0 border-t-2 border-b-2 border-[#333333] py-4">
-              <div className="text-center border-r border-[#333333]">
-                <div className="font-display text-2xl font-bold text-[#E6FF00]">0</div>
-                <div className="font-mono-custom text-[10px] uppercase text-[#666666] mt-1">Posts</div>
-              </div>
-              <div className="text-center border-r border-[#333333]">
-                <div className="font-display text-2xl font-bold text-[#E6FF00]">0</div>
-                <div className="font-mono-custom text-[10px] uppercase text-[#666666] mt-1">Seg.</div>
-              </div>
-              <div className="text-center">
-                <div className="font-display text-2xl font-bold text-[#E6FF00]">0</div>
-                <div className="font-mono-custom text-[10px] uppercase text-[#666666] mt-1">Selos</div>
-              </div>
+            {/* Stats Grid */}
+            <div className="w-full grid grid-cols-3 gap-3 pt-4">
+              {[
+                { label: 'Posts', value: '0' },
+                { label: 'Seguidores', value: '0' },
+                { label: 'Selos', value: '0' },
+              ].map((stat) => (
+                <div key={stat.label} className="glass-card rounded-xl p-3 text-center hover-lift">
+                  <div className="text-lg font-bold text-gradient">{stat.value}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Painel Direito — Formulário */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden relative z-10">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b-2 border-[#333333]">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
             <div>
-              <h2 className="font-display text-2xl font-bold text-[#FFFFFF] uppercase tracking-tight">
-                Editar Perfil
-              </h2>
-              <p className="font-mono-custom text-xs text-[#666666] mt-1">
-                // PERSONALIZE SUA PRESENÇA NO SYSTEMA
+              <h2 className="text-xl font-bold text-gradient">Editar Perfil</h2>
+              <p className="text-xs text-slate-500 font-mono tracking-widest mt-1">
+                // PERSONALIZE SUA PRESENÇA NO EDRUSH
               </p>
             </div>
-
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center border-2 border-[#333333] hover:border-[#FF4D00] hover:text-[#FF4D00] transition-all"
-              style={{ borderRadius: '0px' }}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 hover-lift transition-all"
               aria-label="Fechar"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Tabs Zine */}
-          <div className="flex px-6 pt-6 gap-3 overflow-x-auto border-b-2 border-[#333333] pb-0">
+          {/* Tabs */}
+          <div className="flex px-6 pt-4 gap-2 overflow-x-auto border-b border-white/5 pb-0">
             {([
-              { key: 'identity', label: '01. Identidade', icon: User },
-              { key: 'avatar', label: '02. Avatar', icon: Smile },
-              { key: 'borders', label: '03. Bordas', icon: Sparkles },
-              { key: 'seals', label: '04. Selos', icon: Star },
+              { key: 'identity', label: 'Identidade', icon: User },
+              { key: 'avatar', label: 'Avatar', icon: Smile },
+              { key: 'borders', label: 'Bordas', icon: Sparkles },
+              { key: 'seals', label: 'Selos', icon: Star },
             ] as const).map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`tab-zine flex items-center gap-2 whitespace-nowrap ${activeTab === key ? 'active' : ''}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-250 ${
+                  activeTab === key
+                    ? 'badge-neon-emerald'
+                    : 'border border-white/5 text-slate-400 hover:border-white/10 hover:text-slate-200'
+                }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 {label}
@@ -460,86 +384,77 @@ export function EditProfileModal({
           {/* Conteúdo Scrollável */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
             {actionError && (
-              <div
-                className="mb-6 p-4 border-2 border-[#FF4D00] font-mono-custom text-sm"
-                style={{
-                  background: 'rgba(255, 77, 0, 0.1)',
-                  color: '#FF4D00',
-                }}
-              >
-                [ERRO] {actionError}
+              <div className="mb-4 p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 text-sm flex items-center gap-2">
+                <X className="w-4 h-4" />
+                {actionError}
               </div>
             )}
 
             {activeTab === 'identity' && (
-              <div className="space-y-6 max-w-xl">
+              <div className="space-y-6 max-w-lg animate-scale-in">
                 {/* Username */}
                 <div>
-                  <label className="block font-mono-custom text-xs font-bold uppercase text-[#E6FF00] mb-2 tracking-wider">
-                    Nome de Usuário <span className="text-[#666666]">// 2-30 chars</span>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
+                    Nome de Usuário
                   </label>
                   <input
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
-                    placeholder="COMO QUER SER CHAMADO?"
+                    placeholder="como quer ser chamado?"
                     maxLength={30}
-                    className="brutal-input uppercase"
+                    className="input-modern w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 outline-none"
                   />
                   {usernameError && (
-                    <p className="font-mono-custom text-xs text-[#FF4D00] mt-2">[!] {usernameError}</p>
+                    <p className="text-xs text-red-400 mt-2">{usernameError}</p>
                   )}
                 </div>
 
                 {/* Bio */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="font-mono-custom text-xs font-bold uppercase text-[#E6FF00] tracking-wider">
+                    <label className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">
                       Bio
                     </label>
-                    <span
-                      className="font-mono-custom text-xs font-bold"
-                      style={{ color: bioColor }}
-                    >
+                    <span className="text-xs font-mono tabular-nums" style={{ color: bioColor }}>
                       {bioLength}/{BIO_MAX}
                     </span>
                   </div>
                   <textarea
                     value={formData.bio ?? ''}
                     onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
-                    placeholder="CONTE UM POUCO SOBRE SUA JORNADA..."
+                    placeholder="Conte um pouco sobre sua jornada de estudos..."
                     rows={4}
-                    className="brutal-input resize-none"
+                    className="input-modern w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 outline-none resize-none"
                   />
-                  {/* Barra de progresso brutalista */}
-                  <div className="mt-2 h-2 bg-[#111111] border border-[#333333]">
+                  <div className="mt-2 h-1 rounded-full overflow-hidden bg-white/5">
                     <div
-                      className="h-full transition-all duration-200"
+                      className="h-full transition-all duration-300 ease-out"
                       style={{
-                        width: `${Math.min((bioLength / BIO_MAX) * 100, 100)}%`,
-                        background: bioColor,
+                        width: `${Math.min(bioProgress * 100, 100)}%`,
+                        background: 'linear-gradient(90deg, #10b981, #06b6d4)',
                       }}
                     />
                   </div>
                 </div>
 
-                {/* Aniversário e Localização em Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Aniversário e Localização */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-mono-custom text-xs font-bold uppercase text-[#E6FF00] mb-2 tracking-wider">
+                    <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
                       Aniversário
                     </label>
                     <input
                       type="date"
                       value={formData.birthday ?? ''}
                       onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
-                      className="brutal-input brutal-select"
+                      className="input-modern w-full px-4 py-3 rounded-xl text-white outline-none"
                       style={{ colorScheme: 'dark' }}
                     />
                   </div>
 
                   <div>
-                    <label className="block font-mono-custom text-xs font-bold uppercase text-[#E6FF00] mb-2 tracking-wider">
+                    <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
                       Localização
                     </label>
                     <select
@@ -548,12 +463,13 @@ export function EditProfileModal({
                         setSelectedUf(e.target.value);
                         setSelectedCidade('');
                       }}
-                      className="brutal-input brutal-select mb-3"
+                      className="input-modern w-full px-4 py-3 rounded-xl text-white outline-none appearance-none cursor-pointer mb-3"
+                      style={{ colorScheme: 'dark' }}
                       aria-label="Estado"
                     >
-                      <option value="">SELECIONE O ESTADO</option>
+                      <option value="">UF</option>
                       {BRAZILIAN_STATES.map((uf) => (
-                        <option key={uf.sigla} value={uf.sigla} className="bg-[#0A0A0A] text-[#FFFFFF]">
+                        <option key={uf.sigla} value={uf.sigla}>
                           {uf.sigla} — {uf.nome}
                         </option>
                       ))}
@@ -562,29 +478,30 @@ export function EditProfileModal({
                       value={selectedCidade}
                       onChange={(e) => setSelectedCidade(e.target.value)}
                       disabled={!selectedUf || isLoadingCidades}
-                      className="brutal-input brutal-select disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="input-modern w-full px-4 py-3 rounded-xl text-white outline-none appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ colorScheme: 'dark' }}
                       aria-label="Cidade"
                     >
                       <option value="">
                         {!selectedUf
-                          ? 'PRIMEIRO O ESTADO'
+                          ? 'Selecione o estado'
                           : isLoadingCidades
-                            ? 'CARREGANDO...'
-                            : cidades.length === 0
-                              ? 'INDISPONÍVEL'
-                              : 'SELECIONE A CIDADE'}
+                          ? 'Carregando...'
+                          : cidades.length === 0
+                          ? 'Indisponível'
+                          : 'Selecione a cidade'}
                       </option>
                       {selectedCidade && !cidades.includes(selectedCidade) && (
-                        <option value={selectedCidade} className="bg-[#0A0A0A] text-[#FFFFFF]">{selectedCidade}</option>
+                        <option value={selectedCidade}>{selectedCidade}</option>
                       )}
                       {cidades.map((nome) => (
-                        <option key={nome} value={nome} className="bg-[#0A0A0A] text-[#FFFFFF]">
+                        <option key={nome} value={nome}>
                           {nome}
                         </option>
                       ))}
                     </select>
                     {cidadesError && (
-                      <p className="font-mono-custom text-xs text-[#FF4D00] mt-2">[!] {cidadesError}</p>
+                      <p className="text-xs text-red-400 mt-2">{cidadesError}</p>
                     )}
                   </div>
                 </div>
@@ -592,25 +509,20 @@ export function EditProfileModal({
             )}
 
             {activeTab === 'avatar' && (
-              <div className="space-y-6 max-w-xl">
-                <div
-                  className="p-6 border-2 border-[#333333]"
-                  style={{ background: '#111111' }}
-                >
-                  <h3 className="font-display text-lg font-bold text-[#FFFFFF] uppercase mb-2">
-                    Sua Foto, Seu Estilo
-                  </h3>
-                  <p className="font-mono-custom text-xs text-[#666666] leading-relaxed mb-4">
-                    // ENVIE UMA FOTO PRÓPRIA (JPG, PNG OU WEBP, ATÉ 5 MB) OU ESCOLHA UM AVATAR DA COLEÇÃO.
+              <div className="space-y-6 max-w-lg animate-scale-in">
+                <div className="glass-card rounded-xl p-5 border border-white/5">
+                  <h3 className="text-sm font-bold text-white mb-2">Sua foto, seu estilo</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                    Envie uma foto própria (JPG, PNG ou WebP, até 5 MB) ou escolha um avatar da coleção.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="brutal-btn brutal-btn-primary flex items-center gap-2 text-sm"
+                      className="btn-gradient px-4 py-2 rounded-lg text-sm font-bold text-slate-950 flex items-center gap-2 hover-lift"
                     >
                       <ImagePlus className="w-4 h-4" />
-                      ENVIAR FOTO
+                      Enviar foto
                     </button>
                     {photoPreview && (
                       <button
@@ -621,9 +533,9 @@ export function EditProfileModal({
                           setPhotoChanged(true);
                           setActionError(null);
                         }}
-                        className="brutal-btn flex items-center gap-2 text-sm"
+                        className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 border border-white/10 hover:border-emerald-500/50 hover:text-emerald-400 transition-all hover-lift"
                       >
-                        USAR AVATAR EdRUSH
+                        Usar avatar EdRush
                       </button>
                     )}
                   </div>
@@ -637,11 +549,11 @@ export function EditProfileModal({
                       event.target.value = '';
                       if (!file) return;
                       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                        setActionError('FORMATO INVÁLIDO. USE JPG, PNG OU WEBP.');
+                        setActionError('Escolha uma imagem JPG, PNG ou WebP.');
                         return;
                       }
                       if (file.size > 5 * 1024 * 1024) {
-                        setActionError('TAMANHO EXCEDIDO. MÁXIMO 5 MB.');
+                        setActionError('A foto deve ter no máximo 5 MB.');
                         return;
                       }
                       setActionError(null);
@@ -661,9 +573,9 @@ export function EditProfileModal({
             )}
 
             {activeTab === 'borders' && (
-              <div>
-                <p className="font-mono-custom text-xs text-[#666666] mb-6 leading-relaxed">
-                  // CONQUISTE BORDAS ESTUDANDO TODO DIA. BORDAS EQUIPADAS APARECEM PARA VOCÊ E SEUS AMIGOS NO CHAT E NOS PERFIS.
+              <div className="animate-scale-in">
+                <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                  Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você e seus amigos no chat e nos perfis.
                 </p>
                 <BordersGallery
                   avatarId={formData.avatar}
@@ -673,32 +585,34 @@ export function EditProfileModal({
             )}
 
             {activeTab === 'seals' && (
-              <SealsGallery onEquipped={onSealsEquipped} />
+              <div className="animate-scale-in">
+                <SealsGallery onEquipped={onSealsEquipped} />
+              </div>
             )}
           </div>
 
           {/* Footer com Ações */}
-          <div className="flex items-center justify-end gap-4 px-6 py-5 border-t-2 border-[#333333] bg-[#0A0A0A]">
+          <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-white/5 bg-slate-900/50">
             <button
               onClick={onClose}
-              className="brutal-btn text-sm"
+              className="px-6 py-3 rounded-xl text-sm font-semibold text-slate-300 border border-white/10 hover:border-emerald-500/50 hover:text-emerald-400 transition-all hover-lift"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || !!usernameError}
-              className="brutal-btn brutal-btn-primary text-sm flex items-center gap-2"
+              className="btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-slate-950 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover-lift"
             >
               {isSaving ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  SALVANDO...
+                  Salvando...
                 </>
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  SALVAR ALTERAÇÕES
+                  Salvar Alterações
                 </>
               )}
             </button>
