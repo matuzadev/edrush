@@ -155,28 +155,58 @@ export default function ConcursosPage() {
   }, [search, concursos, statusFilter]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-slate-900 to-[#0f172a]">
+    <div className="min-h-screen bg-[#0d1411] text-[#f3f5f1]">
       {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-          EDRUSH
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-slate-400 hover:text-white transition">Entrar</Link>
-          <Link href="/auth/signup" className="text-sm px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition">
-            Cadastrar
+      <header className="border-b border-white/10">
+        <nav
+          aria-label="Navegação principal"
+          className="mx-auto flex h-[76px] max-w-6xl items-center justify-between px-5 sm:px-8"
+        >
+          <Link
+            href="/"
+            aria-label="EdRush — página inicial"
+            className="inline-flex items-center gap-2 text-xl font-bold tracking-tight no-underline"
+          >
+            <Zap className="fill-emerald-500 text-emerald-500" size={23} aria-hidden="true" />
+            <span>
+              Ed<span className="text-emerald-500">Rush</span>
+            </span>
           </Link>
-        </div>
-      </nav>
+
+          <div className="hidden items-center gap-8 text-sm text-[#b3bbb5] sm:flex">
+            <Link href="#recursos" className="transition hover:text-white">
+              Recursos
+            </Link>
+            <Link href="/concursos" className="transition hover:text-white">
+              Concursos
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link
+              href="/auth/login"
+              className="text-sm font-medium text-[#d3d8d3] transition hover:text-white"
+            >
+              Entrar
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="rounded-lg bg-emerald-500 px-4 py-3 text-sm font-bold text-[#06251b] transition hover:bg-emerald-400"
+            >
+              Criar conta
+            </Link>
+          </div>
+        </nav>
+      </header>
 
       <main className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-10">
-          <p className="mb-2 text-sm font-semibold text-emerald-400">Encontre sua próxima oportunidade</p>
-          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-500 sm:text-sm">Encontre sua próxima oportunidade</p>
+          <h1 className="mb-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
             Concursos públicos
           </h1>
-          <p className="max-w-2xl text-slate-400">
+          <p className="max-w-2xl text-base leading-7 text-[#aeb7b0] sm:text-lg">
             Consulte concursos, conheça as áreas e organize sua preparação em um só lugar.
           </p>
         </div>
@@ -184,18 +214,18 @@ export default function ConcursosPage() {
         {/* Filtros */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#87938a]" />
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar por nome, órgão ou banca..."
               aria-label="Buscar concursos por nome, órgão ou banca"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-500/50"
+              className="w-full rounded-xl border border-[#dedbd0]/20 bg-white/[0.04] py-3 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-[#87938a] focus:border-emerald-500/50 focus:bg-white/[0.06]"
             />
           </div>
           <div className="flex min-w-0 items-start gap-2 sm:items-center">
-            <Filter size={14} className="mt-2.5 shrink-0 text-slate-400 sm:mt-0" aria-hidden="true" />
+            <Filter size={14} className="mt-2.5 shrink-0 text-[#87938a] sm:mt-0" aria-hidden="true" />
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar concursos por status">
               {STATUS_OPTIONS.map(opt => (
                 <button
@@ -205,8 +235,8 @@ export default function ConcursosPage() {
                   aria-pressed={statusFilter === opt.value}
                   className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
                     statusFilter === opt.value
-                      ? 'bg-emerald-500 text-slate-950'
-                      : 'bg-white/[0.04] border border-white/10 text-slate-400 hover:border-emerald-500/40'
+                      ? 'bg-emerald-500 text-[#06251b]'
+                      : 'bg-white/[0.04] border border-[#dedbd0]/20 text-[#b3bbb5] hover:border-emerald-500/40'
                   }`}
                 >
                   {opt.label}
