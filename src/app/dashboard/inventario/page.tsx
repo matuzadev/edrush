@@ -318,10 +318,9 @@ export default function InventarioPage() {
           <p className="max-w-2xl text-base leading-7 text-[#aeb7b0] sm:text-lg">
             Equipe seus itens favoritos para personalizar seu perfil público.
           </p>
-        </div>
           <Link
             href="/dashboard/loja"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#dedbd0]/20 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/[0.05]"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-semibold transition hover:bg-white/[0.05] mt-4"
           >
             <ShoppingBag size={14} />
             Ir à loja
