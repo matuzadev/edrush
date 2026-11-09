@@ -739,17 +739,16 @@ export default function ProfilePage() {
               </div>
 
               {/* Heatmap 30 dias */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5">
+              <div className="relative overflow-hidden glass-card p-5">
                 <div
-                  className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                  style={{ background: 'linear-gradient(90deg, transparent, #06b6d4, transparent)' }}
+                  className="absolute top-0 left-0 right-0 h-px pointer-events-none divider-gradient"
                 />
                 <div className="flex items-center gap-2 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                    <Flame size={15} className="text-cyan-400" />
+                  <div className="w-8 h-8 rounded-lg bg-[var(--cyan-500)]/10 flex items-center justify-center">
+                    <Flame size={15} className="text-[var(--cyan-400)]" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm">Heatmap de Atividade</h3>
+                    <h3 className="font-bold text-[var(--fg)] text-sm">Heatmap de Atividade</h3>
                     <p className="text-[11px] text-slate-500">Últimos 30 dias</p>
                   </div>
                 </div>
@@ -1048,17 +1047,16 @@ export default function ProfilePage() {
             })()}
 
             {/* ── Medalhas ── */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5">
+            <div className="relative overflow-hidden glass-card p-5">
               <div
-                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent, #eab308, transparent)' }}
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none divider-gradient"
               />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
                     <Award size={15} className="text-yellow-400" />
                   </div>
-                  <h3 className="font-bold text-white">Medalhas</h3>
+                  <h3 className="font-bold text-[var(--fg)]">Medalhas</h3>
                 </div>
                 <span className="text-xs font-bold text-slate-500 bg-slate-800/60 border border-white/5 rounded-full px-2.5 py-1">
                   {profile.medals} / {profile.totalMedals} desbloqueadas
@@ -1073,7 +1071,7 @@ export default function ProfilePage() {
                     onClick={() => setActiveCategory(cat)}
                     className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                       activeCategory === cat
-                        ? 'bg-emerald-500 text-slate-950 shadow-[0_0_14px_rgba(16,185,129,0.3)]'
+                        ? 'badge-neon emerald'
                         : 'bg-slate-800/60 text-slate-400 border border-white/5 hover:text-slate-200 hover:border-white/10'
                     }`}
                   >
