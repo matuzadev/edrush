@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { Zap, BookOpen, Trophy, RotateCcw } from 'lucide-react';
 import { MOCK_QUESTIONS, Question } from '@/lib/questions';
 
 const Q_KEY = 'local_questions_v1';
@@ -73,60 +75,113 @@ export default function QuestionsPage() {
   }, [currentIndex, questions.length]);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 p-6">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-[#0d1411] text-[#f3f5f1]">
+      <header className="border-b border-white/10">
+        <nav
+          aria-label="Navegação principal"
+          className="mx-auto flex h-[76px] max-w-6xl items-center justify-between px-5 sm:px-8"
+        >
+          <Link
+            href="/"
+            aria-label="EdRush — página inicial"
+            className="inline-flex items-center gap-2 text-xl font-bold tracking-tight no-underline"
+          >
+            <Zap className="fill-emerald-500 text-emerald-500" size={23} aria-hidden="true" />
+            <span>
+              Ed<span className="text-emerald-500">Rush</span>
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-4">
+            <Link
+              href="/auth/login"
+              className="text-sm font-medium text-[#d3d8d3] transition hover:text-white"
+            >
+              Entrar
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="rounded-lg bg-emerald-500 px-4 py-3 text-sm font-bold text-[#06251b] transition hover:bg-emerald-400"
+            >
+              Criar conta
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12">
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Questões</h1>
-          <div className="text-sm text-slate-400">Pontuação: <span className="font-bold text-white">{score}</span></div>
+          <h1 className="text-3xl font-extrabold text-white sm:text-4xl">Questões</h1>
+          <div className="flex items-center gap-2 text-sm text-[#b3bbb5]">
+            <Trophy className="text-emerald-500" size={16} aria-hidden="true" />
+            Pontuação: <span className="font-bold text-emerald-500">{score}</span>
+          </div>
         </header>
 
-        <div className="mb-4 h-3 bg-slate-800 rounded overflow-hidden">
-          <div className="h-full bg-emerald-400 transition-all" style={{ width: `${progress}%` }} />
+        <div className="mb-6 h-3 bg-white/[0.06] rounded-full overflow-hidden">
+          <div className="h-full bg-emerald-500 transition-all" style={{ width: `${progress}%` }} />
         </div>
 
         {!current ? (
-          <div className="p-8 bg-slate-900/50 rounded-xl text-center">Sem questões disponíveis.</div>
+          <div className="rounded-2xl border border-[#dedbd0]/20 bg-white/[0.03] p-8 text-center">
+            <BookOpen className="mx-auto mb-4 text-[#87938a]" size={32} aria-hidden="true" />
+            <p className="text-[#d6ddd7] font-semibold">Sem questões disponíveis.</p>
+            <Link
+              href="/"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#dedbd0]/20 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/[0.05]"
+            >
+              Voltar ao início
+            </Link>
+          </div>
         ) : (
-          <article className="p-6 bg-slate-900/60 rounded-xl shadow-md">
-            <div className="mb-4 text-sm text-slate-400">{current.subject} • Cap. {current.chapter} • {current.difficulty}</div>
-            <h2 className="text-lg font-semibold text-white mb-4">{current.question}</h2>
+          <article className="rounded-2xl border border-[#dedbd0]/20 bg-white/[0.03] p-6 sm:p-8">
+            <div className="mb-4 text-sm text-[#b3bbb5]">{current.subject} • Cap. {current.chapter} • {current.difficulty}</div>
+            <h2 className="text-lg font-semibold text-white mb-6">{current.question}</h2>
 
             {current.type === 'multipla' ? (
               <div className="grid grid-cols-1 gap-3">
                 {(current.options || []).slice(0,5).map((opt, i) => (
-                  <button key={i} onClick={() => handleAnswer(opt)} className="text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg">{String.fromCharCode(65+i)}. <span className="ml-2">{opt}</span></button>
+                  <button key={i} onClick={() => handleAnswer(opt)} className="text-left px-4 py-3.5 bg-white/[0.04] hover:bg-white/[0.08] border border-[#dedbd0]/20 hover:border-emerald-500/40 rounded-xl transition">{String.fromCharCode(65+i)}. <span className="ml-2">{opt}</span></button>
                 ))}
               </div>
             ) : current.type === 'verdadeiro_falso' ? (
               <div className="flex gap-3">
-                <button onClick={() => handleAnswer('Verdadeiro')} className="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg">Verdadeiro</button>
-                <button onClick={() => handleAnswer('Falso')} className="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg">Falso</button>
+                <button onClick={() => handleAnswer('Verdadeiro')} className="flex-1 px-4 py-3.5 bg-white/[0.04] hover:bg-white/[0.08] border border-[#dedbd0]/20 hover:border-emerald-500/40 rounded-xl transition">Verdadeiro</button>
+                <button onClick={() => handleAnswer('Falso')} className="flex-1 px-4 py-3.5 bg-white/[0.04] hover:bg-white/[0.08] border border-[#dedbd0]/20 hover:border-emerald-500/40 rounded-xl transition">Falso</button>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                <input placeholder="Digite sua resposta (discursiva)" className="px-4 py-3 bg-slate-800 rounded-lg" onKeyDown={(e)=>{ if (e.key==='Enter') handleAnswer((e.target as HTMLInputElement).value); }} />
-                <button onClick={() => {/* no-op */}} className="px-4 py-2 bg-emerald-500 rounded-lg">Enviar</button>
+                <input placeholder="Digite sua resposta (discursiva)" className="px-4 py-3.5 bg-white/[0.04] border border-[#dedbd0]/20 rounded-xl outline-none focus:border-emerald-500/50" onKeyDown={(e)=>{ if (e.key==='Enter') handleAnswer((e.target as HTMLInputElement).value); }} />
+                <button onClick={() => {/* no-op */}} className="px-4 py-3 bg-emerald-500 hover:bg-emerald-400 text-[#06251b] font-bold rounded-xl transition">Enviar</button>
               </div>
             )}
 
-            <div className="mt-4 flex items-center justify-between">
-              <button onClick={() => setShowTip(s => !s)} className="text-sm text-slate-400 hover:text-white">{showTip ? 'Esconder dica' : 'Mostrar dica'}</button>
-              <div className="text-sm text-slate-400">{currentIndex + 1} / {questions.length}</div>
+            <div className="mt-6 flex items-center justify-between">
+              <button onClick={() => setShowTip(s => !s)} className="text-sm text-[#b3bbb5] hover:text-emerald-500 transition">{showTip ? 'Esconder dica' : 'Mostrar dica'}</button>
+              <div className="text-sm text-[#b3bbb5]">{currentIndex + 1} / {questions.length}</div>
             </div>
 
             {showTip && current.tip && (
-              <div className="mt-4 p-3 bg-slate-800 rounded">💡 <span className="text-slate-200">{current.tip}</span></div>
+              <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                <p className="text-sm text-emerald-300">{current.tip}</p>
+              </div>
             )}
           </article>
         )}
 
-        <footer className="mt-6 flex justify-between items-center text-sm text-slate-400">
+        <footer className="mt-8 flex justify-between items-center text-sm text-[#b3bbb5]">
           <div>Modo: A,B,C,D,E • V/F</div>
           <div>
-            <button onClick={() => { setCurrentIndex(0); setScore(0); }} className="px-3 py-1 bg-slate-800 rounded">Reiniciar</button>
+            <button
+              onClick={() => { setCurrentIndex(0); setScore(0); }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/[0.04] hover:bg-white/[0.08] border border-[#dedbd0]/20 rounded-xl transition"
+            >
+              <RotateCcw size={14} aria-hidden="true" />
+              Reiniciar
+            </button>
           </div>
         </footer>
       </div>
-    </div>
+    </main>
   );
 }

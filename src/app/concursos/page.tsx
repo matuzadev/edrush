@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Search, Building2, Users, Calendar, ChevronRight, Filter, RefreshCw } from 'lucide-react';
+import { Search, Building2, Users, Calendar, ChevronRight, Filter, RefreshCw, Zap } from 'lucide-react';
 import { getOrgaoConfig } from '@/lib/orgao-config';
 
 interface Concurso {
@@ -275,7 +275,7 @@ export default function ConcursosPage() {
         ) : (
           <div className="space-y-3" aria-live="polite">
             {filtered.map(c => (
-              <article key={c.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-emerald-500/30">
+              <article key={c.id} className="rounded-2xl border border-[#dedbd0]/20 bg-white/[0.03] p-5 transition-colors hover:border-emerald-500/30">
                 <div className="flex items-start gap-4">
                   <OrgaoLogo concurso={c} />
                   <div className="flex-1 min-w-0">
@@ -283,46 +283,46 @@ export default function ConcursosPage() {
                       <h3 className="font-bold text-white text-base leading-snug">{c.titulo}</h3>
                       {statusBadge(c)}
                     </div>
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mb-2">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-[#b3bbb5] mb-2">
                       <span className="flex items-center gap-1"><Building2 size={11} />{c.organizador}</span>
-                      {c.banca && <span className="text-slate-500">Banca: <span className="text-slate-400">{c.banca}</span></span>}
+                      {c.banca && <span className="text-[#87938a]">Banca: <span className="text-[#b3bbb5]">{c.banca}</span></span>}
                       {c.nivel_escolaridade && <span>{c.nivel_escolaridade}</span>}
                       {c.url_site_oficial?.startsWith('https://') && (
-                        <a href={c.url_site_oficial} target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline-offset-2 hover:underline">
+                        <a href={c.url_site_oficial} target="_blank" rel="noopener noreferrer" className="text-emerald-500 underline-offset-2 hover:underline">
                           Site oficial
                         </a>
                       )}
                       {c.url_edital?.startsWith('https://') && (
-                        <a href={c.url_edital} target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline-offset-2 hover:underline">
+                        <a href={c.url_edital} target="_blank" rel="noopener noreferrer" className="text-emerald-500 underline-offset-2 hover:underline">
                           Edital
                         </a>
                       )}
                     </div>
                     {(c.cargo || c.area_especialidade) && (
-                      <p className="mb-2 text-sm text-slate-300">
+                      <p className="mb-2 text-sm text-[#d6ddd7]">
                         {[c.cargo, c.area_especialidade].filter(Boolean).join(' · ')}
                       </p>
                     )}
-                    {c.descricao && <p className="mb-3 line-clamp-2 text-xs leading-5 text-slate-500">{c.descricao}</p>}
+                    {c.descricao && <p className="mb-3 line-clamp-2 text-xs leading-5 text-[#87938a]">{c.descricao}</p>}
                     <div className="flex flex-wrap items-center gap-3">
                       {(c.vagas_cargo ?? c.vagas_total) != null && (
-                        <span className="flex items-center gap-1 text-xs text-slate-300 bg-slate-800/60 border border-white/5 rounded-lg px-2 py-1">
+                        <span className="flex items-center gap-1 text-xs text-[#d6ddd7] bg-slate-800/60 border border-[#dedbd0]/10 rounded-lg px-2 py-1">
                           <Users size={10} />
                           {c.vagas_cargo ?? c.vagas_total} vagas
                         </span>
                       )}
                       {c.remuneracao_inicial != null && (
-                        <span className="text-xs text-emerald-400 font-semibold">
+                        <span className="text-xs font-semibold text-emerald-500">
                           R$ {c.remuneracao_inicial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                       )}
                       {c.data_prova_objetiva && (
-                        <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <span className="flex items-center gap-1 text-xs text-[#b3bbb5]">
                           <Calendar size={10} />Data da prova: {new Date(c.data_prova_objetiva + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </span>
                       )}
                       {c.data_fechamento_inscricoes && c.status === 'inscricoes_abertas' && !hasRegistrationEnded(c) && (
-                        <span className="text-xs text-amber-400">
+                        <span className="text-xs text-emerald-500">
                           Inscrições até {new Date(c.data_fechamento_inscricoes + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </span>
                       )}
@@ -330,7 +330,7 @@ export default function ConcursosPage() {
                   </div>
                   <Link
                     href="/auth/signup"
-                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-400 transition hover:bg-emerald-500/10"
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-500 transition hover:bg-emerald-500/10"
                   >
                     Estudar <ChevronRight size={12} />
                   </Link>
@@ -341,12 +341,12 @@ export default function ConcursosPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center sm:p-10">
-          <h2 className="mb-3 text-xl font-semibold text-white sm:text-2xl">Prepare-se com o EdRush</h2>
-          <p className="mb-6 text-sm text-slate-400">
+        <div className="mt-12 rounded-2xl border border-[#dedbd0]/20 bg-white/[0.02] p-8 text-center sm:p-10">
+          <h2 className="mb-3 text-2xl font-extrabold text-white sm:text-3xl">Prepare-se com o EdRush</h2>
+          <p className="mb-6 text-base leading-7 text-[#aeb7b0]">
             Questões, simulados e acompanhamento para apoiar sua rotina de estudos — sem mensalidade.
           </p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">
+          <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-6 py-4 font-bold text-[#06251b] transition hover:bg-emerald-400">
             Criar conta gratuita
           </Link>
         </div>

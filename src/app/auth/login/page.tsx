@@ -117,7 +117,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#0d1411] text-[#f3f5f1] overflow-hidden relative">
 
       {/* Animated background blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -207,13 +207,13 @@ function LoginForm() {
               {/* Header */}
               <div className="mb-7">
                 <h1 className="text-2xl font-black text-white mb-1">Bem-vindo de volta</h1>
-                <p className="text-slate-500 text-sm">Entre na sua conta para continuar</p>
+                <p className="text-[#87938a] text-sm">Entre na sua conta para continuar</p>
               </div>
 
               {/* Success message */}
               {justRegistered && (
                 <div className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl mb-5">
-                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                  <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
                   <p className="text-emerald-300 text-sm font-medium">Conta criada! Faça login para continuar.</p>
                 </div>
               )}
@@ -221,7 +221,7 @@ function LoginForm() {
               {/* Error message */}
               {(error || (!isGoogleLoading && googleAuthError)) && (
                 <div className="flex items-center gap-3 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl mb-5">
-                  <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
+                  <AlertCircle size={16} className="text-red-500 flex-shrink-0" />
                   <p className="text-red-300 text-sm font-medium">{error || googleAuthError}</p>
                 </div>
               )}
@@ -231,10 +231,10 @@ function LoginForm() {
                 type="button"
                 onClick={handleGoogle}
                 disabled={isGoogleLoading || isSubmitting}
-                className="w-full flex items-center justify-center gap-3 py-3.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-2xl transition-all text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mb-5"
+                className="w-full flex items-center justify-center gap-3 py-3.5 bg-white/[0.04] hover:bg-white/[0.08] border border-[#dedbd0]/20 hover:border-emerald-500/40 rounded-2xl transition-all text-[#d3d8d3] font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mb-5"
               >
                 {isGoogleLoading ? (
-                  <Loader2 size={18} className="animate-spin text-slate-400" />
+                  <Loader2 size={18} className="animate-spin text-[#87938a]" />
                 ) : (
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
@@ -248,9 +248,9 @@ function LoginForm() {
 
               {/* Divider */}
               <div className="relative flex items-center gap-3 mb-5">
-                <div className="flex-1 h-px bg-white/8" />
-                <span className="text-slate-600 text-xs font-medium">ou entre com email</span>
-                <div className="flex-1 h-px bg-white/8" />
+                <div className="flex-1 h-px bg-[#dedbd0]/20" />
+                <span className="text-[#87938a] text-xs font-medium">ou entre com email</span>
+                <div className="flex-1 h-px bg-[#dedbd0]/20" />
               </div>
 
               {/* Form */}
@@ -258,12 +258,12 @@ function LoginForm() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Email</label>
+                  <label className="text-[10px] font-bold text-[#87938a] uppercase tracking-widest">Email</label>
                   <div className="relative">
                     <Mail
                       size={16}
                       className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                        focusedField === 'email' ? 'text-emerald-400' : 'text-slate-600'
+                        focusedField === 'email' ? 'text-emerald-500' : 'text-[#87938a]'
                       }`}
                     />
                     <input
@@ -275,7 +275,7 @@ function LoginForm() {
                       onBlur={() => setFocusedField(null)}
                       placeholder="seu@email.com"
                       autoComplete="email"
-                      className="w-full pl-11 pr-4 py-3.5 bg-white/[0.03] border border-white/8 rounded-xl text-white text-sm outline-none focus:border-emerald-500/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/20 transition-all duration-200 placeholder:text-slate-600"
+                      className="w-full pl-11 pr-4 py-3.5 bg-white/[0.03] border border-[#dedbd0]/20 rounded-xl text-white text-sm outline-none focus:border-emerald-500/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/20 transition-all duration-200 placeholder:text-[#87938a]"
                     />
                   </div>
                 </div>
@@ -283,8 +283,8 @@ function LoginForm() {
                 {/* Password */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Senha</label>
-                    <Link href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">
+                    <label className="text-[10px] font-bold text-[#87938a] uppercase tracking-widest">Senha</label>
+                    <Link href="#" className="text-xs text-[#87938a] hover:text-emerald-500 transition-colors">
                       Esqueci a senha
                     </Link>
                   </div>
@@ -292,7 +292,7 @@ function LoginForm() {
                     <Lock
                       size={16}
                       className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                        focusedField === 'password' ? 'text-emerald-400' : 'text-slate-600'
+                        focusedField === 'password' ? 'text-emerald-500' : 'text-[#87938a]'
                       }`}
                     />
                     <input
@@ -304,12 +304,12 @@ function LoginForm() {
                       onBlur={() => setFocusedField(null)}
                       placeholder="••••••••"
                       autoComplete="current-password"
-                      className="w-full pl-11 pr-12 py-3.5 bg-white/[0.03] border border-white/8 rounded-xl text-white text-sm outline-none focus:border-emerald-500/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/20 transition-all duration-200 placeholder:text-slate-600"
+                      className="w-full pl-11 pr-12 py-3.5 bg-white/[0.03] border border-[#dedbd0]/20 rounded-xl text-white text-sm outline-none focus:border-emerald-500/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-emerald-500/20 transition-all duration-200 placeholder:text-[#87938a]"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(v => !v)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-emerald-400 transition-colors p-1"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#87938a] hover:text-emerald-500 transition-colors p-1"
                     >
                       {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                     </button>
@@ -320,7 +320,7 @@ function LoginForm() {
                 <button
                   type="submit"
                   disabled={isSubmitting || isGoogleLoading}
-                  className="w-full flex items-center justify-center gap-2.5 py-4 mt-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black text-sm uppercase tracking-wide rounded-2xl transition-all hover:scale-[1.01] hover:shadow-[0_8px_32px_rgba(16,185,129,0.4)]"
+                  className="w-full flex items-center justify-center gap-2.5 py-4 mt-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-[#06251b] font-black text-sm uppercase tracking-wide rounded-2xl transition-all hover:scale-[1.01] hover:shadow-[0_8px_32px_rgba(16,185,129,0.4)]"
                 >
                   {isSubmitting ? (
                     <>
@@ -337,13 +337,13 @@ function LoginForm() {
               </form>
 
               {/* Footer */}
-              <p className="text-center text-slate-500 text-sm mt-6">
+              <p className="text-center text-[#87938a] text-sm mt-6">
                 Não tem conta?{' '}
-                <Link href="/auth/signup" className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors">
+                <Link href="/auth/signup" className="text-emerald-500 hover:text-emerald-400 font-bold transition-colors">
                   Criar conta grátis
                 </Link>
               </p>
-              <nav aria-label="Documentos legais" className="mt-4 flex justify-center gap-4 text-xs text-slate-500">
+              <nav aria-label="Documentos legais" className="mt-4 flex justify-center gap-4 text-xs text-[#87938a]">
                 <Link href="/privacidade" className="transition hover:text-white">Privacidade</Link>
                 <Link href="/termos" className="transition hover:text-white">Termos de Serviço</Link>
               </nav>
