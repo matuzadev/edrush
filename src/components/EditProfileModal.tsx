@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus } from 'lucide-react';
+import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus, Check } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
 import { SealsGallery } from './profile/SealsGallery';
@@ -71,7 +71,6 @@ export function EditProfileModal({
   const [isLoadingCidades, setIsLoadingCidades] = useState(false);
   const [cidadesError, setCidadesError] = useState<string | null>(null);
 
-  // Sincroniza estado interno quando o modal reabrir com novo initialData
   useEffect(() => {
     if (!isOpen) return;
     setFormData({
@@ -104,15 +103,12 @@ export function EditProfileModal({
     return () => URL.revokeObjectURL(photoPreview);
   }, [photoPreview]);
 
-  // Busca cidades quando UF muda — IBGE garante todos os 5570+ municípios do Brasil
   useEffect(() => {
     if (!selectedUf) {
       setCidades([]);
       setCidadesError(null);
       return;
     }
-    // DF: o IBGE retorna só "Brasília", mas o usuário pensa em RAs (Planaltina,
-    // Sobradinho, Recanto das Emas, etc.) — usamos a lista oficial das 35 RAs.
     if (selectedUf === 'DF') {
       setCidades(DF_REGIOES_ADMINISTRATIVAS);
       setCidadesError(null);
@@ -153,7 +149,6 @@ export function EditProfileModal({
   }, [selectedUf]);
 
   const formattedLocation = selectedUf && selectedCidade ? `${selectedCidade}, ${selectedUf}` : '';
-
   const selectedAvatar = getAvatar(formData.avatar);
   const bioLength = (formData.bio ?? '').length;
   const usernameTrimmed = (formData.username ?? '').trim();
@@ -203,281 +198,414 @@ export function EditProfileModal({
 
   if (!isOpen) return null;
 
+  const bioProgress = bioLength / BIO_MAX;
+  const bioColor = bioLength > BIO_MAX ? '#dc2626' : bioLength > 140 ? '#d97706' : '#006d5b';
+
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 p-4"
-      style={{ background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(8px)' }}
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6"
+      style={{
+        background: 'rgba(245, 242, 237, 0.92)',
+        backdropFilter: 'blur(12px)'
+      }}
       role="dialog"
       aria-modal="true"
       aria-label="Editar Perfil"
     >
+      <style>{`
+        @keyframes modalSlideIn {
+          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes avatarFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes counterPulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        .input-editorial {
+          border: none;
+          border-bottom: 1.5px solid #e5e2db;
+          background: transparent;
+          padding: 12px 0;
+          font-size: 15px;
+          transition: border-color 0.2s ease;
+          outline: none;
+        }
+        .input-editorial:focus {
+          border-bottom-color: #006d5b;
+        }
+        .tab-pill {
+          transition: all 0.2s ease;
+          border: 1px solid transparent;
+        }
+        .tab-pill:hover {
+          border-color: #e5e2db;
+          background: rgba(0, 109, 91, 0.03);
+        }
+        .tab-pill.active {
+          border-color: #006d5b;
+          background: rgba(0, 109, 91, 0.06);
+          color: #006d5b;
+        }
+        .save-btn {
+          transition: all 0.2s ease;
+        }
+        .save-btn:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 109, 91, 0.2);
+        }
+        .save-btn:active:not(:disabled) {
+          transform: translateY(0);
+        }
+      `}</style>
+
       <div
-        className="relative w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden"
+        className="relative w-full max-w-5xl max-h-[95vh] flex flex-col lg:flex-row overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.88) 100%)',
-          border: '1px solid rgba(255,255,255,0.09)',
-          borderRadius: '1.5rem',
-          boxShadow: '0 20px 60px -12px rgba(0,0,0,0.7)',
-          animation: 'modalEnter 0.2s ease-out',
+          background: '#faf9f7',
+          borderRadius: '24px',
+          boxShadow: '0 24px 80px -16px rgba(26, 26, 26, 0.12)',
+          animation: 'modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        <style>{`
-          @keyframes modalEnter {
-            from { opacity: 0; transform: scale(0.95) translateY(8px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
-          }
-        `}</style>
-
-        {/* Linha de gradient no topo */}
+        {/* Painel Esquerdo — Preview Editorial */}
         <div
-          className="absolute top-0 left-0 right-0 h-0.5 pointer-events-none rounded-t-3xl"
-          style={{ background: 'linear-gradient(90deg, #10b981, #06b6d4, #8b5cf6)' }}
-        />
-
-        {/* Header */}
-        <div
-          className="flex items-center gap-4 px-6 pt-7 pb-5 shrink-0"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          className="hidden lg:flex lg:w-80 xl:w-96 flex-col items-center justify-center p-8 relative overflow-hidden shrink-0"
+          style={{
+            background: 'linear-gradient(180deg, #f5f2ed 0%, #ebe8e1 100%)',
+            borderRight: '1px solid #e5e2db',
+          }}
         >
-          {/* Avatar preview grande */}
           <div
-            className="relative shrink-0"
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{ background: 'linear-gradient(90deg, #006d5b, #059669)' }}
+          />
+
+          <div
+            className="relative mb-6"
             style={{
-              filter: `drop-shadow(0 0 12px ${selectedAvatar.colors.primary}66)`,
+              animation: 'avatarFloat 4s ease-in-out infinite',
             }}
           >
-            <AvatarSelector selectedId={formData.avatar} size="lg" imageUrl={photoPreview} />
-          </div>
-
-          {/* Título */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-black text-white leading-tight">Editar Perfil</h2>
-            <p className="text-sm text-slate-400 mt-0.5">Personalize seu painel no EdRush</p>
-          </div>
-
-          {/* Fechar */}
-          <button
-            onClick={onClose}
-            className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all"
-            style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8' }}
-            aria-label="Fechar modal"
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#ffffff'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div
-          className="flex px-6 pt-4 gap-1 shrink-0"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-        >
-          {([
-            { key: 'identity', label: 'Identidade', icon: User },
-            { key: 'avatar',   label: 'Avatar',     icon: Smile },
-            { key: 'borders',  label: 'Bordas',     icon: Sparkles },
-            { key: 'seals',    label: 'Selos',      icon: Star },
-          ] as const).map(({ key, label, icon: Icon }) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-all"
+            <div
+              className="w-32 h-32 rounded-full overflow-hidden"
               style={{
-                color: activeTab === key ? '#34d399' : '#64748b',
-                borderBottom: activeTab === key ? '2px solid #10b981' : '2px solid transparent',
-                background: activeTab === key ? 'rgba(16,185,129,0.08)' : 'transparent',
+                boxShadow: '0 8px 32px rgba(0, 109, 91, 0.15)',
+                border: '3px solid white',
               }}
             >
-              <Icon className="w-4 h-4" />
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {activeTab === 'identity' && (
-            <div className="space-y-5">
-              {/* Username */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <User className="w-3.5 h-3.5 text-emerald-400" />
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-                    Nome de Usuário
-                  </label>
+              {photoPreview ? (
+                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ background: '#e5e2db' }}
+                >
+                  <User className="w-16 h-16" style={{ color: '#a8a49d' }} />
                 </div>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
-                  placeholder="como quer ser chamado?"
-                  maxLength={30}
-                  className="w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 text-sm transition-all outline-none"
-                  style={{
-                    background: 'rgba(30,41,59,0.6)',
-                    border: usernameError ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.08)',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = usernameError ? '#f87171' : '#10b981';
-                    e.currentTarget.style.boxShadow = usernameError
-                      ? '0 0 0 2px rgba(248,113,113,0.15)'
-                      : '0 0 0 2px rgba(16,185,129,0.15)';
-                  }}
-                  onBlur={(e)  => {
-                    e.currentTarget.style.borderColor = usernameError ? '#f87171' : 'rgba(255,255,255,0.08)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                />
-                {usernameError && (
-                  <p className="text-xs text-red-400 mt-1.5">{usernameError}</p>
-                )}
-              </div>
-
-              {/* Bio */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-cyan-400" />
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-                      Bio
-                    </label>
-                  </div>
-                  <span
-                    className="text-[11px] font-mono tabular-nums"
-                    style={{ color: bioLength > BIO_MAX ? '#f87171' : '#64748b' }}
-                  >
-                    {bioLength}/{BIO_MAX}
-                  </span>
-                </div>
-                <textarea
-                  value={formData.bio ?? ''}
-                  onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
-                  placeholder="Conte um pouco sobre sua jornada de estudos..."
-                  rows={3}
-                  className="w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 text-sm transition-all outline-none resize-none"
-                  style={{
-                    background: 'rgba(30,41,59,0.6)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = '#06b6d4'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(6,182,212,0.15)'; }}
-                  onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
-                />
-              </div>
-
-              {/* Birthday */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-pink-400" />
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-                    Aniversário
-                  </label>
-                </div>
-                <input
-                  type="date"
-                  value={formData.birthday ?? ''}
-                  onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl text-white text-sm transition-all outline-none"
-                  style={{
-                    background: 'rgba(30,41,59,0.6)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    colorScheme: 'dark',
-                  }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = '#f472b6'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(244,114,182,0.15)'; }}
-                  onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
-                />
-              </div>
-
-              {/* Location — UF + Cidade (sem texto livre) */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-yellow-400" />
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-                    Localização
-                  </label>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-2">
-                  {/* UF */}
-                  <select
-                    value={selectedUf}
-                    onChange={(e) => {
-                      setSelectedUf(e.target.value);
-                      setSelectedCidade('');
-                    }}
-                    className="w-full px-3 py-3 rounded-xl text-white text-sm transition-all outline-none appearance-none cursor-pointer"
-                    style={{
-                      background: 'rgba(30,41,59,0.6)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      colorScheme: 'dark',
-                    }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(251,191,36,0.15)'; }}
-                    onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
-                    aria-label="Estado"
-                  >
-                    <option value="">UF</option>
-                    {BRAZILIAN_STATES.map((uf) => (
-                      <option key={uf.sigla} value={uf.sigla}>
-                        {uf.sigla} — {uf.nome}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* Cidade */}
-                  <select
-                    value={selectedCidade}
-                    onChange={(e) => setSelectedCidade(e.target.value)}
-                    disabled={!selectedUf || isLoadingCidades}
-                    className="w-full px-3 py-3 rounded-xl text-white text-sm transition-all outline-none appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-                    style={{
-                      background: 'rgba(30,41,59,0.6)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      colorScheme: 'dark',
-                    }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(251,191,36,0.15)'; }}
-                    onBlur={(e)  => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
-                    aria-label="Cidade"
-                  >
-                    <option value="">
-                      {!selectedUf
-                        ? 'Selecione o estado primeiro'
-                        : isLoadingCidades
-                          ? 'Carregando cidades...'
-                          : cidades.length === 0
-                            ? 'Nenhuma cidade disponível'
-                            : 'Selecione a cidade'}
-                    </option>
-                    {/* Mantém a cidade salva visível mesmo se ainda não carregou a lista */}
-                    {selectedCidade && !cidades.includes(selectedCidade) && (
-                      <option value={selectedCidade}>{selectedCidade}</option>
-                    )}
-                    {cidades.map((nome) => (
-                      <option key={nome} value={nome}>
-                        {nome}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {cidadesError && (
-                  <p className="text-xs text-red-400 mt-1.5">{cidadesError}</p>
-                )}
-              </div>
+              )}
             </div>
+
+            <button
+              onClick={() => { setActiveTab('avatar'); fileInputRef.current?.click(); }}
+              className="absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center transition-all"
+              style={{
+                background: '#006d5b',
+                boxShadow: '0 2px 8px rgba(0, 109, 91, 0.3)',
+              }}
+              aria-label="Alterar foto"
+            >
+              <ImagePlus className="w-5 h-5 text-white" />
+            </button>
+          </div>
+
+          <h2
+            className="text-2xl font-bold text-center mb-2"
+            style={{
+              color: '#1a1a1a',
+              fontFamily: 'Georgia, "Times New Roman", serif',
+            }}
+          >
+            {formData.username || 'Seu nome'}
+          </h2>
+
+          {formData.bio && (
+            <p
+              className="text-sm text-center px-4 leading-relaxed"
+              style={{ color: '#525252' }}
+            >
+              {formData.bio}
+            </p>
           )}
 
-          {activeTab === 'avatar' && (
-            <div className="space-y-5">
-              <div className="flex items-center gap-4 rounded-2xl border border-cyan-400/20 bg-gradient-to-r from-cyan-500/10 via-slate-900/50 to-emerald-500/10 p-4">
-                <AvatarSelector selectedId={formData.avatar} size="md" imageUrl={photoPreview} />
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold text-white">Sua foto, seu estilo</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-400">
+          <div className="mt-8 grid grid-cols-3 gap-4 w-full max-w-xs">
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: '#006d5b' }}>0</div>
+              <div className="text-xs uppercase tracking-wider mt-1" style={{ color: '#8a867f' }}>Posts</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: '#006d5b' }}>0</div>
+              <div className="text-xs uppercase tracking-wider mt-1" style={{ color: '#8a867f' }}>Seguidores</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: '#006d5b' }}>0</div>
+              <div className="text-xs uppercase tracking-wider mt-1" style={{ color: '#8a867f' }}>Selos</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Painel Direito — Formulário */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div
+            className="flex items-center justify-between px-6 py-4 shrink-0"
+            style={{ borderBottom: '1px solid #e5e2db' }}
+          >
+            <div>
+              <h2
+                className="text-xl font-bold"
+                style={{
+                  color: '#1a1a1a',
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                }}
+              >
+                Editar Perfil
+              </h2>
+              <p className="text-xs mt-0.5" style={{ color: '#8a867f' }}>
+                Personalize sua presença no EdRush
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                style={{
+                  color: '#525252',
+                  border: '1px solid #e5e2db',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving || !!usernameError}
+                className="save-btn px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: '#006d5b',
+                  color: 'white',
+                  boxShadow: '0 2px 8px rgba(0, 109, 91, 0.15)',
+                }}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Salvar
+                  </>
+                )}
+              </button>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-all ml-2"
+                style={{ background: 'transparent', color: '#8a867f' }}
+                aria-label="Fechar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex px-6 pt-4 gap-2 shrink-0 overflow-x-auto">
+            {([
+              { key: 'identity', label: 'Identidade', icon: User },
+              { key: 'avatar', label: 'Avatar', icon: Smile },
+              { key: 'borders', label: 'Bordas', icon: Sparkles },
+              { key: 'seals', label: 'Selos', icon: Star },
+            ] as const).map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className="tab-pill flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg whitespace-nowrap"
+                style={{
+                  color: activeTab === key ? '#006d5b' : '#525252',
+                }}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-6 py-5">
+            {actionError && (
+              <div
+                className="mb-4 p-3 rounded-lg text-sm"
+                style={{
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  color: '#dc2626',
+                }}
+              >
+                {actionError}
+              </div>
+            )}
+
+            {activeTab === 'identity' && (
+              <div className="space-y-6 max-w-lg">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#525252' }}>
+                    Nome de Usuário
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
+                    placeholder="como quer ser chamado?"
+                    maxLength={30}
+                    className="input-editorial w-full"
+                    style={{ color: '#1a1a1a' }}
+                  />
+                  {usernameError && (
+                    <p className="text-xs mt-1.5" style={{ color: '#dc2626' }}>{usernameError}</p>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-widest" style={{ color: '#525252' }}>
+                      Bio
+                    </label>
+                    <span
+                      className="text-xs font-mono tabular-nums"
+                      style={{
+                        color: bioColor,
+                        animation: bioLength > 140 ? 'counterPulse 0.3s ease' : 'none',
+                      }}
+                    >
+                      {bioLength}/{BIO_MAX}
+                    </span>
+                  </div>
+                  <textarea
+                    value={formData.bio ?? ''}
+                    onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
+                    placeholder="Conte um pouco sobre sua jornada de estudos..."
+                    rows={4}
+                    className="input-editorial w-full resize-none"
+                    style={{ color: '#1a1a1a' }}
+                  />
+                  <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: '#e5e2db' }}>
+                    <div
+                      className="h-full transition-all duration-300 ease-out"
+                      style={{
+                        width: `${Math.min(bioProgress * 100, 100)}%`,
+                        background: bioColor,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#525252' }}>
+                    Aniversário
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.birthday ?? ''}
+                    onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
+                    className="input-editorial w-full"
+                    style={{ color: '#1a1a1a', colorScheme: 'light' }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#525252' }}>
+                    Localização
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-3">
+                    <select
+                      value={selectedUf}
+                      onChange={(e) => {
+                        setSelectedUf(e.target.value);
+                        setSelectedCidade('');
+                      }}
+                      className="input-editorial w-full appearance-none cursor-pointer"
+                      style={{ color: '#1a1a1a' }}
+                      aria-label="Estado"
+                    >
+                      <option value="">UF</option>
+                      {BRAZILIAN_STATES.map((uf) => (
+                        <option key={uf.sigla} value={uf.sigla}>
+                          {uf.sigla} — {uf.nome}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={selectedCidade}
+                      onChange={(e) => setSelectedCidade(e.target.value)}
+                      disabled={!selectedUf || isLoadingCidades}
+                      className="input-editorial w-full appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ color: '#1a1a1a' }}
+                      aria-label="Cidade"
+                    >
+                      <option value="">
+                        {!selectedUf
+                          ? 'Selecione o estado primeiro'
+                          : isLoadingCidades
+                            ? 'Carregando cidades...'
+                            : cidades.length === 0
+                              ? 'Nenhuma cidade disponível'
+                              : 'Selecione a cidade'}
+                      </option>
+                      {selectedCidade && !cidades.includes(selectedCidade) && (
+                        <option value={selectedCidade}>{selectedCidade}</option>
+                      )}
+                      {cidades.map((nome) => (
+                        <option key={nome} value={nome}>
+                          {nome}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {cidadesError && (
+                    <p className="text-xs mt-1.5" style={{ color: '#dc2626' }}>{cidadesError}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'avatar' && (
+              <div className="space-y-6 max-w-lg">
+                <div
+                  className="rounded-xl p-5"
+                  style={{
+                    background: '#f5f2ed',
+                    border: '1px solid #e5e2db',
+                  }}
+                >
+                  <h3 className="text-sm font-bold mb-2" style={{ color: '#1a1a1a' }}>
+                    Sua foto, seu estilo
+                  </h3>
+                  <p className="text-xs leading-relaxed mb-4" style={{ color: '#525252' }}>
                     Envie uma foto própria (JPG, PNG ou WebP, até 5 MB) ou escolha um avatar da coleção.
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-bold text-cyan-200 transition hover:bg-cyan-400/20"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all"
+                      style={{
+                        background: '#006d5b',
+                        color: 'white',
+                      }}
                     >
                       <ImagePlus className="h-3.5 w-3.5" />
                       Enviar foto
@@ -491,7 +619,11 @@ export function EditProfileModal({
                           setPhotoChanged(true);
                           setActionError(null);
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-400 transition hover:border-rose-400/30 hover:text-rose-300"
+                        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all"
+                        style={{
+                          border: '1px solid #e5e2db',
+                          color: '#525252',
+                        }}
                       >
                         Usar avatar EdRush
                       </button>
@@ -521,77 +653,32 @@ export function EditProfileModal({
                     }}
                   />
                 </div>
+                <AvatarSelector
+                  selectedId={formData.avatar}
+                  onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
+                  size="lg"
+                  imageUrl={photoPreview}
+                />
               </div>
-              <AvatarSelector
-                selectedId={formData.avatar}
-                onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
-                size="lg"
-                imageUrl={photoPreview}
-              />
-            </div>
-          )}
-
-          {activeTab === 'borders' && (
-            <div>
-              <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você
-                e seus amigos no chat e nos perfis.
-              </p>
-              <BordersGallery
-                avatarId={formData.avatar}
-                onEquipped={() => onBorderEquipped?.()}
-              />
-            </div>
-          )}
-
-          {activeTab === 'seals' && (
-            <SealsGallery onEquipped={onSealsEquipped} />
-          )}
-        </div>
-
-        {/* Footer */}
-        <div
-          className="flex gap-3 px-6 py-5 shrink-0"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-        >
-          {actionError && (
-            <p className="absolute bottom-[5.5rem] left-6 right-6 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
-              {actionError}
-            </p>
-          )}
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: '#94a3b8',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.09)'; (e.currentTarget as HTMLButtonElement).style.color = '#ffffff'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'; (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving || !!usernameError}
-            className="flex-1 py-3 rounded-xl text-sm font-black text-slate-950 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-              boxShadow: '0 0 20px rgba(16,185,129,0.3)',
-            }}
-            onMouseEnter={(e) => { if (!isSaving) (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 28px rgba(16,185,129,0.5)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 20px rgba(16,185,129,0.3)'; }}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              'Salvar alterações'
             )}
-          </button>
+
+            {activeTab === 'borders' && (
+              <div>
+                <p className="text-xs mb-4 leading-relaxed" style={{ color: '#525252' }}>
+                  Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você
+                  e seus amigos no chat e nos perfis.
+                </p>
+                <BordersGallery
+                  avatarId={formData.avatar}
+                  onEquipped={() => onBorderEquipped?.()}
+                />
+              </div>
+            )}
+
+            {activeTab === 'seals' && (
+              <SealsGallery onEquipped={onSealsEquipped} />
+            )}
+          </div>
         </div>
       </div>
     </div>
