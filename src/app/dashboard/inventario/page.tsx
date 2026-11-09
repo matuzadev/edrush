@@ -275,16 +275,16 @@ export default function InventarioPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0d1411] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
+    <div className="min-h-screen bg-[#0d1411] text-[#f3f5f1]">
       {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
+      <nav className="border-b border-white/10 sticky top-0 z-40 px-4 sm:px-6 h-[76px] flex justify-between items-center bg-[#0d1411]/95 backdrop-blur-lg">
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/dashboard" className="text-slate-400 hover:text-white transition shrink-0">
             <ChevronLeft className="w-5 h-5" />
