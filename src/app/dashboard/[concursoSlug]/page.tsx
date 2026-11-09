@@ -178,9 +178,9 @@ export default function PersonalizedDashboardPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-[var(--emerald-500)]/30 border-t-[var(--emerald-500)] rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Carregando painel...</p>
         </div>
       </div>
@@ -205,13 +205,13 @@ export default function PersonalizedDashboardPage() {
     .join(' ');
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
       {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
+      <nav className="bg-[var(--card)]/80 backdrop-blur-lg border-b border-[var(--border)] sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+            className="text-lg font-bold text-gradient"
           >
             EDRUSH
           </Link>
@@ -220,13 +220,13 @@ export default function PersonalizedDashboardPage() {
             {concursoDisplayName}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <NotificationBell />
           <UserMenu onLogout={handleLogout} />
           {/* Indicador de jornada, sem referência a plano de assinatura. */}
           <div
-            className="journey-badge hidden md:flex relative items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden cursor-default group"
+            className="journey-badge hidden md:flex relative items-center gap-1.5 px-3 py-1.5 rounded-full overflow-hidden cursor-default group badge-neon emerald"
             style={{
               background: 'linear-gradient(135deg, rgba(6,78,59,0.35), rgba(15,23,42,0.92), rgba(8,47,73,0.35))',
               border: '1px solid rgba(52,211,153,0.3)',
