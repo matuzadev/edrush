@@ -96,21 +96,21 @@ export default function FeedPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[var(--emerald-500)] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
       {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
+      <nav className="bg-[var(--card)]/80 backdrop-blur-lg border-b border-[var(--border)] sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition shrink-0">
+          <Link href="/dashboard" className="text-slate-400 hover:text-[var(--fg)] transition shrink-0">
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          <Link href="/dashboard" className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          <Link href="/dashboard" className="hidden sm:block text-lg font-bold text-gradient">
             EDRUSH
           </Link>
           <span className="hidden sm:inline text-slate-600">·</span>
@@ -153,11 +153,7 @@ export default function FeedPage() {
 
           {/* Tabs */}
           <div
-            className="flex gap-1 mb-4 p-1 rounded-xl"
-            style={{
-              background: 'rgba(15,23,42,0.6)',
-              border: '1px solid rgba(255,255,255,0.06)',
-            }}
+            className="flex gap-1 mb-4 p-1 rounded-xl glass-card"
           >
             {(Object.keys(TAB_CONFIG) as FeedTab[]).map((t) => {
               const cfg = TAB_CONFIG[t];
@@ -166,11 +162,11 @@ export default function FeedPage() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className="flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition"
+                  className="flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition hover-lift"
                   style={{
                     background: active ? 'rgba(16,185,129,0.15)' : 'transparent',
                     color: active ? '#34d399' : '#64748b',
-                    boxShadow: active ? '0 0 12px -4px rgba(16,185,129,0.40)' : 'none',
+                    boxShadow: active ? 'var(--glow-emerald)' : 'none',
                   }}
                 >
                   {cfg.label}

@@ -57,22 +57,22 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       />
 
       {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-[#020617]/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/70 backdrop-blur-strong">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href="/" className="text-slate-400 hover:text-white transition shrink-0" aria-label="Início">
+            <Link href="/" className="text-slate-400 hover:text-[var(--fg)] transition shrink-0" aria-label="Início">
               <ChevronLeft className="w-5 h-5" />
             </Link>
             <Link
               href="/"
-              className="text-lg font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+              className="text-lg font-black text-gradient"
             >
               EDRUSH
             </Link>
           </div>
           <Link
             href="/auth/login"
-            className="text-sm font-bold text-slate-300 hover:text-white border border-white/10 hover:border-white/25 rounded-full px-4 py-1.5 transition"
+            className="text-sm font-bold text-slate-300 hover:text-white border border-[var(--border)] hover:border-[var(--emerald-500)]/40 rounded-full px-4 py-1.5 transition hover-lift"
           >
             Entrar
           </Link>
@@ -82,8 +82,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-6">
         {/* ───────── HERO ───────── */}
         <section
-          className="relative overflow-hidden rounded-3xl border border-white/10"
-          style={{ background: 'linear-gradient(180deg, rgba(15,23,42,0.6), rgba(2,6,23,0.9))' }}
+          className="relative overflow-hidden rounded-3xl border border-[var(--border)] glass-card"
         >
           {/* Banner aurora animado */}
           <div className="relative h-36 sm:h-44 overflow-hidden">

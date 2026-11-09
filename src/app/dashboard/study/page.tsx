@@ -195,17 +195,17 @@ function StudyPageContent() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-emerald-500"></div>
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[var(--emerald-500)]"></div>
       </div>
     );
   }
 
   if (isBlockMode && blockLoading) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-emerald-500 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[var(--emerald-500)] mx-auto mb-4" />
           <p className="text-slate-300 font-bold">Preparando seu bloco</p>
           <p className="text-slate-500 text-sm mt-1">{disciplina} · {quantidade} questões</p>
         </div>
@@ -215,9 +215,9 @@ function StudyPageContent() {
 
   if (sessionQuestions.length === 0) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-7 h-7 text-slate-500" />
           </div>
           <p className="text-white font-black text-lg">
@@ -230,11 +230,7 @@ function StudyPageContent() {
           </p>
           <button
             onClick={() => router.back()}
-            className="mt-5 px-5 py-2.5 rounded-xl text-sm font-black text-emerald-300 transition"
-            style={{
-              background: 'rgba(16,185,129,0.10)',
-              border: '1px solid rgba(16,185,129,0.30)',
-            }}
+            className="mt-5 px-5 py-2.5 rounded-xl text-sm font-black text-[var(--emerald-400)] transition input-modern border-[var(--emerald-500)]/30 hover:border-[var(--emerald-400)] hover:shadow-[var(--glow-emerald)]"
           >
             Voltar
           </button>
@@ -247,11 +243,11 @@ function StudyPageContent() {
   const progress = ((currentQuestionIndex + 1) / sessionQuestions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
       {/* Header Estilo Duolingo (Barra de Progresso) */}
       <nav className="max-w-4xl mx-auto px-6 py-6 flex items-center gap-6">
         <Link href="/dashboard/trilha">
-          <X className="w-6 h-6 text-slate-500 hover:text-white transition" />
+          <X className="w-6 h-6 text-slate-500 hover:text-[var(--fg)] transition" />
         </Link>
         <div className="flex-1 h-4 bg-slate-800 rounded-full overflow-hidden border border-white/5">
           <div 
