@@ -5,21 +5,28 @@ async function setupDatabase() {
     process.env.NEXT_PUBLIC_TURSO_CONNECTION_URL;
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
+  // Se não houver configuração do Turso e estivermos na Vercel, pula o setup silenciosamente
   if (!databaseUrl) {
+    if (process.env.VERCEL) {
+      console.log('⏭️ Skipping database setup on Vercel (no Turso configuration found).');
+      return;
+    }
     throw new Error(
       'Missing Turso configuration: set TURSO_DB_URL and TURSO_AUTH_TOKEN.',
     );
   }
 
   if (process.env.VERCEL && !/^(libsql|https):\/\//i.test(databaseUrl)) {
-    throw new Error('Vercel database setup requires a remote Turso URL.');
+    console.log('⏭️ Skipping database setup on Vercel (local database URL detected).');
+    return;
   }
 
   if (
     (databaseUrl.startsWith('libsql://') || process.env.VERCEL) &&
     !authToken
   ) {
-    throw new Error('Missing Turso configuration: set TURSO_AUTH_TOKEN.');
+    console.log('⏭️ Skipping database setup on Vercel (missing auth token).');
+    return;
   }
 
   const { client, initializeDatabase } = await import('../src/lib/db');
