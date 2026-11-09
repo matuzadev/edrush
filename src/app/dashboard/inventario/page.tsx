@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { NotificationBell } from '@/components/NotificationBell';
-import { UserMenu } from '@/components/UserMenu';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { StoreItemPreview } from '@/components/store/StoreItemPreview';
 import {
   ChevronLeft,
@@ -282,20 +281,11 @@ export default function InventarioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
-      {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-40 px-4 sm:px-6 h-16 flex justify-between items-center">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition shrink-0">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <Link href="/dashboard" className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            EDRUSH
-          </Link>
-          <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="text-sm text-slate-400 font-medium truncate">Inventário</span>
-        </div>
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      <UnifiedNavbar
+        title="Inventário"
+        showBack
+        rightSlot={
           <div
             className="flex items-center gap-2 px-3 py-1.5 rounded-full"
             style={{
@@ -307,12 +297,10 @@ export default function InventarioPage() {
             <Gem size={14} className="text-fuchsia-300" />
             <span className="text-sm font-black text-white tabular-nums">{balance.toLocaleString('pt-BR')}</span>
           </div>
-          <NotificationBell />
-          <UserMenu onLogout={() => { router.push('/auth/login'); }} />
-        </div>
-      </nav>
+        }
+      />
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-8">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
           <div>

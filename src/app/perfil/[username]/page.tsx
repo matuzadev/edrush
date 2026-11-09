@@ -57,7 +57,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       />
 
       {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-[#020617]/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/70 backdrop-blur-strong">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Link href="/" className="text-slate-400 hover:text-white transition shrink-0" aria-label="Início">
