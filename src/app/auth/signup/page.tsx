@@ -37,7 +37,7 @@ function SignupForm() {
   const handleGoogleSignUp = async () => {
     try {
       setIsGoogleLoading(true);
-      await startGoogleSignIn(redirect, true); // true indica signup
+      await startGoogleSignIn(redirect);
     } catch (err) {
       console.error('Erro no Google Sign-Up:', err);
       setError('Não foi possível iniciar o login com Google.');
