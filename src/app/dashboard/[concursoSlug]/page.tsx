@@ -288,19 +288,19 @@ export default function PersonalizedDashboardPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-10">
         {/* Cabeçalho personalizado */}
-        <div className="mb-6 relative overflow-hidden rounded-2xl bg-slate-900/80 border border-white/8 p-6">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 via-transparent to-cyan-500/5 pointer-events-none" />
-          <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none" />
+        <div className="mb-6 relative overflow-hidden rounded-2xl glass-card p-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--emerald-500)]/8 via-transparent to-[var(--cyan-500)]/5 pointer-events-none" />
+          <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-[var(--emerald-500)]/5 blur-2xl pointer-events-none" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <Target size={13} className="text-emerald-400" />
+              <div className="w-6 h-6 rounded-lg bg-[var(--emerald-500)]/20 flex items-center justify-center">
+                <Target size={13} className="text-[var(--emerald-400)]" />
               </div>
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-[var(--emerald-400)] uppercase tracking-widest">
                 Seu painel personalizado
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">{concursoDisplayName}</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-[var(--fg)] mb-1">{concursoDisplayName}</h1>
             <p className="text-slate-500 text-sm">
               {profileLoaded ? (
                 <>
@@ -395,7 +395,7 @@ export default function PersonalizedDashboardPage() {
             return (
               <div
                 key={metric.label}
-                className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl p-5 group transition-all hover:border-white/20 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
+                className="relative overflow-hidden glass-card p-5 group transition-all hover:border-[var(--emerald-500)]/40 hover:-translate-y-0.5 hover:shadow-[var(--shadow-xl),var(--glow-emerald)]"
               >
                 {/* glow superior */}
                 <div
@@ -416,13 +416,13 @@ export default function PersonalizedDashboardPage() {
                       <Icon size={18} className={metric.iconColor} />
                     </div>
                     <div
-                      className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-gradient-to-r ${metric.ringFrom} ${metric.ringTo} text-white/80`}
+                      className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full badge-neon emerald text-white/80`}
                     >
                       Live
                     </div>
                   </div>
 
-                  <div className="text-3xl font-black text-white leading-none mb-1 tabular-nums">
+                  <div className="text-3xl font-black text-[var(--fg)] leading-none mb-1 tabular-nums">
                     {metric.value}
                   </div>
                   <div className="text-xs font-semibold text-slate-300 mb-0.5">{metric.label}</div>
@@ -450,7 +450,7 @@ export default function PersonalizedDashboardPage() {
         <div className="flex gap-3 mb-10 flex-wrap">
           <Link
             href="/questions"
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-[#020617] rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_28px_rgba(16,185,129,0.35)]"
+            className="btn-gradient px-5 py-2.5 rounded-full text-sm font-bold hover-lift shadow-[var(--glow-emerald)]"
           >
             Ir para simulado aplicado
           </Link>
@@ -469,7 +469,7 @@ export default function PersonalizedDashboardPage() {
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-xl border border-white/[0.05] bg-slate-900/40 px-3 py-3 animate-pulse"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--card)]/40 px-3 py-3 animate-pulse shimmer-effect"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
                   <div className="flex items-center gap-2.5">
@@ -484,19 +484,19 @@ export default function PersonalizedDashboardPage() {
             </div>
           </div>
         ) : profileError ? (
-          <div className="mb-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-200" role="alert">
+          <div className="mb-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-200 glass-card" role="alert">
             Não foi possível carregar suas matérias. Tente novamente mais tarde ou revise sua configuração de concurso.
             <div>
-              <Link href="/onboarding/select-concurso" className="inline-block mt-3 underline underline-offset-4">
+              <Link href="/onboarding/select-concurso" className="inline-block mt-3 underline underline-offset-4 text-[var(--emerald-400)] hover:text-[var(--emerald-300)] transition">
                 Revisar configuração
               </Link>
             </div>
           </div>
         ) : displaySubjects.length === 0 ? (
-          <div className="mb-8 rounded-xl border border-white/10 bg-slate-900/50 p-4 text-sm text-slate-300">
+          <div className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--card)]/50 p-4 text-sm text-slate-300 glass-card">
             Nenhuma matéria válida está selecionada para este painel.
             <div>
-              <Link href="/onboarding/select-concurso" className="inline-block mt-3 text-emerald-300 underline underline-offset-4">
+              <Link href="/onboarding/select-concurso" className="inline-block mt-3 text-[var(--emerald-400)] underline underline-offset-4 hover:text-[var(--emerald-300)] transition">
                 Configurar concurso
               </Link>
             </div>
