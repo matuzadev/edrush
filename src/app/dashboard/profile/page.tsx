@@ -194,20 +194,20 @@ export default function ProfilePage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[var(--emerald-500)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
       {/* Navbar */}
-      <nav className="bg-[#0f172a]/80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
+      <nav className="bg-[var(--card)]/80 backdrop-blur-lg border-b border-[var(--border)] sticky top-0 z-50 px-6 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+            className="text-lg font-bold text-gradient"
           >
             EDRUSH
           </Link>
@@ -236,19 +236,18 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-6">
             {/* ── Hero ── */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-900/40 border border-white/8 rounded-2xl">
+            <div className="relative overflow-hidden glass-card">
               {/* Glow de fundo */}
               <div
                 className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, #10b981, #06b6d4)' }}
+                style={{ background: 'radial-gradient(circle, var(--emerald-500), var(--cyan-500))' }}
               />
               {/* Faixa de gradiente no topo */}
               <div
-                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent, #10b981, #06b6d4, transparent)' }}
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none divider-gradient"
               />
               {/* Banner decorativo */}
-              <div className="h-24 bg-gradient-to-br from-emerald-900/40 via-cyan-900/20 to-transparent" />
+              <div className="h-24 bg-gradient-to-br from-[var(--emerald-500)]/20 via-[var(--cyan-500)]/10 to-transparent" />
 
               <div className="relative px-6 pb-6 -mt-12">
                 {/* Avatar + ações */}
@@ -396,39 +395,22 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_28px_rgba(16,185,129,0.4)]"
+                    className="flex items-center gap-2 px-5 py-2.5 btn-gradient rounded-xl font-bold text-sm shadow-[var(--glow-emerald)] hover-lift"
                   >
                     <Edit className="w-4 h-4" />
                     Editar Perfil
                   </button>
                   <button
                     onClick={() => setIsFriendsPopupOpen(true)}
-                    className="relative flex items-center gap-1.5 px-3 py-2.5 rounded-xl font-semibold text-sm text-slate-300 hover:text-white transition-all"
-                    style={{
-                      background: 'rgba(15,23,42,0.6)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(34,211,238,0.35)';
-                      e.currentTarget.style.background = 'rgba(8,47,73,0.55)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.background = 'rgba(15,23,42,0.6)';
-                    }}
+                    className="relative flex items-center gap-1.5 px-3 py-2.5 rounded-xl font-semibold text-sm text-slate-300 hover:text-white transition-all input-modern border-[var(--cyan-500)]/30 hover:border-[var(--cyan-400)] hover:shadow-[var(--glow-cyan)]"
                     title="Amigos"
                     aria-label="Abrir lista de amigos"
                   >
-                    <Users className="w-4 h-4 text-cyan-400" />
+                    <Users className="w-4 h-4 text-[var(--cyan-400)]" />
                     <span className="hidden sm:inline">Amigos</span>
                     {friendsCount !== null && friendsCount > 0 && (
                       <span
-                        className="ml-0.5 min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black flex items-center justify-center tabular-nums"
-                        style={{
-                          background: 'rgba(34,211,238,0.15)',
-                          color: '#22d3ee',
-                          border: '1px solid rgba(34,211,238,0.30)',
-                        }}
+                        className="ml-0.5 min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black flex items-center justify-center tabular-nums badge-neon cyan"
                       >
                         {friendsCount}
                       </span>
@@ -463,8 +445,7 @@ export default function ProfilePage() {
 
               {/* Linha de gradient no topo */}
               <div
-                className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent, #10b981, #06b6d4, transparent)' }}
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none divider-gradient"
               />
 
               {/* Brilho sweep no hover */}
@@ -478,12 +459,12 @@ export default function ProfilePage() {
               {/* Glow blob esquerdo */}
               <div
                 className="absolute -left-12 -top-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-40"
-                style={{ background: 'radial-gradient(circle, #10b981 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, var(--emerald-500) 0%, transparent 70%)' }}
               />
               {/* Glow blob direito */}
               <div
                 className="absolute -right-16 -bottom-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-30"
-                style={{ background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, var(--cyan-500) 0%, transparent 70%)' }}
               />
 
               {/* Sparkles decorativos */}
