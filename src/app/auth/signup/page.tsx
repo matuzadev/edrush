@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, FormEvent, useMemo, useEffect, Suspense, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
