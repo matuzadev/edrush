@@ -42,19 +42,23 @@ export default function DashboardPage() {
       : 'Redirecionando você para o destino correto...';
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-200 flex items-center justify-center px-6">
+    <main className="min-h-screen bg-[#0d1411] text-[#f3f5f1] flex items-center justify-center px-6">
       <section className="max-w-md text-center" role={isError ? 'alert' : 'status'} aria-live="polite">
         {!isError && (
           <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
         )}
         <h1 className="text-xl font-bold text-white mb-2">
-          {isError ? 'Não foi possível abrir o painel' : 'EDRUSH'}
+          {isError ? 'Não foi possível abrir o painel' : (
+            <>
+              Ed<span className="text-emerald-500">Rush</span>
+            </>
+          )}
         </h1>
-        <p className="text-slate-400">{message}</p>
+        <p className="text-[#b3bbb5]">{message}</p>
         {isError && (
           <Link
             href="/onboarding/select-concurso"
-            className="inline-block mt-5 rounded-full bg-emerald-500 px-5 py-2 font-semibold text-[#020617]"
+            className="inline-block mt-5 rounded-lg bg-emerald-500 px-5 py-2 font-semibold text-[#06251b] transition hover:bg-emerald-400"
           >
             Continuar configuração
           </Link>

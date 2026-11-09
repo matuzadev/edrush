@@ -286,48 +286,42 @@ export default function InventarioPage() {
       {/* Navbar */}
       <nav className="border-b border-white/10 sticky top-0 z-40 px-4 sm:px-6 h-[76px] flex justify-between items-center bg-[#0d1411]/95 backdrop-blur-lg">
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition shrink-0">
+          <Link href="/dashboard" className="text-[#b3bbb5] hover:text-white transition shrink-0">
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          <Link href="/dashboard" className="hidden sm:block text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            EDRUSH
+          <Link href="/dashboard" className="hidden sm:inline-flex items-center gap-2 text-xl font-bold tracking-tight no-underline">
+            <Zap className="fill-emerald-500 text-emerald-500" size={20} aria-hidden="true" />
+            <span className="text-white">
+              Ed<span className="text-emerald-500">Rush</span>
+            </span>
           </Link>
           <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="text-sm text-slate-400 font-medium truncate">Inventário</span>
+          <span className="text-sm text-[#b3bbb5] font-medium truncate">Inventário</span>
         </div>
         <div className="flex items-center gap-3">
           <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-            style={{
-              background: 'linear-gradient(135deg, rgba(168,85,247,0.18), rgba(59,130,246,0.10))',
-              border: '1px solid rgba(168,85,247,0.30)',
-              boxShadow: '0 0 14px rgba(168,85,247,0.20)',
-            }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#dedbd0]/20 bg-white/[0.04]"
           >
-            <Gem size={14} className="text-fuchsia-300" />
-            <span className="text-sm font-black text-white tabular-nums">{balance.toLocaleString('pt-BR')}</span>
+            <Gem size={14} className="text-emerald-500" />
+            <span className="text-sm font-bold text-emerald-500 tabular-nums">{balance.toLocaleString('pt-BR')}</span>
           </div>
           <NotificationBell />
           <UserMenu onLogout={() => { router.push('/auth/login'); }} />
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">Meu Inventário</h1>
-            <p className="text-sm text-slate-400 mt-1">
-              Equipe seus itens favoritos para personalizar seu perfil público.
-            </p>
-          </div>
+        <div className="mb-10">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-500 sm:text-sm">Gerencie seus itens colecionáveis</p>
+          <h1 className="mb-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Meu Inventário</h1>
+          <p className="max-w-2xl text-base leading-7 text-[#aeb7b0] sm:text-lg">
+            Equipe seus itens favoritos para personalizar seu perfil público.
+          </p>
+        </div>
           <Link
             href="/dashboard/loja"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-black text-slate-950 transition"
-            style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              boxShadow: '0 0 14px rgba(16,185,129,0.30)',
-            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#dedbd0]/20 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/[0.05]"
           >
             <ShoppingBag size={14} />
             Ir à loja
