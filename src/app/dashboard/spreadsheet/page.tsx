@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from '@/components/NotificationBell';
 import { Search, LogOut, Zap } from 'lucide-react';
+import { Search, Zap } from 'lucide-react';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 
 interface Question {
   id: number;

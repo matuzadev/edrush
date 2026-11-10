@@ -103,7 +103,6 @@ html, body {
   line-height: 1.75rem;
 }
 
-
 .legal-content p + p {
   margin-top: 0.75rem;
 }
@@ -126,32 +125,6 @@ html, body {
   color: #10b981;
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-/* =========================================================
-   THEME EXTENSIONS / BASE STYLES
-   Keep @tailwind directives at the top-level so PostCSS +
-   Tailwind can process them correctly in all environments.
-========================================================= */
-
-/* ── CSS Theme Variables ───────────────────────────────── */
-:root {
-  --bg: #0d1411;
-  --fg: #f3f5f1;
-  --card: #0d1411;
-  --border: rgba(222,219,208,0.15);
-}
-
-html.light {
-  --bg: #f8fafc;
-  --fg: #0f172a;
-  --card: #ffffff;
-  --border: rgba(15,23,42,0.08);
-}
-
-/* Transição suave ao alternar tema */
-html, body {
-  transition: background-color 200ms ease, color 200ms ease;
 }
 
 /* =========================================================
