@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BugReportButton } from "@/components/BugReportButton";
 import FriendsChatLoader from "@/components/FriendsChatLoader";
 import { StudentPresenceTracker } from "@/components/StudentPresenceTracker";
+import { SmoothScroller } from "@/components/SmoothScroller";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
@@ -32,6 +33,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${inter.className} antialiased`}>
+        <SmoothScroller />
         <ThemeProvider>
           <AuthProvider>
             <StudentPresenceTracker />

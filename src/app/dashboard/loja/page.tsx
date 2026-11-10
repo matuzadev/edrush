@@ -10,10 +10,19 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
 import { ChevronLeft, Gem, Loader2 } from 'lucide-react';
 
+interface StoreItemLite {
+ id: string;
+ slug: string;
+ name: string;
+ rarity: string;
+ category: string;
+ metadata: unknown;
+}
+
 export default function LojaPage() {
  const router = useRouter();
  const { user, isLoading } = useAuth();
- const [items, setItems] = useState([]);
+ const [items, setItems] = useState<StoreItemLite[]>([]);
  const [loading, setLoading] = useState(true);
 
  useEffect(() => {
