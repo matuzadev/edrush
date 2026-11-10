@@ -25,6 +25,7 @@ import {
   Globe,
   Target,
   ChevronLeft,
+  Loader2,
 } from 'lucide-react';
 
 interface UserSettings {
