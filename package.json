@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "db:setup": "tsx scripts/setup-database.ts",
-    "vercel-build": "npm run db:setup && npm run build",
+    "vercel-build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "optimize:avatars": "node scripts/optimize-avatars.js"

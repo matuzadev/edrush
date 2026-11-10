@@ -9,10 +9,12 @@ const databaseUrl =
   process.env.NEXT_PUBLIC_TURSO_CONNECTION_URL;
 const databaseAuthToken = process.env.TURSO_AUTH_TOKEN;
 
-if (process.env.NODE_ENV === 'production' && !databaseUrl) {
+if (process.env.VERCEL && !databaseUrl) {
+  console.warn('⚠️ TURSO_DB_URL não configurada no build da Vercel. Conexão DB será adiada para runtime.');
+} else if (process.env.NODE_ENV === 'production' && !databaseUrl) {
   throw new Error('TURSO_DB_URL é obrigatória em produção; SQLite local não persiste na Vercel');
 }
-if (databaseUrl?.startsWith('libsql://') && !databaseAuthToken) {
+if (databaseUrl?.startsWith('libsql://') && !databaseAuthToken && !process.env.VERCEL) {
   throw new Error('TURSO_AUTH_TOKEN é obrigatório para conectar ao banco Turso');
 }
 
