@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { UnifiedNavbar } from '@/components/UnifiedNavbar';
+import { NotificationBell } from '@/components/NotificationBell';
+import { UserMenu } from '@/components/UserMenu';
 import {
   Settings,
   Bell,

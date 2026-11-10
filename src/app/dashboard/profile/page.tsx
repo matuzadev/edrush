@@ -17,6 +17,7 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { TIER_STYLE, MEDAL_CATEGORIES } from '@/lib/levels';
 import type { Medal } from '@/lib/levels';
 import { UnifiedNavbar } from '@/components/UnifiedNavbar';
+import {
   ChevronLeft,
   MapPin,
   Calendar,
