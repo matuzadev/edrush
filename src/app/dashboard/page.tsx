@@ -9,7 +9,6 @@ import { CheckCircle, Lock, PlayCircle, Star } from 'lucide-react';
 
 // Exemplo de estrutura de dados para as trilhas
 import subjectsData from '@/data/subjects.json';
-import { useEffect } from 'react';
 
 const COURSES = Object.keys(subjectsData).reduce((acc, slug) => {
   acc[slug] = {
