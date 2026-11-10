@@ -11,7 +11,13 @@ import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 export default function SpreadsheetPage() {
  const router = useRouter();
  const { user, signOut } = useAuth();
- const [questions, setQuestions] = useState([]);
+ interface Question {
+ id: string;
+ titulo: string;
+ disciplina: string;
+ capitulo: string;
+ }
+ const [questions, setQuestions] = useState<Question[]>([]);
  const [searchTerm, setSearchTerm] = useState('');
 
  useEffect(() => {

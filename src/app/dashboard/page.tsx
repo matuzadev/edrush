@@ -8,10 +8,22 @@ import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { CheckCircle, Lock, PlayCircle, Star } from 'lucide-react';
 import subjectsData from '@/data/subjects.json';
 
-const COURSES = Object.keys(subjectsData).reduce((acc, slug) => {
+interface CourseChapter {
+ id: string | number;
+ title: string;
+ completed: boolean;
+}
+
+interface Course {
+ title: string;
+ chapters: CourseChapter[];
+}
+
+const COURSES = Object.keys(subjectsData).reduce<Record<string, Course>>((acc, slug) => {
+ const subject = subjectsData as Record<string, { title: string; chapters: { id: string | number; title: string }[] }>;
  acc[slug] = {
- title: subjectsData[slug].title,
- chapters: subjectsData[slug].chapters.map((c) => ({ id: c.id, title: c.title, completed: false }))
+ title: subject[slug].title,
+ chapters: subject[slug].chapters.map((c) => ({ id: c.id, title: c.title, completed: false }))
  };
  return acc;
 }, {});
