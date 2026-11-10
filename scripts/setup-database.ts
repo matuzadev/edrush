@@ -2,8 +2,11 @@ async function setupDatabase() {
   const databaseUrl =
     process.env.TURSO_DB_URL ??
     process.env.TURSO_DATABASE_URL ??
+    process.env.EDRUSH_TURSO_DATABASE_URL ??
     process.env.NEXT_PUBLIC_TURSO_CONNECTION_URL;
-  const authToken = process.env.TURSO_AUTH_TOKEN;
+  const authToken =
+    process.env.TURSO_AUTH_TOKEN ??
+    process.env.EDRUSH_TURSO_AUTH_TOKEN;
 
   // Se não houver configuração do Turso e estivermos na Vercel, pula o setup silenciosamente
   if (!databaseUrl) {
