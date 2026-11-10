@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 import { StoreItemPreview } from '@/components/store/StoreItemPreview';
-import {
 import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
+import {
   ChevronLeft,
   Gem,
   Check,
