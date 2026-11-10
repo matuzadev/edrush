@@ -1,52 +1,660 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
 import { StoreItemPreview } from '@/components/store/StoreItemPreview';
-import { ChevronLeft, Gem, ShoppingBag } from 'lucide-react';
+import {
+  ChevronLeft,
+  Gem,
+  Check,
+  Sparkles,
+  Zap,
+  Crown,
+  Shield,
+  Star,
+  Loader2,
+  Clock,
+  ShoppingBag,
+  Save,
+  Flame,
+  BookOpen,
+  ArrowDownRight,
+  ArrowUpRight,
+} from 'lucide-react';
+
+interface StoreItem {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: string;
+  priceCrystals: number;
+  rarity: string;
+  imageUrl: string | null;
+  metadata: unknown;
+  stock: number | null;
+  owned: boolean;
+  equipped: boolean;
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  type: string;
+  reason: string;
+  createdAt: string;
+}
+
+const CATEGORY_LABELS: Record<string, { label: string; Icon: typeof Crown }> = {
+  avatar_orgao:     { label: 'Avatares Órgão', Icon: Shield },
+  avatar_vitoria:   { label: 'Avatares Vitória', Icon: Crown },
+  borda_perfil:     { label: 'Bordas', Icon: Sparkles },
+  mini_logo_badge:  { label: 'Selos', Icon: Star },
+  exp_buff:         { label: 'Buffs EXP', Icon: Zap },
+};
+
+const RARITY_TINT: Record<string, { color: string; bg: string; border: string }> = {
+  common:    { color: '#94a3b8', bg: 'rgba(100,116,139,0.10)', border: 'rgba(100,116,139,0.30)' },
+  rare:      { color: '#60a5fa', bg: 'rgba(59,130,246,0.10)',  border: 'rgba(59,130,246,0.30)' },
+  epic:      { color: '#c084fc', bg: 'rgba(168,85,247,0.10)',  border: 'rgba(168,85,247,0.40)' },
+  legendary: { color: '#fbbf24', bg: 'rgba(245,158,11,0.10)',  border: 'rgba(245,158,11,0.50)' },
+  mythic:    { color: '#fb7185', bg: 'rgba(244,63,94,0.12)',   border: 'rgba(244,63,94,0.55)' },
+};
+
+function isEquipableCategory(c: string): boolean {
+  return c === 'borda_perfil' || c === 'avatar_orgao' || c === 'avatar_vitoria' || c === 'mini_logo_badge';
+}
+
+type TxStyle = {
+  Icon: typeof Zap;
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+  accent: string;
+};
+
+const TX_STYLES: Record<string, TxStyle> = {
+  earn_question: {
+    Icon: BookOpen,
+    label: 'Questão',
+    color: '#34d399',
+    bg: 'rgba(16,185,129,0.14)',
+    border: 'rgba(16,185,129,0.40)',
+    accent: 'linear-gradient(180deg, #10b981, #047857)',
+  },
+  earn_chapter: {
+    Icon: Sparkles,
+    label: 'Capítulo',
+    color: '#22d3ee',
+    bg: 'rgba(6,182,212,0.14)',
+    border: 'rgba(6,182,212,0.40)',
+    accent: 'linear-gradient(180deg, #06b6d4, #0e7490)',
+  },
+  earn_streak: {
+    Icon: Flame,
+    label: 'Sequência',
+    color: '#fb923c',
+    bg: 'rgba(249,115,22,0.14)',
+    border: 'rgba(249,115,22,0.40)',
+    accent: 'linear-gradient(180deg, #f97316, #c2410c)',
+  },
+  spend_store: {
+    Icon: ShoppingBag,
+    label: 'Compra',
+    color: '#f0abfc',
+    bg: 'rgba(168,85,247,0.16)',
+    border: 'rgba(168,85,247,0.45)',
+    accent: 'linear-gradient(180deg, #a855f7, #6b21a8)',
+  },
+};
+
+const TX_FALLBACK: TxStyle = {
+  Icon: Gem,
+  label: 'Outra',
+  color: '#94a3b8',
+  bg: 'rgba(100,116,139,0.14)',
+  border: 'rgba(100,116,139,0.40)',
+  accent: 'linear-gradient(180deg, #64748b, #334155)',
+};
+
+function relativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 60_000) return 'agora';
+  const min = Math.floor(ms / 60_000);
+  if (min < 60) return `há ${min}min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `há ${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `há ${d}d`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `há ${mo}mês${mo > 1 ? 'es' : ''}`;
+  const y = Math.floor(mo / 12);
+  return `há ${y}a`;
+}
+
+function formatFullDate(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function InventarioPage() {
- const router = useRouter();
- const { user, isLoading } = useAuth();
- const [items, setItems] = useState([]);
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const [items, setItems] = useState<StoreItem[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState(0);
+  const [expBuff, setExpBuff] = useState<{ multiplier: number; expiresAt: string } | null>(null);
+  const [borderId, setBorderId] = useState<string | null>(null);
+  const [avatarId, setAvatarId] = useState<string | null>(null);
+  const [badgeIds, setBadgeIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
- useEffect(() => {
- if (!isLoading && !user) router.push('/auth/login');
- }, [user, isLoading, router]);
+  useEffect(() => {
+    if (!authLoading && !user) router.push('/auth/login');
+  }, [user, authLoading, router]);
 
- if (isLoading || !user) return <div className="min-h-screen bg-[#020617] flex items-center justify-center"><div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" /></div>;
+  async function loadAll() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [itemsRes, crystalsRes, txRes] = await Promise.all([
+        fetch('/api/store/items', { cache: 'no-store' }),
+        fetch('/api/users/me/crystals', { cache: 'no-store' }),
+        fetch('/api/users/me/transactions?limit=10', { cache: 'no-store' }),
+      ]);
+      if (!itemsRes.ok) throw new Error('Falha ao carregar inventário');
+      const itemsData = await itemsRes.json();
+      const allItems: StoreItem[] = (itemsData.items ?? []).filter((i: StoreItem) => i.owned);
+      setItems(allItems);
 
- return (
- <div className="min-h-screen bg-[#020617]">
- <nav className="glass-card border-b border-white/5 sticky top-0 z-50 px-4 sm:px-6 h-16 flex justify-between items-center">
- <div className="flex items-center gap-3">
- <Link href="/dashboard" className="text-slate-400 hover:text-emerald-400 transition hover-lift"><ChevronLeft className="w-5 h-5" /></Link>
- <Link href="/dashboard" className="text-lg font-black text-gradient">EDRUSH</Link>
- </div>
- <div className="flex items-center gap-3"><NotificationBell /><UserMenu onLogout={() => {}} /></div>
- </nav>
- <main className="max-w-7xl mx-auto px-4 py-8">
- <div className="mb-8">
- <h1 className="text-3xl font-bold text-gradient mb-2">Meu Inventário</h1>
- <p className="text-slate-400">Gerencie seus itens e personalizações</p>
- </div>
- <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
- {items.length > 0 ? items.map((item) => (
- <div key={item.id} className="glass-card p-6 rounded-xl hover-lift"><StoreItemPreview item={item} /></div>
- )) : (
- <div className="col-span-full glass-card p-12 text-center">
- <ShoppingBag className="w-12 h-12 text-slate-600 mx-auto mb-4" />
- <h3 className="text-xl font-bold text-white mb-2">Inventário vazio</h3>
- <p className="text-slate-400 mb-6">Visite a loja para adquirir novos itens</p>
- <Link href="/dashboard/loja" className="inline-flex items-center gap-2 btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-slate-950"><Gem className="w-4 h-4" />Ir à Loja</Link>
- </div>
- )}
- </div>
- </main>
- </div>
- );
+      const equippedBorder = allItems.find((i) => i.category === 'borda_perfil' && i.equipped);
+      const equippedAvatar = allItems.find((i) => (i.category === 'avatar_orgao' || i.category === 'avatar_vitoria') && i.equipped);
+      const equippedBadges = allItems.filter((i) => i.category === 'mini_logo_badge' && i.equipped);
+      setBorderId(equippedBorder?.id ?? null);
+      setAvatarId(equippedAvatar?.id ?? null);
+      setBadgeIds(equippedBadges.slice(0, 3).map((b) => b.id));
+
+      if (typeof itemsData.balance === 'number') setBalance(itemsData.balance);
+
+      if (crystalsRes.ok) {
+        const c = await crystalsRes.json();
+        setBalance(typeof c.balance === 'number' ? c.balance : 0);
+        setExpBuff(c.expBuff ?? null);
+      }
+
+      if (txRes.ok) {
+        const t = await txRes.json();
+        setTransactions(t.transactions ?? []);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (user) loadAll();
+  }, [user]);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, StoreItem[]>();
+    for (const it of items) {
+      const arr = map.get(it.category) ?? [];
+      arr.push(it);
+      map.set(it.category, arr);
+    }
+    return [...map.entries()];
+  }, [items]);
+
+  function toggleBadge(id: string) {
+    setBadgeIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
+  }
+
+  async function saveLoadout() {
+    setSaving(true);
+    setSaveMessage(null);
+    try {
+      const res = await fetch('/api/users/me/loadout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          borderItemId: borderId,
+          avatarItemId: avatarId,
+          badgeIds,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSaveMessage({ ok: false, text: data.error ?? 'Erro ao salvar' });
+        return;
+      }
+      setSaveMessage({ ok: true, text: 'Vitrine atualizada!' });
+      loadAll();
+    } catch (e) {
+      setSaveMessage({ ok: false, text: e instanceof Error ? e.message : 'Erro' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const buffRemaining = useMemo(() => {
+    if (!expBuff) return null;
+    const ms = new Date(expBuff.expiresAt).getTime() - Date.now();
+    if (ms <= 0) return null;
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    if (hours >= 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+    return `${hours}h ${minutes}m`;
+  }, [expBuff]);
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+      {/* Navbar */}
+      <nav className="glass-card border-b border-[var(--border)] sticky top-0 z-40 px-4 sm:px-6 h-[76px] flex justify-between items-center">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link href="/dashboard" className="text-slate-400 hover:text-[var(--fg)] transition hover-lift shrink-0">
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <Link href="/dashboard" className="hidden sm:inline-flex items-center gap-2 text-xl font-bold tracking-tight no-underline">
+            <Zap className="fill-emerald-500 text-emerald-500" size={20} aria-hidden="true" />
+            <span className="text-white">
+              Ed<span className="text-emerald-500">Rush</span>
+            </span>
+          </Link>
+          <span className="hidden sm:inline text-slate-600">·</span>
+          <span className="text-sm text-slate-400 font-medium truncate">Inventário</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg glass-card">
+            <Gem size={14} className="text-emerald-500" />
+            <span className="text-sm font-bold text-emerald-500 tabular-nums">{balance.toLocaleString('pt-BR')}</span>
+          </div>
+          <NotificationBell />
+          <UserMenu onLogout={() => { router.push('/auth/login'); }} />
+        </div>
+      </nav>
+
+      <main className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+        {/* Header */}
+        <div className="mb-10 animate-fade-in-up">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-500 sm:text-sm">Gerencie seus itens colecionáveis</p>
+          <h1 className="mb-3 text-4xl font-extrabold tracking-tight text-gradient sm:text-5xl">Meu Inventário</h1>
+          <p className="max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
+            Equipe seus itens favoritos para personalizar seu perfil público.
+          </p>
+          <Link
+            href="/dashboard/loja"
+            className="inline-flex items-center gap-1.5 rounded-lg glass-card px-4 py-2.5 text-sm font-semibold hover-lift mt-4"
+          >
+            <ShoppingBag size={14} />
+            Ir à loja
+          </Link>
+        </div>
+
+        {/* Buff ativo */}
+        {expBuff && buffRemaining && (
+          <div
+            className="mb-6 px-4 py-3 rounded-2xl flex items-center gap-3 flex-wrap glass-card"
+            style={{
+              background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(15,23,42,0.6))',
+              border: '1px solid rgba(16,185,129,0.40)',
+              boxShadow: '0 0 24px rgba(16,185,129,0.20)',
+            }}
+          >
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: 'rgba(16,185,129,0.25)', border: '1px solid rgba(16,185,129,0.50)' }}
+            >
+              <Zap className="w-5 h-5 text-emerald-300" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs uppercase font-black text-emerald-300 tracking-widest">Buff de EXP ativo</p>
+              <p className="text-sm font-bold text-white">
+                Multiplicador {expBuff.multiplier}x · expira em {buffRemaining}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Loading / error */}
+        {loading ? (
+          <div className="flex items-center justify-center py-32">
+            <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-32 text-slate-400">{error}</div>
+        ) : items.length === 0 ? (
+          <div className="text-center py-16 rounded-2xl glass-card">
+            <ShoppingBag className="w-10 h-10 text-slate-600 mx-auto" />
+            <p className="text-slate-300 font-bold mt-4">Seu inventário está vazio</p>
+            <p className="text-sm text-slate-500 mt-1">Visite a loja para adquirir seus primeiros itens.</p>
+            <Link
+              href="/dashboard/loja"
+              className="inline-block mt-5 px-6 py-2 rounded-xl text-sm font-black text-slate-950 btn-gradient"
+            >
+              Visitar loja
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Grupos por categoria */}
+            <div className="space-y-6">
+              {grouped.map(([category, catItems]) => {
+                const cfg = CATEGORY_LABELS[category];
+                const Icon = cfg?.Icon ?? ShoppingBag;
+                return (
+                  <section
+                    key={category}
+                    className="relative overflow-hidden rounded-2xl p-5 glass-card"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                          <Icon size={14} className="text-emerald-400" />
+                        </div>
+                        <h3 className="font-bold text-white text-sm">{cfg?.label ?? category}</h3>
+                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                          {catItems.length}
+                        </span>
+                      </div>
+                      {category === 'mini_logo_badge' && (
+                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                          {badgeIds.length}/3 equipados
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {catItems.map((item) => {
+                        const tint = RARITY_TINT[item.rarity] ?? RARITY_TINT.common;
+                        const isEquipable = isEquipableCategory(item.category);
+                        let isSelected = false;
+                        if (item.category === 'borda_perfil') isSelected = borderId === item.id;
+                        else if (item.category === 'avatar_orgao' || item.category === 'avatar_vitoria') isSelected = avatarId === item.id;
+                        else if (item.category === 'mini_logo_badge') isSelected = badgeIds.includes(item.id);
+
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => {
+                              if (!isEquipable) return;
+                              if (item.category === 'borda_perfil') setBorderId(isSelected ? null : item.id);
+                              else if (item.category === 'avatar_orgao' || item.category === 'avatar_vitoria') setAvatarId(isSelected ? null : item.id);
+                              else if (item.category === 'mini_logo_badge') toggleBadge(item.id);
+                            }}
+                            className="relative overflow-hidden rounded-2xl flex flex-col text-left transition-all hover-lift"
+                            style={{
+                              background: `linear-gradient(180deg, ${tint.bg}, rgba(15,23,42,0.85))`,
+                              border: `1px solid ${isSelected ? 'var(--emerald-500)' : tint.border}`,
+                              boxShadow: isSelected
+                                ? 'var(--glow-emerald)'
+                                : `0 4px 12px -4px ${tint.color}33`,
+                            }}
+                            disabled={!isEquipable}
+                          >
+                            <div className="flex items-center justify-center py-4 px-3 relative">
+                              <StoreItemPreview item={item} size={80} />
+                              {isSelected && (
+                                <span
+                                  className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500"
+                                >
+                                  <Check size={12} className="text-slate-950" strokeWidth={3} />
+                                </span>
+                              )}
+                            </div>
+                            <div className="px-3 pb-3 border-t border-white/5 pt-2">
+                              <p className="text-xs font-bold text-white truncate">{item.name}</p>
+                              {item.category === 'exp_buff' ? (
+                                <p className="text-[10px] text-slate-500 mt-0.5">Consumível</p>
+                              ) : (
+                                <p className="text-[10px] mt-0.5" style={{ color: isSelected ? '#34d399' : '#64748b' }}>
+                                  {isSelected ? 'Selecionado' : isEquipable ? 'Toque para equipar' : 'Já aplicado'}
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+
+            {/* Barra de salvar */}
+            <div
+              className="fixed bottom-4 left-4 right-4 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:mt-8 z-30"
+            >
+              <div
+                className="flex items-center justify-between gap-3 p-4 rounded-2xl flex-wrap glass-card"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.88) 100%)',
+                  border: '1px solid rgba(16,185,129,0.30)',
+                  boxShadow: '0 12px 32px -8px rgba(16,185,129,0.20)',
+                }}
+              >
+                <div className="text-sm">
+                  <p className="font-bold text-white">Personalize sua vitrine</p>
+                  <p className="text-xs text-slate-400">As escolhas aparecem no seu perfil público.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {saveMessage && (
+                    <span
+                      className="text-xs font-bold"
+                      style={{ color: saveMessage.ok ? '#34d399' : '#fb7185' }}
+                    >
+                      {saveMessage.text}
+                    </span>
+                  )}
+                  <button
+                    onClick={saveLoadout}
+                    disabled={saving}
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-slate-950 transition disabled:opacity-60 btn-gradient"
+                  >
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                    Salvar vitrine
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Histórico de transações */}
+        {transactions.length > 0 && (() => {
+          const totalIn = transactions
+            .filter((tx) => tx.amount > 0)
+            .reduce((sum, tx) => sum + tx.amount, 0);
+          const totalOut = transactions
+            .filter((tx) => tx.amount < 0)
+            .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+          return (
+            <section
+              className="mt-8 relative overflow-hidden rounded-3xl glass-card"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.55) 100%)',
+                border: '1px solid var(--border)',
+                boxShadow: '0 12px 40px -12px rgba(168,85,247,0.18)',
+              }}
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-px pointer-events-none divider-gradient"
+              />
+
+              <div className="px-6 pt-5 pb-4 flex items-center justify-between gap-4 flex-wrap border-b border-[var(--border)]">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, rgba(168,85,247,0.25), rgba(59,130,246,0.10))',
+                      border: '1px solid rgba(168,85,247,0.35)',
+                      boxShadow: '0 0 14px rgba(168,85,247,0.20)',
+                    }}
+                  >
+                    <Clock size={16} className="text-fuchsia-300" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-white text-base leading-none">
+                      Últimas transações
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Histórico de cristais ganhos e gastos
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{
+                      background: 'rgba(16,185,129,0.10)',
+                      border: '1px solid rgba(16,185,129,0.30)',
+                    }}
+                  >
+                    <ArrowUpRight size={12} className="text-emerald-400" />
+                    <span className="text-[11px] font-black tabular-nums text-emerald-300">
+                      +{totalIn.toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                  <div
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{
+                      background: 'rgba(244,63,94,0.08)',
+                      border: '1px solid rgba(244,63,94,0.25)',
+                    }}
+                  >
+                    <ArrowDownRight size={12} className="text-rose-400" />
+                    <span className="text-[11px] font-black tabular-nums text-rose-300">
+                      −{totalOut.toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-3 sm:px-4 py-3 space-y-1.5">
+                {transactions.map((tx) => {
+                  const isPositive = tx.amount > 0;
+                  const style = TX_STYLES[tx.type] ?? TX_FALLBACK;
+                  const Icon = style.Icon;
+                  return (
+                    <div
+                      key={tx.id}
+                      className="group relative flex items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 rounded-2xl transition-all hover:translate-x-0.5"
+                      style={{
+                        background: 'rgba(15,23,42,0.55)',
+                        border: '1px solid var(--border)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(15,23,42,0.85)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = style.border;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(15,23,42,0.55)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)';
+                      }}
+                    >
+                      <div
+                        className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r"
+                        style={{ background: style.accent }}
+                      />
+
+                      <div
+                        className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{
+                          background: style.bg,
+                          border: `1px solid ${style.border}`,
+                          boxShadow: `0 0 12px -4px ${style.color}80`,
+                        }}
+                      >
+                        <Icon size={16} style={{ color: style.color }} />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-bold text-slate-100 truncate">
+                            {tx.reason}
+                          </p>
+                          <span
+                            className="text-[9px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded shrink-0"
+                            style={{
+                              background: style.bg,
+                              color: style.color,
+                              border: `1px solid ${style.border}`,
+                            }}
+                          >
+                            {style.label}
+                          </span>
+                        </div>
+                        <p
+                          className="text-[10px] text-slate-500 mt-0.5"
+                          title={formatFullDate(tx.createdAt)}
+                        >
+                          {relativeTime(tx.createdAt)}
+                          <span className="text-slate-700 mx-1.5">·</span>
+                          <span className="text-slate-600">{formatFullDate(tx.createdAt)}</span>
+                        </p>
+                      </div>
+
+                      <div className="shrink-0 text-right">
+                        <span
+                          className="inline-flex items-center gap-1 text-base font-black tabular-nums leading-none"
+                          style={{ color: isPositive ? '#34d399' : '#fb7185' }}
+                        >
+                          {isPositive ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
+                          {isPositive ? '+' : '−'}
+                          {Math.abs(tx.amount).toLocaleString('pt-BR')}
+                        </span>
+                        <div className="flex items-center justify-end gap-0.5 mt-1">
+                          <Gem size={9} className="text-fuchsia-400/70" />
+                          <span className="text-[9px] uppercase tracking-widest font-bold text-slate-500">
+                            cristais
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="px-6 py-3 border-t border-[var(--border)] flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-slate-600">
+                  {transactions.length} {transactions.length === 1 ? 'movimentação' : 'movimentações'}
+                </p>
+                <span className="text-[10px] text-slate-600 font-bold">
+                  Histórico recente
+                </span>
+              </div>
+            </section>
+          );
+        })()}
+      </main>
+    </div>
+  );
 }

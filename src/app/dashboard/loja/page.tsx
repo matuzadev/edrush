@@ -24,11 +24,11 @@ export default function LojaPage() {
  }
  }, [user, isLoading, router]);
 
- if (isLoading || loading) return <div className="min-h-screen bg-[#020617] flex items-center justify-center"><Loader2 className="w-12 h-12 text-emerald-500 animate-spin" /></div>;
+ if (isLoading || loading) return <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center"><Loader2 className="w-12 h-12 text-emerald-500 animate-spin" /></div>;
  if (!user) return null;
 
  return (
- <div className="min-h-screen bg-[#020617]">
+ <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
  <UnifiedNavbar />
  <main className="max-w-7xl mx-auto px-4 py-8">
  <div className="mb-8">
