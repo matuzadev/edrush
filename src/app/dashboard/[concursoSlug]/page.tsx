@@ -20,6 +20,7 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { UserMenu } from '@/components/UserMenu';
 import { BlockSetupModal } from '@/components/study/BlockSetupModal';
 import subjects from '@/data/subjects.json';
+import { UnifiedNavbar } from '@/components/UnifiedNavbar';
 
 interface UserSession {
   id: string;

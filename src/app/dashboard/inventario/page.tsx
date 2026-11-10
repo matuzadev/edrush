@@ -1,12 +1,12 @@
-'use client';
+\'use client\';
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { NotificationBell } from '@/components/NotificationBell';
-import { UserMenu } from '@/components/UserMenu';
-import { StoreItemPreview } from '@/components/store/StoreItemPreview';
+import { useEffect, useMemo, useState } from \'react\';
+import Link from \'next/link\';
+import { useRouter } from \'next/navigation\';
+import { useAuth } from \'@/contexts/AuthContext\';
+import { NotificationBell } from \'@/components/NotificationBell\';
+import { UserMenu } from \'@/components/UserMenu\';
+import { StoreItemPreview } from \'@/components/store/StoreItemPreview\';
 import {
   ChevronLeft,
   Gem,
@@ -24,7 +24,7 @@ import {
   BookOpen,
   ArrowDownRight,
   ArrowUpRight,
-} from 'lucide-react';
+} from \'lucide-react\';
 
 interface StoreItem {
   id: string;
@@ -50,27 +50,25 @@ interface Transaction {
 }
 
 const CATEGORY_LABELS: Record<string, { label: string; Icon: typeof Crown }> = {
-  avatar_orgao:     { label: 'Avatares Órgão', Icon: Shield },
-  avatar_vitoria:   { label: 'Avatares Vitória', Icon: Crown },
-  borda_perfil:     { label: 'Bordas', Icon: Sparkles },
-  mini_logo_badge:  { label: 'Selos', Icon: Star },
-  exp_buff:         { label: 'Buffs EXP', Icon: Zap },
+  avatar_orgao:     { label: \'Avatares Órgão\', Icon: Shield },
+  avatar_vitoria:   { label: \'Avatares Vitória\', Icon: Crown },
+  borda_perfil:     { label: \'Bordas\', Icon: Sparkles },
+  mini_logo_badge:  { label: \'Selos\', Icon: Star },
+  exp_buff:         { label: \'Buffs EXP\', Icon: Zap },
 };
 
 const RARITY_TINT: Record<string, { color: string; bg: string; border: string }> = {
-  common:    { color: '#94a3b8', bg: 'rgba(100,116,139,0.10)', border: 'rgba(100,116,139,0.30)' },
-  rare:      { color: '#60a5fa', bg: 'rgba(59,130,246,0.10)',  border: 'rgba(59,130,246,0.30)' },
-  epic:      { color: '#c084fc', bg: 'rgba(168,85,247,0.10)',  border: 'rgba(168,85,247,0.40)' },
-  legendary: { color: '#fbbf24', bg: 'rgba(245,158,11,0.10)',  border: 'rgba(245,158,11,0.50)' },
-  mythic:    { color: '#fb7185', bg: 'rgba(244,63,94,0.12)',   border: 'rgba(244,63,94,0.55)' },
+  common:    { color: \'#94a3b8\', bg: \'rgba(100,116,139,0.10)\', border: \'rgba(100,116,139,0.30)\' },
+  rare:      { color: \'#60a5fa\', bg: \'rgba(59,130,246,0.10)\',  border: \'rgba(59,130,246,0.30)\' },
+  epic:      { color: \'#c084fc\', bg: \'rgba(168,85,247,0.10)\',  border: \'rgba(168,85,247,0.40)\' },
+  legendary: { color: \'#fbbf24\', bg: \'rgba(245,158,11,0.10)\',  border: \'rgba(245,158,11,0.50)\' },
+  mythic:    { color: \'#fb7185\', bg: \'rgba(244,63,94,0.12)\',   border: \'rgba(244,63,94,0.55)\' },
 };
 
-// Slot equipável no loadout
 function isEquipableCategory(c: string): boolean {
-  return c === 'borda_perfil' || c === 'avatar_orgao' || c === 'avatar_vitoria' || c === 'mini_logo_badge';
+  return c === \'borda_perfil\' || c === \'avatar_orgao\' || c === \'avatar_vitoria\' || c === \'mini_logo_badge\';
 }
 
-// ─── Visual de cada tipo de transação ────────────────────────────────
 type TxStyle = {
   Icon: typeof Zap;
   label: string;
@@ -83,50 +81,50 @@ type TxStyle = {
 const TX_STYLES: Record<string, TxStyle> = {
   earn_question: {
     Icon: BookOpen,
-    label: 'Questão',
-    color: '#34d399',
-    bg: 'rgba(16,185,129,0.14)',
-    border: 'rgba(16,185,129,0.40)',
-    accent: 'linear-gradient(180deg, #10b981, #047857)',
+    label: \'Questão\',
+    color: \'#34d399\',
+    bg: \'rgba(16,185,129,0.14)\',
+    border: \'rgba(16,185,129,0.40)\',
+    accent: \'linear-gradient(180deg, #10b981, #047857)\',
   },
   earn_chapter: {
     Icon: Sparkles,
-    label: 'Capítulo',
-    color: '#22d3ee',
-    bg: 'rgba(6,182,212,0.14)',
-    border: 'rgba(6,182,212,0.40)',
-    accent: 'linear-gradient(180deg, #06b6d4, #0e7490)',
+    label: \'Capítulo\',
+    color: \'#22d3ee\',
+    bg: \'rgba(6,182,212,0.14)\',
+    border: \'rgba(6,182,212,0.40)\',
+    accent: \'linear-gradient(180deg, #06b6d4, #0e7490)\',
   },
   earn_streak: {
     Icon: Flame,
-    label: 'Sequência',
-    color: '#fb923c',
-    bg: 'rgba(249,115,22,0.14)',
-    border: 'rgba(249,115,22,0.40)',
-    accent: 'linear-gradient(180deg, #f97316, #c2410c)',
+    label: \'Sequência\',
+    color: \'#fb923c\',
+    bg: \'rgba(249,115,22,0.14)\',
+    border: \'rgba(249,115,22,0.40)\',
+    accent: \'linear-gradient(180deg, #f97316, #c2410c)\',
   },
   spend_store: {
     Icon: ShoppingBag,
-    label: 'Compra',
-    color: '#f0abfc',
-    bg: 'rgba(168,85,247,0.16)',
-    border: 'rgba(168,85,247,0.45)',
-    accent: 'linear-gradient(180deg, #a855f7, #6b21a8)',
+    label: \'Compra\',
+    color: \'#f0abfc\',
+    bg: \'rgba(168,85,247,0.16)\',
+    border: \'rgba(168,85,247,0.45)\',
+    accent: \'linear-gradient(180deg, #a855f7, #6b21a8)\',
   },
 };
 
 const TX_FALLBACK: TxStyle = {
   Icon: Gem,
-  label: 'Outra',
-  color: '#94a3b8',
-  bg: 'rgba(100,116,139,0.14)',
-  border: 'rgba(100,116,139,0.40)',
-  accent: 'linear-gradient(180deg, #64748b, #334155)',
+  label: \'Outra\',
+  color: \'#94a3b8\',
+  bg: \'rgba(100,116,139,0.14)\',
+  border: \'rgba(100,116,139,0.40)\',
+  accent: \'linear-gradient(180deg, #64748b, #334155)\',
 };
 
 function relativeTime(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();
-  if (ms < 60_000) return 'agora';
+  if (ms < 60_000) return \'agora\';
   const min = Math.floor(ms / 60_000);
   if (min < 60) return `há ${min}min`;
   const h = Math.floor(min / 60);
@@ -134,17 +132,17 @@ function relativeTime(iso: string): string {
   const d = Math.floor(h / 24);
   if (d < 30) return `há ${d}d`;
   const mo = Math.floor(d / 30);
-  if (mo < 12) return `há ${mo}mês${mo > 1 ? 'es' : ''}`;
+  if (mo < 12) return `há ${mo}mês${mo > 1 ? \'es\' : \'\'}`;
   const y = Math.floor(mo / 12);
   return `há ${y}a`;
 }
 
 function formatFullDate(iso: string): string {
-  return new Date(iso).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(iso).toLocaleString(\'pt-BR\', {
+    day: \'2-digit\',
+    month: \'short\',
+    hour: \'2-digit\',
+    minute: \'2-digit\',
   });
 }
 
@@ -161,13 +159,12 @@ export default function InventarioPage() {
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  // Estado do loadout em edição
   const [borderId, setBorderId] = useState<string | null>(null);
   const [avatarId, setAvatarId] = useState<string | null>(null);
   const [badgeIds, setBadgeIds] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push('/auth/login');
+    if (!authLoading && !user) router.push(\'/auth/login\');
   }, [user, authLoading, router]);
 
   async function loadAll() {
@@ -175,28 +172,27 @@ export default function InventarioPage() {
     setError(null);
     try {
       const [itemsRes, crystalsRes, txRes] = await Promise.all([
-        fetch('/api/store/items', { cache: 'no-store' }),
-        fetch('/api/users/me/crystals', { cache: 'no-store' }),
-        fetch('/api/users/me/transactions?limit=10', { cache: 'no-store' }),
+        fetch(\'/api/store/items\', { cache: \'no-store\' }),
+        fetch(\'/api/users/me/crystals\', { cache: \'no-store\' }),
+        fetch(\'/api/users/me/transactions?limit=10\', { cache: \'no-store\' }),
       ]);
-      if (!itemsRes.ok) throw new Error('Falha ao carregar inventário');
+      if (!itemsRes.ok) throw new Error(\'Falha ao carregar inventário\');
       const itemsData = await itemsRes.json();
       const allItems: StoreItem[] = (itemsData.items ?? []).filter((i: StoreItem) => i.owned);
       setItems(allItems);
 
-      // Inicializa loadout com itens já equipados (do servidor)
-      const equippedBorder = allItems.find((i) => i.category === 'borda_perfil' && i.equipped);
-      const equippedAvatar = allItems.find((i) => (i.category === 'avatar_orgao' || i.category === 'avatar_vitoria') && i.equipped);
-      const equippedBadges = allItems.filter((i) => i.category === 'mini_logo_badge' && i.equipped);
+      const equippedBorder = allItems.find((i) => i.category === \'borda_perfil\' && i.equipped);
+      const equippedAvatar = allItems.find((i) => (i.category === \'avatar_orgao\' || i.category === \'avatar_vitoria\') && i.equipped);
+      const equippedBadges = allItems.filter((i) => i.category === \'mini_logo_badge\' && i.equipped);
       setBorderId(equippedBorder?.id ?? null);
       setAvatarId(equippedAvatar?.id ?? null);
       setBadgeIds(equippedBadges.slice(0, 3).map((b) => b.id));
 
-      if (typeof itemsData.balance === 'number') setBalance(itemsData.balance);
+      if (typeof itemsData.balance === \'number\') setBalance(itemsData.balance);
 
       if (crystalsRes.ok) {
         const c = await crystalsRes.json();
-        setBalance(typeof c.balance === 'number' ? c.balance : 0);
+        setBalance(typeof c.balance === \'number\' ? c.balance : 0);
         setExpBuff(c.expBuff ?? null);
       }
 
@@ -205,7 +201,7 @@ export default function InventarioPage() {
         setTransactions(t.transactions ?? []);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro');
+      setError(e instanceof Error ? e.message : \'Erro\');
     } finally {
       setLoading(false);
     }
@@ -215,7 +211,6 @@ export default function InventarioPage() {
     if (user) loadAll();
   }, [user]);
 
-  // Agrupa itens por categoria
   const grouped = useMemo(() => {
     const map = new Map<string, StoreItem[]>();
     for (const it of items) {
@@ -238,9 +233,9 @@ export default function InventarioPage() {
     setSaving(true);
     setSaveMessage(null);
     try {
-      const res = await fetch('/api/users/me/loadout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch(\'/api/users/me/loadout\', {
+        method: \'POST\',
+        headers: { \'Content-Type\': \'application/json\' },
         body: JSON.stringify({
           borderItemId: borderId,
           avatarItemId: avatarId,
@@ -249,20 +244,18 @@ export default function InventarioPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setSaveMessage({ ok: false, text: data.error ?? 'Erro ao salvar' });
+        setSaveMessage({ ok: false, text: data.error ?? \'Erro ao salvar\' });
         return;
       }
-      setSaveMessage({ ok: true, text: 'Vitrine atualizada!' });
-      // recarrega para atualizar equipped flags
+      setSaveMessage({ ok: true, text: \'Vitrine atualizada!\' });
       loadAll();
     } catch (e) {
-      setSaveMessage({ ok: false, text: e instanceof Error ? e.message : 'Erro' });
+      setSaveMessage({ ok: false, text: e instanceof Error ? e.message : \'Erro\' });
     } finally {
       setSaving(false);
     }
   }
 
-  // Tempo restante do buff (formatado)
   const buffRemaining = useMemo(() => {
     if (!expBuff) return null;
     const ms = new Date(expBuff.expiresAt).getTime() - Date.now();
@@ -275,18 +268,18 @@ export default function InventarioPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#0d1411] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0d1411] text-[#f3f5f1]">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
       {/* Navbar */}
-      <nav className="border-b border-white/10 sticky top-0 z-40 px-4 sm:px-6 h-[76px] flex justify-between items-center bg-[#0d1411]/95 backdrop-blur-lg">
+      <nav className="border-b border-[var(--border)] sticky top-0 z-40 px-4 sm:px-6 h-[76px] flex justify-between items-center bg-[var(--bg)]/95 backdrop-blur-lg">
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/dashboard" className="text-[#b3bbb5] hover:text-white transition shrink-0">
+          <Link href="/dashboard" className="text-slate-400 hover:text-[var(--fg)] transition shrink-0">
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <Link href="/dashboard" className="hidden sm:inline-flex items-center gap-2 text-xl font-bold tracking-tight no-underline">
@@ -296,17 +289,17 @@ export default function InventarioPage() {
             </span>
           </Link>
           <span className="hidden sm:inline text-slate-600">·</span>
-          <span className="text-sm text-[#b3bbb5] font-medium truncate">Inventário</span>
+          <span className="text-sm text-slate-400 font-medium truncate">Inventário</span>
         </div>
         <div className="flex items-center gap-3">
           <div
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#dedbd0]/20 bg-white/[0.04]"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] bg-white/[0.04]"
           >
             <Gem size={14} className="text-emerald-500" />
-            <span className="text-sm font-bold text-emerald-500 tabular-nums">{balance.toLocaleString('pt-BR')}</span>
+            <span className="text-sm font-bold text-emerald-500 tabular-nums">{balance.toLocaleString(\'pt-BR\')}</span>
           </div>
           <NotificationBell />
-          <UserMenu onLogout={() => { router.push('/auth/login'); }} />
+          <UserMenu onLogout={() => { router.push(\'/auth/login\'); }} />
         </div>
       </nav>
 
@@ -315,7 +308,7 @@ export default function InventarioPage() {
         <div className="mb-10">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-500 sm:text-sm">Gerencie seus itens colecionáveis</p>
           <h1 className="mb-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Meu Inventário</h1>
-          <p className="max-w-2xl text-base leading-7 text-[#aeb7b0] sm:text-lg">
+          <p className="max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
             Equipe seus itens favoritos para personalizar seu perfil público.
           </p>
           <Link
@@ -332,14 +325,14 @@ export default function InventarioPage() {
           <div
             className="mb-6 px-4 py-3 rounded-2xl flex items-center gap-3 flex-wrap"
             style={{
-              background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(15,23,42,0.6))',
-              border: '1px solid rgba(16,185,129,0.40)',
-              boxShadow: '0 0 24px rgba(16,185,129,0.20)',
+              background: \'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(15,23,42,0.6))\',
+              border: \'1px solid rgba(16,185,129,0.40)\',
+              boxShadow: \'0 0 24px rgba(16,185,129,0.20)\',
             }}
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(16,185,129,0.25)', border: '1px solid rgba(16,185,129,0.50)' }}
+              style={{ background: \'rgba(16,185,129,0.25)\', border: \'1px solid rgba(16,185,129,0.50)\' }}
             >
               <Zap className="w-5 h-5 text-emerald-300" />
             </div>
@@ -362,18 +355,14 @@ export default function InventarioPage() {
         ) : items.length === 0 ? (
           <div
             className="text-center py-16 rounded-2xl"
-            style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}
+            style={{ background: \'rgba(15,23,42,0.6)\', border: \'1px solid rgba(255,255,255,0.06)\' }}
           >
             <ShoppingBag className="w-10 h-10 text-slate-600 mx-auto" />
             <p className="text-slate-300 font-bold mt-4">Seu inventário está vazio</p>
             <p className="text-sm text-slate-500 mt-1">Visite a loja para adquirir seus primeiros itens.</p>
             <Link
               href="/dashboard/loja"
-              className="inline-block mt-5 px-6 py-2 rounded-xl text-sm font-black text-slate-950"
-              style={{
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                boxShadow: '0 0 14px rgba(16,185,129,0.30)',
-              }}
+              className="inline-block mt-5 px-6 py-2 rounded-xl text-sm font-black text-slate-950 btn-gradient"
             >
               Visitar loja
             </Link>
@@ -388,11 +377,7 @@ export default function InventarioPage() {
                 return (
                   <section
                     key={category}
-                    className="relative overflow-hidden rounded-2xl p-5"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(15,23,42,0.85), rgba(15,23,42,0.40))',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                    }}
+                    className="relative overflow-hidden rounded-2xl p-5 glass-card"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
@@ -404,7 +389,7 @@ export default function InventarioPage() {
                           {catItems.length}
                         </span>
                       </div>
-                      {category === 'mini_logo_badge' && (
+                      {category === \'mini_logo_badge\' && (
                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                           {badgeIds.length}/3 equipados
                         </span>
@@ -416,25 +401,25 @@ export default function InventarioPage() {
                         const tint = RARITY_TINT[item.rarity] ?? RARITY_TINT.common;
                         const isEquipable = isEquipableCategory(item.category);
                         let isSelected = false;
-                        if (item.category === 'borda_perfil') isSelected = borderId === item.id;
-                        else if (item.category === 'avatar_orgao' || item.category === 'avatar_vitoria') isSelected = avatarId === item.id;
-                        else if (item.category === 'mini_logo_badge') isSelected = badgeIds.includes(item.id);
+                        if (item.category === \'borda_perfil\') isSelected = borderId === item.id;
+                        else if (item.category === \'avatar_orgao\' || item.category === \'avatar_vitoria\') isSelected = avatarId === item.id;
+                        else if (item.category === \'mini_logo_badge\') isSelected = badgeIds.includes(item.id);
 
                         return (
                           <button
                             key={item.id}
                             onClick={() => {
                               if (!isEquipable) return;
-                              if (item.category === 'borda_perfil') setBorderId(isSelected ? null : item.id);
-                              else if (item.category === 'avatar_orgao' || item.category === 'avatar_vitoria') setAvatarId(isSelected ? null : item.id);
-                              else if (item.category === 'mini_logo_badge') toggleBadge(item.id);
+                              if (item.category === \'borda_perfil\') setBorderId(isSelected ? null : item.id);
+                              else if (item.category === \'avatar_orgao\' || item.category === \'avatar_vitoria\') setAvatarId(isSelected ? null : item.id);
+                              else if (item.category === \'mini_logo_badge\') toggleBadge(item.id);
                             }}
-                            className="relative overflow-hidden rounded-2xl flex flex-col text-left transition-all hover:-translate-y-0.5"
+                            className="relative overflow-hidden rounded-2xl flex flex-col text-left transition-all hover-lift"
                             style={{
                               background: `linear-gradient(180deg, ${tint.bg}, rgba(15,23,42,0.85))`,
-                              border: `1px solid ${isSelected ? '#10b981' : tint.border}`,
+                              border: `1px solid ${isSelected ? \'#10b981\' : tint.border}`,
                               boxShadow: isSelected
-                                ? '0 0 16px rgba(16,185,129,0.40)'
+                                ? \'0 0 16px rgba(16,185,129,0.40)\'
                                 : `0 4px 12px -4px ${tint.color}33`,
                             }}
                             disabled={!isEquipable}
@@ -444,7 +429,7 @@ export default function InventarioPage() {
                               {isSelected && (
                                 <span
                                   className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                                  style={{ background: '#10b981' }}
+                                  style={{ background: \'#10b981\' }}
                                 >
                                   <Check size={12} className="text-slate-950" strokeWidth={3} />
                                 </span>
@@ -452,11 +437,11 @@ export default function InventarioPage() {
                             </div>
                             <div className="px-3 pb-3 border-t border-white/5 pt-2">
                               <p className="text-xs font-bold text-white truncate">{item.name}</p>
-                              {item.category === 'exp_buff' ? (
+                              {item.category === \'exp_buff\' ? (
                                 <p className="text-[10px] text-slate-500 mt-0.5">Consumível</p>
                               ) : (
-                                <p className="text-[10px] mt-0.5" style={{ color: isSelected ? '#34d399' : '#64748b' }}>
-                                  {isSelected ? 'Selecionado' : isEquipable ? 'Toque para equipar' : 'Já aplicado'}
+                                <p className="text-[10px] mt-0.5" style={{ color: isSelected ? \'#34d399\' : \'#64748b\' }}>
+                                  {isSelected ? \'Selecionado\' : isEquipable ? \'Toque para equipar\' : \'Já aplicado\'}
                                 </p>
                               )}
                             </div>
@@ -474,11 +459,11 @@ export default function InventarioPage() {
               className="fixed bottom-4 left-4 right-4 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:mt-8 z-30"
             >
               <div
-                className="flex items-center justify-between gap-3 p-4 rounded-2xl flex-wrap"
+                className="flex items-center justify-between gap-3 p-4 rounded-2xl flex-wrap glass-card"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.88) 100%)',
-                  border: '1px solid rgba(16,185,129,0.30)',
-                  boxShadow: '0 12px 32px -8px rgba(16,185,129,0.20)',
+                  background: \'linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.88) 100%)\',
+                  border: \'1px solid rgba(16,185,129,0.30)\',
+                  boxShadow: \'0 12px 32px -8px rgba(16,185,129,0.20)\',
                 }}
               >
                 <div className="text-sm">
@@ -489,7 +474,7 @@ export default function InventarioPage() {
                   {saveMessage && (
                     <span
                       className="text-xs font-bold"
-                      style={{ color: saveMessage.ok ? '#34d399' : '#fb7185' }}
+                      style={{ color: saveMessage.ok ? \'#34d399\' : \'#fb7185\' }}
                     >
                       {saveMessage.text}
                     </span>
@@ -497,11 +482,7 @@ export default function InventarioPage() {
                   <button
                     onClick={saveLoadout}
                     disabled={saving}
-                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-slate-950 transition disabled:opacity-60"
-                    style={{
-                      background: 'linear-gradient(135deg, #10b981, #059669)',
-                      boxShadow: '0 0 14px rgba(16,185,129,0.40)',
-                    }}
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-slate-950 transition disabled:opacity-60 btn-gradient"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     Salvar vitrine
@@ -522,33 +503,31 @@ export default function InventarioPage() {
             .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
           return (
             <section
-              className="mt-8 relative overflow-hidden rounded-3xl"
+              className="mt-8 relative overflow-hidden rounded-3xl glass-card"
               style={{
                 background:
-                  'linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.55) 100%)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 12px 40px -12px rgba(168,85,247,0.18)',
+                  \'linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.55) 100%)\',
+                border: \'1px solid rgba(255,255,255,0.08)\',
+                boxShadow: \'0 12px 40px -12px rgba(168,85,247,0.18)\',
               }}
             >
-              {/* Linha de gradiente no topo */}
               <div
                 className="absolute top-0 left-0 right-0 h-px pointer-events-none"
                 style={{
                   background:
-                    'linear-gradient(90deg, transparent, #a855f7, #06b6d4, #10b981, transparent)',
+                    \'linear-gradient(90deg, transparent, #a855f7, #06b6d4, #10b981, transparent)\',
                 }}
               />
 
-              {/* Header */}
               <div className="px-6 pt-5 pb-4 flex items-center justify-between gap-4 flex-wrap border-b border-white/5">
                 <div className="flex items-center gap-3">
                   <div
                     className="w-10 h-10 rounded-2xl flex items-center justify-center"
                     style={{
                       background:
-                        'linear-gradient(135deg, rgba(168,85,247,0.25), rgba(59,130,246,0.10))',
-                      border: '1px solid rgba(168,85,247,0.35)',
-                      boxShadow: '0 0 14px rgba(168,85,247,0.20)',
+                        \'linear-gradient(135deg, rgba(168,85,247,0.25), rgba(59,130,246,0.10))\',
+                      border: \'1px solid rgba(168,85,247,0.35)\',
+                      boxShadow: \'0 0 14px rgba(168,85,247,0.20)\',
                     }}
                   >
                     <Clock size={16} className="text-fuchsia-300" />
@@ -563,36 +542,34 @@ export default function InventarioPage() {
                   </div>
                 </div>
 
-                {/* Resumo entrada/saída */}
                 <div className="flex items-center gap-2">
                   <div
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: 'rgba(16,185,129,0.10)',
-                      border: '1px solid rgba(16,185,129,0.30)',
+                      background: \'rgba(16,185,129,0.10)\',
+                      border: \'1px solid rgba(16,185,129,0.30)\',
                     }}
                   >
                     <ArrowUpRight size={12} className="text-emerald-400" />
                     <span className="text-[11px] font-black tabular-nums text-emerald-300">
-                      +{totalIn.toLocaleString('pt-BR')}
+                      +{totalIn.toLocaleString(\'pt-BR\')}
                     </span>
                   </div>
                   <div
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: 'rgba(244,63,94,0.08)',
-                      border: '1px solid rgba(244,63,94,0.25)',
+                      background: \'rgba(244,63,94,0.08)\',
+                      border: \'1px solid rgba(244,63,94,0.25)\',
                     }}
                   >
                     <ArrowDownRight size={12} className="text-rose-400" />
                     <span className="text-[11px] font-black tabular-nums text-rose-300">
-                      −{totalOut.toLocaleString('pt-BR')}
+                      −{totalOut.toLocaleString(\'pt-BR\')}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Lista */}
               <div className="px-3 sm:px-4 py-3 space-y-1.5">
                 {transactions.map((tx) => {
                   const isPositive = tx.amount > 0;
@@ -603,25 +580,23 @@ export default function InventarioPage() {
                       key={tx.id}
                       className="group relative flex items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 rounded-2xl transition-all hover:translate-x-0.5"
                       style={{
-                        background: 'rgba(15,23,42,0.55)',
-                        border: '1px solid rgba(255,255,255,0.04)',
+                        background: \'rgba(15,23,42,0.55)\',
+                        border: \'1px solid rgba(255,255,255,0.04)\',
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(15,23,42,0.85)';
+                        (e.currentTarget as HTMLDivElement).style.background = \'rgba(15,23,42,0.85)\';
                         (e.currentTarget as HTMLDivElement).style.borderColor = style.border;
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(15,23,42,0.55)';
-                        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.04)';
+                        (e.currentTarget as HTMLDivElement).style.background = \'rgba(15,23,42,0.55)\';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = \'rgba(255,255,255,0.04)\';
                       }}
                     >
-                      {/* Barra lateral de destaque por tipo */}
                       <div
                         className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r"
                         style={{ background: style.accent }}
                       />
 
-                      {/* Ícone com fundo colorido */}
                       <div
                         className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                         style={{
@@ -633,7 +608,6 @@ export default function InventarioPage() {
                         <Icon size={16} style={{ color: style.color }} />
                       </div>
 
-                      {/* Texto */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-bold text-slate-100 truncate">
@@ -660,15 +634,14 @@ export default function InventarioPage() {
                         </p>
                       </div>
 
-                      {/* Valor */}
                       <div className="shrink-0 text-right">
                         <span
                           className="inline-flex items-center gap-1 text-base font-black tabular-nums leading-none"
-                          style={{ color: isPositive ? '#34d399' : '#fb7185' }}
+                          style={{ color: isPositive ? \'#34d399\' : \'#fb7185\' }}
                         >
                           {isPositive ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
-                          {isPositive ? '+' : '−'}
-                          {Math.abs(tx.amount).toLocaleString('pt-BR')}
+                          {isPositive ? \'+\' : \'−\'}
+                          {Math.abs(tx.amount).toLocaleString(\'pt-BR\')}
                         </span>
                         <div className="flex items-center justify-end gap-0.5 mt-1">
                           <Gem size={9} className="text-fuchsia-400/70" />
@@ -682,10 +655,9 @@ export default function InventarioPage() {
                 })}
               </div>
 
-              {/* Footer */}
               <div className="px-6 py-3 border-t border-white/5 flex items-center justify-between">
                 <p className="text-[10px] uppercase tracking-widest font-bold text-slate-600">
-                  {transactions.length} {transactions.length === 1 ? 'movimentação' : 'movimentações'}
+                  {transactions.length} {transactions.length === 1 ? \'movimentação\' : \'movimentações\'}
                 </p>
                 <span className="text-[10px] text-slate-600 font-bold">
                   Histórico recente
