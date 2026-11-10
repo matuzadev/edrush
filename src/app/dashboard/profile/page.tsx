@@ -1229,4 +1229,3 @@ export default function ProfilePage() {
     </div>
   );
 }
->>>>>>> 9a6861aecb37fc8f5413cde0060beb7c7e8dafcd
