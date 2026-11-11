@@ -204,8 +204,8 @@ export function EditProfileModal({
     <div
       className="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6"
       style={{
-        background: 'rgba(2, 6, 23, 0.85)',
-        backdropFilter: 'blur(12px)'
+        background: 'rgba(15, 23, 42, 0.9)',
+        backdropFilter: 'blur(16px)'
       }}
       role="dialog"
       aria-modal="true"
@@ -223,13 +223,14 @@ export function EditProfileModal({
         .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .animate-float { animation: float 4s ease-in-out infinite; }
         .glass-card {
-          background: rgba(15, 23, 42, 0.7);
+          background: rgba(15, 23, 42, 0.85);
           backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.5);
+          border: 1px solid rgba(16, 185, 129, 0.15);
+          box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.1);
         }
         .glass-card:hover {
-          border-color: rgba(255, 255, 255, 0.12);
+          border-color: rgba(16, 185, 129, 0.3);
+          box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(16, 185, 129, 0.15);
         }
         .text-gradient {
           background: linear-gradient(135deg, #10b981, #06b6d4);
@@ -241,7 +242,7 @@ export function EditProfileModal({
           background: linear-gradient(135deg, #10b981, #06b6d4);
           background-size: 200% 200%;
           animation: gradient-shift 3s ease infinite;
-          box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+          box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
         }
         @keyframes gradient-shift {
           0% { background-position: 0% 50%; }
@@ -249,14 +250,16 @@ export function EditProfileModal({
           100% { background-position: 0% 50%; }
         }
         .input-modern {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(15, 23, 42, 0.6);
+          border: 1px solid rgba(16, 185, 129, 0.2);
           transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+          color: #e2e8f0;
         }
         .input-modern:focus {
           border-color: #10b981;
-          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
-          background: rgba(255, 255, 255, 0.05);
+          box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 0 15px rgba(16, 185, 129, 0.15);
+          background: rgba(15, 23, 42, 0.8);
+          outline: none;
         }
         .hover-lift {
           transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
