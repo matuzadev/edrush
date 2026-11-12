@@ -37,6 +37,7 @@ interface EditProfileModalProps {
   onSealsEquipped?: () => void;
   initialData: {
     username: string;
+    email?: string;
     birthday?: string;
     location?: string;
     bio?: string;
