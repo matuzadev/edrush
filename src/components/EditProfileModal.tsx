@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus, Check } from 'lucide-react';
+import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus, Check, Shield, Settings, MoreVertical, BarChart3, LogOut, Award, Frame } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
 import { SealsGallery } from './profile/SealsGallery';
@@ -200,12 +200,19 @@ export function EditProfileModal({
   const bioProgress = bioLength / BIO_MAX;
   const bioColor = bioLength > BIO_MAX ? '#f87171' : bioLength > 140 ? '#fbbf24' : '#10b981';
 
+  const tabs = [
+    { key: 'identity', label: 'Perfil', icon: User },
+    { key: 'avatar', label: 'Avatar', icon: Smile },
+    { key: 'borders', label: 'Bordas', icon: Frame },
+    { key: 'seals', label: 'Selos', icon: Award },
+  ] as const;
+
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6"
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6 animate-scale-in"
       style={{
-        background: 'rgba(15, 23, 42, 0.9)',
-        backdropFilter: 'blur(16px)'
+        background: 'linear-gradient(135deg, rgba(15, 81, 50, 0.95), rgba(32, 201, 151, 0.85))',
+        backdropFilter: 'blur(16px)',
       }}
       role="dialog"
       aria-modal="true"
@@ -216,410 +223,435 @@ export function EditProfileModal({
           from { opacity: 0; transform: scale(0.95) translateY(10px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
         .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .animate-float { animation: float 4s ease-in-out infinite; }
-        .glass-card {
-          background: rgba(15, 23, 42, 0.85);
-          backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(16, 185, 129, 0.15);
-          box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.1);
+
+        .modal-card {
+          background: #ffffff;
+          border-radius: 20px;
+          box-shadow: 0 25px 50px -12px rgba(15, 81, 50, 0.4);
+          border: 2px solid #A7F3D0;
+          overflow: hidden;
         }
-        .glass-card:hover {
-          border-color: rgba(16, 185, 129, 0.3);
-          box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(16, 185, 129, 0.15);
+
+        .cover-banner {
+          height: 120px;
+          background: linear-gradient(135deg, #0F5132, #198754);
+          position: relative;
         }
-        .text-gradient {
-          background: linear-gradient(135deg, #10b981, #06b6d4);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+
+        .avatar-container {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: 4px solid white;
+          outline: 2px solid #198754;
+          position: absolute;
+          bottom: -50px;
+          left: 24px;
+          background: white;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .btn-gradient {
-          background: linear-gradient(135deg, #10b981, #06b6d4);
-          background-size: 200% 200%;
-          animation: gradient-shift 3s ease infinite;
-          box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+
+        .tab-active {
+          color: #0A2E1C;
+          font-weight: 700;
+          border-bottom: 3px solid #198754;
         }
-        @keyframes gradient-shift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+
+        .tab-inactive {
+          color: #6B7280;
+          border-bottom: 3px solid transparent;
         }
-        .input-modern {
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-          color: #e2e8f0;
+
+        .input-edrush {
+          background: #F0FFF4;
+          border: 1px solid #A7F3D0;
+          color: #0A2E1C;
+          transition: all 200ms ease;
         }
-        .input-modern:focus {
-          border-color: #10b981;
-          box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 0 15px rgba(16, 185, 129, 0.15);
-          background: rgba(15, 23, 42, 0.8);
+
+        .input-edrush:focus {
+          border-color: #198754;
+          box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
           outline: none;
+          background: white;
         }
-        .hover-lift {
-          transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+        .btn-primary {
+          background: linear-gradient(135deg, #0F5132, #198754);
+          color: white;
+          transition: all 200ms ease;
         }
-        .hover-lift:hover {
-          transform: translateY(-2px);
+
+        .btn-primary:hover:not(:disabled) {
+          background: linear-gradient(135deg, #198754, #20C997);
+          transform: translateY(-1px);
         }
-        .badge-neon-emerald {
-          background: rgba(16, 185, 129, 0.15);
-          border: 1px solid rgba(16, 185, 129, 0.4);
-          color: #34d399;
-          box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+
+        .btn-secondary {
+          background: white;
+          border: 2px solid #198754;
+          color: #0F5132;
+          transition: all 200ms ease;
         }
-        .divider-gradient {
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), rgba(6, 182, 212, 0.5), transparent);
+
+        .btn-secondary:hover {
+          background: #F0FFF4;
+        }
+
+        .tag-pill {
+          background: #F0FFF4;
+          color: #0F5132;
+          border: 1px solid #A7F3D0;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 600;
         }
       `}</style>
 
-      <div
-        className="relative w-full max-w-5xl max-h-[95vh] flex flex-col lg:flex-row overflow-hidden rounded-[20px] glass-card animate-scale-in"
-      >
-        {/* Elementos decorativos de fundo */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[20px]">
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }} />
-          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        </div>
+      <div className="relative w-full max-w-[680px] max-h-[90vh] flex flex-col modal-card animate-scale-in">
+        {/* Cover Banner */}
+        <div className="cover-banner">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all"
+            aria-label="Fechar"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-        {/* Painel Esquerdo — Preview do Perfil */}
-        <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col p-8 relative z-10 border-r border-white/5">
-          <div className="absolute top-0 left-0 right-0 h-px divider-gradient" />
-
-          <div className="flex-1 flex flex-col items-center text-center space-y-6">
-            {/* Avatar com glow */}
-            <div
-              className="relative group cursor-pointer animate-float"
-              onClick={() => { setActiveTab('avatar'); fileInputRef.current?.click(); }}
-            >
-              <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] group-hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300">
-                <div className="w-full h-full rounded-full overflow-hidden bg-slate-900">
-                  {photoPreview ? (
-                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <User className="w-16 h-16 text-slate-600" />
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center group-hover:bg-emerald-500/20 group-hover:border-emerald-500/50 transition-all">
-                <ImagePlus className="w-4 h-4 text-emerald-400" />
-              </div>
-            </div>
-
-            {/* Dados do Preview */}
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gradient">
-                {formData.username || 'Seu Nome'}
-              </h2>
-              {formData.bio && (
-                <p className="text-sm text-slate-400 italic px-4 leading-relaxed">
-                  "{formData.bio}"
-                </p>
-              )}
-            </div>
-
-            {/* Stats Grid */}
-            <div className="w-full grid grid-cols-3 gap-3 pt-4">
-              {[
-                { label: 'Posts', value: '0' },
-                { label: 'Seguidores', value: '0' },
-                { label: 'Selos', value: '0' },
-              ].map((stat) => (
-                <div key={stat.label} className="glass-card rounded-xl p-3 text-center hover-lift">
-                  <div className="text-lg font-bold text-gradient">{stat.value}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Painel Direito — Formulário */}
-        <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
-            <div>
-              <h2 className="text-xl font-bold text-gradient">Editar Perfil</h2>
-              <p className="text-xs text-slate-500 font-mono tracking-widest mt-1">
-                // PERSONALIZE SUA PRESENÇA NO EDRUSH
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 hover-lift transition-all"
-              aria-label="Fechar"
-            >
-              <X className="w-4 h-4" />
+          <div className="absolute top-4 right-16 flex gap-2">
+            <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all" aria-label="Estatísticas">
+              <BarChart3 className="w-4 h-4" />
+            </button>
+            <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all" aria-label="Mais opções">
+              <MoreVertical className="w-4 h-4" />
             </button>
           </div>
+        </div>
 
-          {/* Tabs */}
-          <div className="flex px-6 pt-4 gap-2 overflow-x-auto border-b border-white/5 pb-0">
-            {([
-              { key: 'identity', label: 'Identidade', icon: User },
-              { key: 'avatar', label: 'Avatar', icon: Smile },
-              { key: 'borders', label: 'Bordas', icon: Sparkles },
-              { key: 'seals', label: 'Selos', icon: Star },
-            ] as const).map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                onClick={() => setActiveTab(key)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-250 ${
-                  activeTab === key
-                    ? 'badge-neon-emerald'
-                    : 'border border-white/5 text-slate-400 hover:border-white/10 hover:text-slate-200'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Conteúdo Scrollável */}
-          <div className="flex-1 overflow-y-auto px-6 py-6">
-            {actionError && (
-              <div className="mb-4 p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 text-sm flex items-center gap-2">
-                <X className="w-4 h-4" />
-                {actionError}
+        {/* Avatar sobreposto */}
+        <div className="avatar-container group cursor-pointer" onClick={() => setActiveTab('avatar')}>
+          <div className="w-full h-full rounded-full overflow-hidden bg-gray-100">
+            {photoPreview ? (
+              <img src={photoPreview} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <User className="w-12 h-12 text-gray-400" />
               </div>
             )}
+          </div>
+          <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#198754] flex items-center justify-center border-2 border-white">
+            <Check className="w-3 h-3 text-white" />
+          </div>
+        </div>
 
-            {activeTab === 'identity' && (
-              <div className="space-y-6 max-w-lg animate-scale-in">
-                {/* Username */}
+        {/* Header Info */}
+        <div className="pt-16 px-6 pb-4 border-b border-[#A7F3D0]/30">
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-2xl font-bold" style={{ color: '#0A2E1C' }}>
+              {formData.username || 'Seu Nome'}
+            </h2>
+            <div className="w-5 h-5 rounded-full bg-[#198754] flex items-center justify-center">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-sm mb-3" style={{ color: '#6B7280' }}>
+            <span>{initialData.email || 'usuario@edrush.com'}</span>
+            <span>•</span>
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
+              <span>{formattedLocation || 'Localização não definida'}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <span className="tag-pill">Concurseiro</span>
+            <span className="tag-pill">EdRush</span>
+            <span className="tag-pill">Foco Federal</span>
+          </div>
+        </div>
+
+        {/* Tabs Navigation */}
+        <div className="flex px-6 border-b border-[#A7F3D0]/30 overflow-x-auto">
+          {tabs.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all ${
+                activeTab === key ? 'tab-active' : 'tab-inactive hover:text-[#0A2E1C]'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          {actionError && (
+            <div className="mb-4 p-3 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm flex items-center gap-2">
+              <X className="w-4 h-4" />
+              {actionError}
+            </div>
+          )}
+
+          {activeTab === 'identity' && (
+            <div className="space-y-5 animate-scale-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
-                    Nome de Usuário
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
+                    Primeiro Nome
                   </label>
+                  <input
+                    type="text"
+                    value={formData.username.split(' ')[0] || ''}
+                    onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
+                    placeholder="Primeiro nome"
+                    className="input-edrush w-full px-4 py-3 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
+                    Sobrenome
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.username.split(' ').slice(1).join(' ') || ''}
+                    onChange={(e) => setFormData((p) => ({ ...p, username: `${p.username.split(' ')[0]} ${e.target.value}`.trim() }))}
+                    placeholder="Sobrenome"
+                    className="input-edrush w-full px-4 py-3 rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
+                  Username
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
                   <input
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
-                    placeholder="como quer ser chamado?"
-                    maxLength={30}
-                    className="input-modern w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 outline-none"
+                    placeholder="username"
+                    className="input-edrush w-full pl-8 pr-4 py-3 rounded-xl"
                   />
-                  {usernameError && (
-                    <p className="text-xs text-red-400 mt-2">{usernameError}</p>
+                  {formData.username.length >= 2 && (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#198754]">
+                      <Check className="w-4 h-4" />
+                    </div>
                   )}
                 </div>
-
-                {/* Bio */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">
-                      Bio
-                    </label>
-                    <span className="text-xs font-mono tabular-nums" style={{ color: bioColor }}>
-                      {bioLength}/{BIO_MAX}
-                    </span>
-                  </div>
-                  <textarea
-                    value={formData.bio ?? ''}
-                    onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
-                    placeholder="Conte um pouco sobre sua jornada de estudos..."
-                    rows={4}
-                    className="input-modern w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 outline-none resize-none"
-                  />
-                  <div className="mt-2 h-1 rounded-full overflow-hidden bg-white/5">
-                    <div
-                      className="h-full transition-all duration-300 ease-out"
-                      style={{
-                        width: `${Math.min(bioProgress * 100, 100)}%`,
-                        background: 'linear-gradient(90deg, #10b981, #06b6d4)',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Aniversário e Localização */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
-                      Aniversário
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.birthday ?? ''}
-                      onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
-                      className="input-modern w-full px-4 py-3 rounded-xl text-white outline-none"
-                      style={{ colorScheme: 'dark' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
-                      Localização
-                    </label>
-                    <select
-                      value={selectedUf}
-                      onChange={(e) => {
-                        setSelectedUf(e.target.value);
-                        setSelectedCidade('');
-                      }}
-                      className="input-modern w-full px-4 py-3 rounded-xl text-white outline-none appearance-none cursor-pointer mb-3"
-                      style={{ colorScheme: 'dark' }}
-                      aria-label="Estado"
-                    >
-                      <option value="">UF</option>
-                      {BRAZILIAN_STATES.map((uf) => (
-                        <option key={uf.sigla} value={uf.sigla}>
-                          {uf.sigla} — {uf.nome}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      value={selectedCidade}
-                      onChange={(e) => setSelectedCidade(e.target.value)}
-                      disabled={!selectedUf || isLoadingCidades}
-                      className="input-modern w-full px-4 py-3 rounded-xl text-white outline-none appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ colorScheme: 'dark' }}
-                      aria-label="Cidade"
-                    >
-                      <option value="">
-                        {!selectedUf
-                          ? 'Selecione o estado'
-                          : isLoadingCidades
-                          ? 'Carregando...'
-                          : cidades.length === 0
-                          ? 'Indisponível'
-                          : 'Selecione a cidade'}
-                      </option>
-                      {selectedCidade && !cidades.includes(selectedCidade) && (
-                        <option value={selectedCidade}>{selectedCidade}</option>
-                      )}
-                      {cidades.map((nome) => (
-                        <option key={nome} value={nome}>
-                          {nome}
-                        </option>
-                      ))}
-                    </select>
-                    {cidadesError && (
-                      <p className="text-xs text-red-400 mt-2">{cidadesError}</p>
-                    )}
-                  </div>
-                </div>
               </div>
-            )}
 
-            {activeTab === 'avatar' && (
-              <div className="space-y-6 max-w-lg animate-scale-in">
-                <div className="glass-card rounded-xl p-5 border border-white/5">
-                  <h3 className="text-sm font-bold text-white mb-2">Sua foto, seu estilo</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                    Envie uma foto própria (JPG, PNG ou WebP, até 5 MB) ou escolha um avatar da coleção.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="btn-gradient px-4 py-2 rounded-lg text-sm font-bold text-slate-950 flex items-center gap-2 hover-lift"
-                    >
-                      <ImagePlus className="w-4 h-4" />
-                      Enviar foto
-                    </button>
-                    {photoPreview && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPhotoFile(null);
-                          setPhotoPreview(null);
-                          setPhotoChanged(true);
-                          setActionError(null);
-                        }}
-                        className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 border border-white/10 hover:border-emerald-500/50 hover:text-emerald-400 transition-all hover-lift"
-                      >
-                        Usar avatar EdRush
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      event.target.value = '';
-                      if (!file) return;
-                      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                        setActionError('Escolha uma imagem JPG, PNG ou WebP.');
-                        return;
-                      }
-                      if (file.size > 5 * 1024 * 1024) {
-                        setActionError('A foto deve ter no máximo 5 MB.');
-                        return;
-                      }
-                      setActionError(null);
-                      setPhotoFile(file);
-                      setPhotoPreview(URL.createObjectURL(file));
-                      setPhotoChanged(true);
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#0A2E1C' }}>
+                    Bio
+                  </label>
+                  <span className="text-xs font-mono" style={{ color: bioColor }}>
+                    {bioLength}/{BIO_MAX}
+                  </span>
+                </div>
+                <textarea
+                  value={formData.bio ?? ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
+                  placeholder="Conte um pouco sobre sua jornada..."
+                  rows={4}
+                  className="input-edrush w-full px-4 py-3 rounded-xl resize-none"
+                />
+                <div className="mt-2 h-1 rounded-full overflow-hidden bg-gray-200">
+                  <div
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(bioProgress * 100, 100)}%`,
+                      background: 'linear-gradient(90deg, #198754, #20C997)',
                     }}
                   />
                 </div>
-                <AvatarSelector
-                  selectedId={formData.avatar}
-                  onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
-                  size="lg"
-                  imageUrl={photoPreview}
-                />
               </div>
-            )}
 
-            {activeTab === 'borders' && (
-              <div className="animate-scale-in">
-                <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-                  Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você e seus amigos no chat e nos perfis.
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
+                    Aniversário
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.birthday ?? ''}
+                    onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
+                    className="input-edrush w-full px-4 py-3 rounded-xl"
+                    style={{ colorScheme: 'light' }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
+                    Localização
+                  </label>
+                  <select
+                    value={selectedUf}
+                    onChange={(e) => {
+                      setSelectedUf(e.target.value);
+                      setSelectedCidade('');
+                    }}
+                    className="input-edrush w-full px-4 py-3 rounded-xl appearance-none cursor-pointer mb-3"
+                    style={{ colorScheme: 'light' }}
+                  >
+                    <option value="">UF</option>
+                    {BRAZILIAN_STATES.map((uf) => (
+                      <option key={uf.sigla} value={uf.sigla}>
+                        {uf.sigla} — {uf.nome}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedCidade}
+                    onChange={(e) => setSelectedCidade(e.target.value)}
+                    disabled={!selectedUf || isLoadingCidades}
+                    className="input-edrush w-full px-4 py-3 rounded-xl appearance-none cursor-pointer disabled:opacity-50"
+                    style={{ colorScheme: 'light' }}
+                  >
+                    <option value="">
+                      {!selectedUf
+                        ? 'Selecione o estado'
+                        : isLoadingCidades
+                        ? 'Carregando...'
+                        : cidades.length === 0
+                        ? 'Indisponível'
+                        : 'Selecione a cidade'}
+                    </option>
+                    {selectedCidade && !cidades.includes(selectedCidade) && (
+                      <option value={selectedCidade}>{selectedCidade}</option>
+                    )}
+                    {cidades.map((nome) => (
+                      <option key={nome} value={nome}>
+                        {nome}
+                      </option>
+                    ))}
+                  </select>
+                  {cidadesError && (
+                    <p className="text-xs text-red-600 mt-2">{cidadesError}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'avatar' && (
+            <div className="space-y-6 animate-scale-in">
+              <div className="p-5 rounded-xl border-2 border-[#A7F3D0] bg-[#F0FFF4]">
+                <h3 className="text-sm font-bold mb-2" style={{ color: '#0A2E1C' }}>Sua foto, seu estilo</h3>
+                <p className="text-xs mb-4" style={{ color: '#6B7280' }}>
+                  Envie uma foto própria (JPG, PNG ou WebP, até 5 MB) ou escolha um avatar da coleção.
                 </p>
-                <BordersGallery
-                  avatarId={formData.avatar}
-                  onEquipped={() => onBorderEquipped?.()}
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="btn-primary px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
+                  >
+                    <ImagePlus className="w-4 h-4" />
+                    Enviar foto
+                  </button>
+                  {photoPreview && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhotoFile(null);
+                        setPhotoPreview(null);
+                        setPhotoChanged(true);
+                        setActionError(null);
+                      }}
+                      className="btn-secondary px-4 py-2 rounded-lg text-sm font-semibold"
+                    >
+                      Usar avatar EdRush
+                    </button>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = '';
+                    if (!file) return;
+                    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                      setActionError('Escolha uma imagem JPG, PNG ou WebP.');
+                      return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                      setActionError('A foto deve ter no máximo 5 MB.');
+                      return;
+                    }
+                    setActionError(null);
+                    setPhotoFile(file);
+                    setPhotoPreview(URL.createObjectURL(file));
+                    setPhotoChanged(true);
+                  }}
                 />
               </div>
-            )}
+              <AvatarSelector
+                selectedId={formData.avatar}
+                onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
+                size="lg"
+                imageUrl={photoPreview}
+              />
+            </div>
+          )}
 
-            {activeTab === 'seals' && (
-              <div className="animate-scale-in">
-                <SealsGallery onEquipped={onSealsEquipped} />
-              </div>
-            )}
-          </div>
+          {activeTab === 'borders' && (
+            <div className="animate-scale-in">
+              <p className="text-xs mb-6" style={{ color: '#6B7280' }}>
+                Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você e seus amigos no chat e nos perfis.
+              </p>
+              <BordersGallery
+                avatarId={formData.avatar}
+                onEquipped={() => onBorderEquipped?.()}
+              />
+            </div>
+          )}
 
-          {/* Footer com Ações */}
-          <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-white/5 bg-slate-900/50">
-            <button
-              onClick={onClose}
-              className="px-6 py-3 rounded-xl text-sm font-semibold text-slate-300 border border-white/10 hover:border-emerald-500/50 hover:text-emerald-400 transition-all hover-lift"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving || !!usernameError}
-              className="btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-slate-950 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover-lift"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  Salvar Alterações
-                </>
-              )}
-            </button>
-          </div>
+          {activeTab === 'seals' && (
+            <div className="animate-scale-in">
+              <SealsGallery onEquipped={onSealsEquipped} />
+            </div>
+          )}
+        </div>
+
+        {/* Footer Actions */}
+        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-[#A7F3D0]/30 bg-white">
+          <button
+            onClick={onClose}
+            className="btn-secondary px-6 py-3 rounded-xl text-sm font-semibold"
+          >
+            Descartar
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isSaving || !!usernameError}
+            className="btn-primary px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4" />
+                Salvar Alterações
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
