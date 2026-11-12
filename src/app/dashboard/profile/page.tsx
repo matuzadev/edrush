@@ -101,6 +101,7 @@ export default function ProfilePage() {
   const { profile, isLoading: profileLoading, error, updateProfile, fetchProfile } = usUserProfile();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editModalOrigin, setEditModalOrigin] = useState<DOMRect | null>(null);
   const [isAddFriendsOpen, setIsAddFriendsOpen] = useState(false);
   const [isFriendsPopupOpen, setIsFriendsPopupOpen] = useState(false);
   const [friendsCount, setFriendsCount] = useState<number | null>(null);
@@ -395,7 +396,11 @@ export default function ProfilePage() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setIsEditModalOpen(true)}
+                    id="btn-editar-perfil"
+                    onClick={(e) => {
+                      setEditModalOrigin((e.currentTarget as HTMLButtonElement).getBoundingClientRect());
+                      setIsEditModalOpen(true);
+                    }}
                     className="flex items-center gap-2 px-5 py-2.5 btn-gradient rounded-xl font-bold text-sm shadow-[var(--glow-emerald)] hover-lift"
                   >
                     <Edit className="w-4 h-4" />
@@ -1128,6 +1133,7 @@ export default function ProfilePage() {
         onSave={handleSaveProfile}
         onBorderEquipped={() => fetchProfile()}
         onSealsEquipped={() => fetchProfile()}
+        originRect={editModalOrigin}
         initialData={{
           username: profile.username,
           email: profile.email,
