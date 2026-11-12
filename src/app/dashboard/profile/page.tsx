@@ -1130,6 +1130,7 @@ export default function ProfilePage() {
         onSealsEquipped={() => fetchProfile()}
         initialData={{
           username: profile.username,
+          email: profile.email,
           birthday: profile.birthday ?? '',
           location: profile.location ?? '',
           bio: profile.bio ?? '',
