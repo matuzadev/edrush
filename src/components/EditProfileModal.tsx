@@ -211,12 +211,12 @@ export function EditProfileModal({
   ] as const;
 
   // Calcular origem para animação morph
-  const originStyle = originRect
+  const originStyle: React.CSSProperties | undefined = originRect
     ? {
         '--origin-x': `${originRect.left + originRect.width / 2}px`,
         '--origin-y': `${originRect.top + originRect.height / 2}px`,
       }
-    : {};
+    : undefined;
 
   return (
     <>
