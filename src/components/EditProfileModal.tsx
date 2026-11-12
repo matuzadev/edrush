@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus, Check, Shield, Settings, MoreVertical, BarChart3, LogOut, Award, Frame } from 'lucide-react';
+import { X, Loader2, User, MapPin, Calendar, FileText, Smile, Sparkles, Star, ImagePlus, Check, Shield, Settings, MoreVertical, BarChart3, LogOut, Award, Frame, Upload } from 'lucide-react';
 import { AvatarSelector } from './AvatarSelector';
 import { BordersGallery } from './BordersGallery';
 import { SealsGallery } from './profile/SealsGallery';
@@ -201,256 +201,152 @@ export function EditProfileModal({
   if (!isOpen) return null;
 
   const bioProgress = bioLength / BIO_MAX;
-  const bioColor = bioLength > BIO_MAX ? '#f87171' : bioLength > 140 ? '#fbbf24' : '#10b981';
+  const bioColorClass = bioLength > BIO_MAX ? 'text-red-500' : bioLength > 140 ? 'text-yellow-400' : 'text-[#6B8F7B]';
+  const bioBarColorClass = bioLength > BIO_MAX ? 'bg-red-500' : bioLength > 140 ? 'bg-yellow-400' : 'bg-gradient-to-r from-[#20C997] to-[#00FF9D]';
 
   const tabs = [
-    { key: 'identity', label: 'Perfil', icon: User },
+    { key: 'identity', label: 'Identidade', icon: User },
     { key: 'avatar', label: 'Avatar', icon: Smile },
     { key: 'borders', label: 'Bordas', icon: Frame },
     { key: 'seals', label: 'Selos', icon: Award },
   ] as const;
 
-  // Calcular origem para animação morph
   const originStyle = originRect
-    ? {
+    ? ({
         '--origin-x': `${originRect.left + originRect.width / 2}px`,
         '--origin-y': `${originRect.top + originRect.height / 2}px`,
-      } as any
+      } as any)
     : undefined;
 
   return (
     <>
       <style>{`
-        @keyframes modal-expand {
-          0% {
-            opacity: 0;
-            transform: scale(0.2) translate(-50%, -50%);
-            filter: blur(8px);
-          }
-          40% {
-            opacity: 1;
-            filter: blur(0);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1) translate(0, 0);
-            filter: blur(0);
-          }
+        .modal-backdrop {
+          background: rgba(5, 15, 10, 0.85);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
         }
 
-        @keyframes backdrop-in {
-          0% {
-            opacity: 0;
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
-          }
-          100% {
-            opacity: 1;
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-          }
-        }
-
-        .animate-modal-enter {
-          animation: modal-expand 450ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
-        }
-
-        .backdrop-layer {
-          position: fixed;
-          inset: 0;
-          background: rgba(15, 81, 50, 0.25);
-          backdrop-filter: blur(16px) saturate(180%);
-          -webkit-backdrop-filter: blur(16px) saturate(180%);
-          animation: backdrop-in 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          z-index: 50;
-        }
-
-        @supports not ((backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px))) {
-          .backdrop-layer {
-            background: rgba(15, 81, 50, 0.85);
-          }
-        }
-
-        .modal-card {
-          background: #ffffff;
+        .modal-container {
+          background-color: #0A2E1C;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0L60 17.32v34.64L30 60 0 51.96V17.32L30 0z' fill='none' stroke='%23198754' stroke-opacity='0.035' stroke-width='1'/%3E%3C/svg%3E");
+          border: 1px solid #2D6B4F;
           border-radius: 24px;
           box-shadow:
-            0 40px 80px -20px rgba(15, 81, 50, 0.35),
-            0 0 0 1px rgba(32, 201, 151, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
-          overflow: hidden;
+            0 40px 80px -20px rgba(0, 0, 0, 0.6),
+            0 0 0 1px rgba(32, 201, 151, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        .cover-banner {
-          height: 120px;
-          background: linear-gradient(135deg, #0F5132, #198754);
-          position: relative;
+        .preview-panel {
+          background: #0F3D26;
+          border-right: 1px solid #2D6B4F;
         }
 
-        .avatar-container {
-          width: 100px;
-          height: 100px;
-          border-radius: 50%;
-          border: 4px solid white;
-          outline: 2px solid #198754;
+        .tab-item.active {
+          color: #20C997;
+        }
+        .tab-item.active::after {
+          content: '';
           position: absolute;
-          bottom: -50px;
-          left: 24px;
-          background: white;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          bottom: -1px;
+          left: 12px;
+          right: 12px;
+          height: 3px;
+          background: #20C997;
+          border-radius: 3px 3px 0 0;
+          box-shadow: 0 0 12px rgba(32, 201, 151, 0.5);
         }
 
-        .tab-active {
-          color: #0A2E1C;
-          font-weight: 700;
-          border-bottom: 3px solid #198754;
-          box-shadow: 0 2px 8px rgba(32, 201, 151, 0.6);
+        .form-input, .form-textarea, .form-select {
+          background: #0A2E1C;
+          border: 1px solid #2D6B4F;
+          color: #FFFFFF;
         }
-
-        .tab-inactive {
-          color: #6B7280;
-          border-bottom: 3px solid transparent;
-        }
-
-        .input-edrush {
-          background: #F0FFF4;
-          border: 1px solid #A7F3D0;
-          color: #0A2E1C;
-          transition: all 200ms ease;
-        }
-
-        .input-edrush:focus {
-          border-color: #198754;
-          box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+          border-color: #20C997;
+          box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.15);
           outline: none;
-          background: white;
+        }
+        .form-input::placeholder, .form-textarea::placeholder {
+          color: #6B8F7B;
         }
 
-        .btn-primary {
-          background: linear-gradient(135deg, #0F5132, #198754);
-          color: white;
-          transition: all 200ms ease;
+        .btn-save {
+          background: linear-gradient(135deg, #198754 0%, #20C997 100%);
+          box-shadow: 0 4px 16px rgba(32, 201, 151, 0.3);
         }
-
-        .btn-primary:hover:not(:disabled) {
-          background: linear-gradient(135deg, #198754, #20C997);
+        .btn-save:hover:not(:disabled) {
+          background: linear-gradient(135deg, #20C997 0%, #00FF9D 100%);
+          box-shadow: 0 6px 24px rgba(0, 255, 157, 0.4);
           transform: translateY(-1px);
         }
-
-        .btn-secondary {
-          background: white;
-          border: 2px solid #198754;
-          color: #0F5132;
-          transition: all 200ms ease;
+        .btn-cancel:hover {
+          border-color: #EF4444;
+          color: #EF4444;
+          background: rgba(239, 68, 68, 0.08);
         }
 
-        .btn-secondary:hover {
-          background: #F0FFF4;
+        @keyframes modal-open {
+          0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
         }
-
-        .tag-pill {
-          background: #F0FFF4;
-          color: #0F5132;
-          border: 1px solid #A7F3D0;
-          padding: 2px 8px;
-          border-radius: 12px;
-          font-size: 11px;
-          font-weight: 600;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .animate-modal-enter,
-          .backdrop-layer {
-            animation: none !important;
-          }
+        .modal-enter {
+          animation: modal-open 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
       `}</style>
 
-      {/* Layer 2: Backdrop Blur + Overlay */}
-      <div className="backdrop-layer" onClick={onClose} />
-
-      {/* Layer 3: Modal Card */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-[60] p-4 sm:p-6 animate-modal-enter"
-        style={originStyle}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Editar Perfil"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+        onClick={onClose}
       >
-        <div className="relative w-full max-w-[680px] max-h-[90vh] flex flex-col modal-card">
-          {/* Cover Banner */}
-          <div className="cover-banner">
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all"
-              aria-label="Fechar"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="absolute top-4 right-16 flex gap-2">
-              <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all" aria-label="Estatísticas">
-                <BarChart3 className="w-4 h-4" />
+        <div
+          className="relative w-full max-w-[960px] max-h-[90vh] flex flex-col modal-container modal-enter"
+          style={originStyle}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-[#2D6B4F]">
+            <div>
+              <h2 id="modal-title" className="text-2xl font-bold text-white">Editar Perfil</h2>
+              <p className="text-sm text-[#A7F3D0] mt-1">Personalize sua presença no EdRush</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-semibold text-[#A7F3D0] border border-[#2D6B4F] rounded-xl transition-all btn-cancel"
+              >
+                Cancelar
               </button>
-              <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all" aria-label="Mais opções">
-                <MoreVertical className="w-4 h-4" />
+              <button
+                onClick={handleSave}
+                disabled={isSaving || !!usernameError}
+                className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white rounded-xl transition-all btn-save disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                Salvar Alterações
+              </button>
+              <button
+                onClick={onClose}
+                className="p-2 text-white rounded-lg hover:bg-white/10 transition-colors"
+                aria-label="Fechar"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Avatar sobreposto */}
-          <div className="avatar-container group cursor-pointer" onClick={() => setActiveTab('avatar')}>
-            <div className="w-full h-full rounded-full overflow-hidden bg-gray-100">
-              {photoPreview ? (
-                <img src={photoPreview} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <User className="w-12 h-12 text-gray-400" />
-                </div>
-              )}
-            </div>
-            <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#198754] flex items-center justify-center border-2 border-white">
-              <Check className="w-3 h-3 text-white" />
-            </div>
-          </div>
-
-          {/* Header Info */}
-          <div className="pt-16 px-6 pb-4 border-b border-[#A7F3D0]/30">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-2xl font-bold" style={{ color: '#0A2E1C' }}>
-                {formData.username || 'Seu Nome'}
-              </h2>
-              <div className="w-5 h-5 rounded-full bg-[#198754] flex items-center justify-center">
-                <Check className="w-3 h-3 text-white" />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-sm mb-3" style={{ color: '#6B7280' }}>
-              <span>{initialData.email || 'usuario@edrush.com'}</span>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                <span>{formattedLocation || 'Localização não definida'}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <span className="tag-pill">Concurseiro</span>
-              <span className="tag-pill">EdRush</span>
-              <span className="tag-pill">Foco Federal</span>
-            </div>
-          </div>
-
-          {/* Tabs Navigation */}
-          <div className="flex px-6 border-b border-[#A7F3D0]/30 overflow-x-auto">
+          {/* Tabs */}
+          <div className="flex gap-4 px-6 border-b border-[#2D6B4F]">
             {tabs.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all ${
-                  activeTab === key ? 'tab-active' : 'tab-inactive hover:text-[#0A2E1C]'
+                className={`relative flex items-center gap-2 px-4 py-3 text-sm font-semibold transition-colors tab-item ${
+                  activeTab === key ? 'active' : 'text-[#6B8F7B] hover:text-[#A7F3D0]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -459,176 +355,194 @@ export function EditProfileModal({
             ))}
           </div>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-y-auto px-6 py-6">
-            {actionError && (
-              <div className="mb-4 p-3 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm flex items-center gap-2">
-                <X className="w-4 h-4" />
-                {actionError}
-              </div>
-            )}
-
-            {activeTab === 'identity' && (
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
-                      Primeiro Nome
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.username.split(' ')[0] || ''}
-                      onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
-                      placeholder="Primeiro nome"
-                      className="input-edrush w-full px-4 py-3 rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
-                      Sobrenome
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.username.split(' ').slice(1).join(' ') || ''}
-                      onChange={(e) => setFormData((p) => ({ ...p, username: `${p.username.split(' ')[0]} ${e.target.value}`.trim() }))}
-                      placeholder="Sobrenome"
-                      className="input-edrush w-full px-4 py-3 rounded-xl"
-                    />
-                  </div>
+          {/* Content */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Left Panel: Preview */}
+            <div className="hidden md:flex flex-col items-center w-[35%] preview-panel p-8 text-center">
+              <div className="relative mb-4">
+                <div className="w-32 h-32 rounded-full border-4 border-[#0A2E1C] outline-2 outline-[#20C997] overflow-hidden bg-[#122B1D]">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full">
+                      <User className="w-12 h-12 text-[#6B8F7B]" />
+                    </div>
+                  )}
                 </div>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2 break-words max-w-full">
+                {formData.username || 'Seu Nome'}
+              </h3>
+              <p className="text-sm text-[#A7F3D0] mb-6 line-clamp-2 max-w-[220px]">
+                {formData.bio || 'Sua bio aparecerá aqui...'}
+              </p>
+              <div className="flex gap-6 pt-6 border-t border-[#2D6B4F] w-full justify-center">
+                <div className="flex flex-col items-center">
+                  <span className="text-lg font-bold text-[#20C997] font-mono">0</span>
+                  <span className="text-[10px] font-semibold tracking-wider text-[#6B8F7B] uppercase">Posts</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-lg font-bold text-[#20C997] font-mono">0</span>
+                  <span className="text-[10px] font-semibold tracking-wider text-[#6B8F7B] uppercase">Seg</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-lg font-bold text-[#20C997] font-mono">0</span>
+                  <span className="text-[10px] font-semibold tracking-wider text-[#6B8F7B] uppercase">Selos</span>
+                </div>
+              </div>
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
-                    Username
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
+            {/* Right Panel: Form/Content */}
+            <div className="flex-1 p-6 overflow-y-auto bg-[#122B1D]">
+              {actionError && (
+                <div className="flex items-center gap-2 p-3 mb-4 text-sm text-red-400 border border-red-500/20 rounded-lg bg-red-500/10">
+                  <X className="w-4 h-4" />
+                  {actionError}
+                </div>
+              )}
+
+              {activeTab === 'identity' && (
+                <div className="space-y-6 animate-[tab-fade-in_250ms_ease_forwards]">
+                  <div>
+                    <label className="block mb-2 text-xs font-bold tracking-wider uppercase text-[#A7F3D0]">
+                      Nome de Usuário
+                    </label>
                     <input
                       type="text"
                       value={formData.username}
                       onChange={(e) => setFormData((p) => ({ ...p, username: e.target.value }))}
-                      placeholder="username"
-                      className="input-edrush w-full pl-8 pr-4 py-3 rounded-xl"
+                      placeholder="Seu nome completo"
+                      className="w-full px-4 py-3 text-sm rounded-xl form-input"
                     />
-                    {formData.username.length >= 2 && (
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#198754]">
-                        <Check className="w-4 h-4" />
+                    {usernameError && <p className="mt-2 text-xs text-red-400">{usernameError}</p>}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-bold tracking-wider uppercase text-[#A7F3D0]">Bio</label>
+                      <span className={`text-xs font-mono ${bioColorClass}`}>{bioLength}/{BIO_MAX}</span>
+                    </div>
+                    <div className="relative">
+                      <textarea
+                        value={formData.bio ?? ''}
+                        onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
+                        placeholder="Conte um pouco sobre sua jornada..."
+                        rows={4}
+                        className="w-full px-4 py-3 text-sm rounded-xl resize-none form-textarea"
+                      />
+                    </div>
+                    <div className="h-1 mt-2 overflow-hidden rounded-full bg-[#1A4731]">
+                      <div
+                        className={`h-full transition-all duration-300 rounded-full ${bioBarColorClass}`}
+                        style={{ width: `${Math.min(bioProgress * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block mb-2 text-xs font-bold tracking-wider uppercase text-[#A7F3D0]">
+                        Aniversário
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.birthday ?? ''}
+                        onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
+                        className="w-full px-4 py-3 text-sm rounded-xl form-input"
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2 text-xs font-bold tracking-wider uppercase text-[#A7F3D0]">
+                        Localização
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <select
+                          value={selectedUf}
+                          onChange={(e) => {
+                            setSelectedUf(e.target.value);
+                            setSelectedCidade('');
+                          }}
+                          className="w-full px-4 py-3 text-sm rounded-xl appearance-none cursor-pointer form-select"
+                          style={{ colorScheme: 'dark' }}
+                        >
+                          <option value="">UF</option>
+                          {BRAZILIAN_STATES.map((uf) => (
+                            <option key={uf.sigla} value={uf.sigla}>
+                              {uf.sigla}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={selectedCidade}
+                          onChange={(e) => setSelectedCidade(e.target.value)}
+                          disabled={!selectedUf || isLoadingCidades}
+                          className="w-full px-4 py-3 text-sm rounded-xl appearance-none cursor-pointer disabled:opacity-50 form-select"
+                          style={{ colorScheme: 'dark' }}
+                        >
+                          <option value="">
+                            {!selectedUf
+                              ? 'Estado'
+                              : isLoadingCidades
+                              ? '...'
+                              : cidades.length === 0
+                              ? 'N/A'
+                              : 'Cidade'}
+                          </option>
+                          {selectedCidade && !cidades.includes(selectedCidade) && (
+                            <option value={selectedCidade}>{selectedCidade}</option>
+                          )}
+                          {cidades.map((nome) => (
+                            <option key={nome} value={nome}>
+                              {nome}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                    )}
+                      {cidadesError && <p className="mt-2 text-xs text-red-400">{cidadesError}</p>}
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#0A2E1C' }}>
-                      Bio
-                    </label>
-                    <span className="text-xs font-mono" style={{ color: bioColor }}>
-                      {bioLength}/{BIO_MAX}
-                    </span>
-                  </div>
-                  <textarea
-                    value={formData.bio ?? ''}
-                    onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value.slice(0, BIO_MAX) }))}
-                    placeholder="Conte um pouco sobre sua jornada..."
-                    rows={4}
-                    className="input-edrush w-full px-4 py-3 rounded-xl resize-none"
-                  />
-                  <div className="mt-2 h-1 rounded-full overflow-hidden bg-gray-200">
-                    <div
-                      className="h-full transition-all duration-300"
-                      style={{
-                        width: `${Math.min(bioProgress * 100, 100)}%`,
-                        background: 'linear-gradient(90deg, #198754, #20C997)',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
-                      Aniversário
-                    </label>
+              {activeTab === 'avatar' && (
+                <div className="space-y-6 animate-[tab-fade-in_250ms_ease_forwards]">
+                  <div className="flex flex-col items-center p-8 border-2 border-dashed rounded-full border-[#2D6B4F] w-52 h-52 mx-auto cursor-pointer transition-all hover:border-[#20C997] hover:bg-[#20C997]/5 group">
                     <input
-                      type="date"
-                      value={formData.birthday ?? ''}
-                      onChange={(e) => setFormData((p) => ({ ...p, birthday: e.target.value }))}
-                      className="input-edrush w-full px-4 py-3 rounded-xl"
-                      style={{ colorScheme: 'light' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A2E1C' }}>
-                      Localização
-                    </label>
-                    <select
-                      value={selectedUf}
-                      onChange={(e) => {
-                        setSelectedUf(e.target.value);
-                        setSelectedCidade('');
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        event.target.value = '';
+                        if (!file) return;
+                        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                          setActionError('Escolha uma imagem JPG, PNG ou WebP.');
+                          return;
+                        }
+                        if (file.size > 5 * 1024 * 1024) {
+                          setActionError('A foto deve ter no máximo 5 MB.');
+                          return;
+                        }
+                        setActionError(null);
+                        setPhotoFile(file);
+                        setPhotoPreview(URL.createObjectURL(file));
+                        setPhotoChanged(true);
                       }}
-                      className="input-edrush w-full px-4 py-3 rounded-xl appearance-none cursor-pointer mb-3"
-                      style={{ colorScheme: 'light' }}
-                    >
-                      <option value="">UF</option>
-                      {BRAZILIAN_STATES.map((uf) => (
-                        <option key={uf.sigla} value={uf.sigla}>
-                          {uf.sigla} — {uf.nome}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      value={selectedCidade}
-                      onChange={(e) => setSelectedCidade(e.target.value)}
-                      disabled={!selectedUf || isLoadingCidades}
-                      className="input-edrush w-full px-4 py-3 rounded-xl appearance-none cursor-pointer disabled:opacity-50"
-                      style={{ colorScheme: 'light' }}
-                    >
-                      <option value="">
-                        {!selectedUf
-                          ? 'Selecione o estado'
-                          : isLoadingCidades
-                          ? 'Carregando...'
-                          : cidades.length === 0
-                          ? 'Indisponível'
-                          : 'Selecione a cidade'}
-                      </option>
-                      {selectedCidade && !cidades.includes(selectedCidade) && (
-                        <option value={selectedCidade}>{selectedCidade}</option>
-                      )}
-                      {cidades.map((nome) => (
-                        <option key={nome} value={nome}>
-                          {nome}
-                        </option>
-                      ))}
-                    </select>
-                    {cidadesError && (
-                      <p className="text-xs text-red-600 mt-2">{cidadesError}</p>
+                    />
+                    {photoPreview ? (
+                      <img src={photoPreview} alt="Preview" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <>
+                        <Upload className="w-12 h-12 mb-3 text-[#6B8F7B] group-hover:text-[#20C997]" />
+                        <span className="text-sm font-medium text-[#A7F3D0]">Enviar foto</span>
+                        <span className="text-xs text-[#6B8F7B]">JPG, PNG ou WebP (max 5MB)</span>
+                      </>
                     )}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'avatar' && (
-              <div className="space-y-6">
-                <div className="p-5 rounded-xl border-2 border-[#A7F3D0] bg-[#F0FFF4]">
-                  <h3 className="text-sm font-bold mb-2" style={{ color: '#0A2E1C' }}>Sua foto, seu estilo</h3>
-                  <p className="text-xs mb-4" style={{ color: '#6B7280' }}>
-                    Envie uma foto própria (JPG, PNG ou WebP, até 5 MB) ou escolha um avatar da coleção.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="btn-primary px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
-                    >
-                      <ImagePlus className="w-4 h-4" />
-                      Enviar foto
-                    </button>
-                    {photoPreview && (
+                  {photoPreview && (
+                    <div className="text-center">
                       <button
                         type="button"
                         onClick={() => {
@@ -637,89 +551,45 @@ export function EditProfileModal({
                           setPhotoChanged(true);
                           setActionError(null);
                         }}
-                        className="btn-secondary px-4 py-2 rounded-lg text-sm font-semibold"
+                        className="text-sm text-red-400 hover:text-red-300 transition-colors"
                       >
-                        Usar avatar EdRush
+                        Remover foto
                       </button>
-                    )}
+                    </div>
+                  )}
+                  <div className="pt-6 border-t border-[#2D6B4F]">
+                    <h4 className="mb-4 text-sm font-bold text-[#A7F3D0] uppercase tracking-wider">Ou escolha um avatar</h4>
+                    <AvatarSelector
+                      selectedId={formData.avatar}
+                      onSelect={(id) => {
+                        setFormData((p) => ({ ...p, avatar: id }));
+                        setPhotoPreview(null);
+                        setPhotoChanged(true);
+                      }}
+                      size="md"
+                    />
                   </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      event.target.value = '';
-                      if (!file) return;
-                      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                        setActionError('Escolha uma imagem JPG, PNG ou WebP.');
-                        return;
-                      }
-                      if (file.size > 5 * 1024 * 1024) {
-                        setActionError('A foto deve ter no máximo 5 MB.');
-                        return;
-                      }
-                      setActionError(null);
-                      setPhotoFile(file);
-                      setPhotoPreview(URL.createObjectURL(file));
-                      setPhotoChanged(true);
-                    }}
+                </div>
+              )}
+
+              {activeTab === 'borders' && (
+                <div className="animate-[tab-fade-in_250ms_ease_forwards]">
+                  <p className="mb-6 text-sm text-[#6B8F7B]">
+                    Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você e seus amigos.
+                  </p>
+                  <BordersGallery
+                    avatarId={formData.avatar}
+                    onEquipped={() => onBorderEquipped?.()}
                   />
                 </div>
-                <AvatarSelector
-                  selectedId={formData.avatar}
-                  onSelect={(id) => setFormData((p) => ({ ...p, avatar: id }))}
-                  size="lg"
-                  imageUrl={photoPreview}
-                />
-              </div>
-            )}
-
-            {activeTab === 'borders' && (
-              <div>
-                <p className="text-xs mb-6" style={{ color: '#6B7280' }}>
-                  Conquiste bordas estudando todo dia. Bordas equipadas aparecem para você e seus amigos no chat e nos perfis.
-                </p>
-                <BordersGallery
-                  avatarId={formData.avatar}
-                  onEquipped={() => onBorderEquipped?.()}
-                />
-              </div>
-            )}
-
-            {activeTab === 'seals' && (
-              <div>
-                <SealsGallery onEquipped={onSealsEquipped} />
-              </div>
-            )}
-          </div>
-
-          {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-[#A7F3D0]/30 bg-white">
-            <button
-              onClick={onClose}
-              className="btn-secondary px-6 py-3 rounded-xl text-sm font-semibold"
-            >
-              Descartar
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving || !!usernameError}
-              className="btn-primary px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  Salvar Alterações
-                </>
               )}
-            </button>
+
+              {activeTab === 'seals' && (
+                <div className="animate-[tab-fade-in_250ms_ease_forwards]">
+                  <SealsGallery onEquipped={onSealsEquipped} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
