@@ -60,3 +60,61 @@ __pycache__/
 /FLUXO_DESBLOQUEIO.txt
 /plan_future.txt
 /criar_conta_pro_admin.py
+
+# Security: secrets, credentials and sensitive data
+.filter-repo-expressions.txt
+*.secret
+*.secrets
+*.credentials
+*.keystore
+*.p12
+*.pfx
+*.jks
+*.env.example.bak
+.vercel/
+.netlify/
+.turbo/
+
+# OS and tooling artifacts
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.pid
+*.seed
+*.pid.lock
+
+# Terraform / IaC state (may contain secrets)
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Docker secrets and compose overrides
+docker-compose.override.yml
+docker-compose.*.override.yml
+
+# Next.js specific
+.next/cache/
+next.config.js.bak
+
+# Testing and debug artifacts
+*.lcov
+.nyc_output/
+*.heapsnapshot
+*.cpuprofile
+
+# Misc sensitive patterns
+*-secret.*
+*-private.*
+*.gpg
+*.asc
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+known_hosts
+authorized_keys
